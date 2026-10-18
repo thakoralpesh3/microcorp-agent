@@ -1,0 +1,39 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Local database and transient runtime state
+data/*.db
+data/*.db-journal
+data/*.log
+data/*.pid
+
+# Deliverables generated locally
+deliverables/**/*.zip
+deliverables/**/*.html
+deliverables/**/*.md
+!deliverables/**/.gitkeep
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Scratch and test output artifacts
+*.tmp
+*.bak

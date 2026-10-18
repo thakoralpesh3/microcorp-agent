@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="corpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="112" fill="#090d16"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="url(#corpGrad)" stroke-width="8" opacity="0.6"/>
+
+  <!-- Enterprise Hexagon Grid & Microchip Core -->
+  <path d="M256 96 L384 170 L384 318 L256 392 L128 318 L128 170 Z" fill="none" stroke="#3b82f6" stroke-width="12" stroke-linejoin="round" opacity="0.4"/>
+  
+  <!-- Glowing Center Brain / Chip -->
+  <rect x="196" y="196" width="120" height="120" rx="24" fill="url(#corpGrad)" filter="url(#glow)"/>
+  
+  <!-- Circuit Nodes -->
+  <circle cx="256" cy="96" r="14" fill="#60a5fa"/>
+  <circle cx="384" cy="170" r="14" fill="#8b5cf6"/>
+  <circle cx="384" cy="318" r="14" fill="#a855f7"/>
+  <circle cx="256" cy="392" r="14" fill="#10b981"/>
+  <circle cx="128" cy="318" r="14" fill="#3b82f6"/>
+  <circle cx="128" cy="170" r="14" fill="#60a5fa"/>
+
+  <!-- Connection Traces -->
+  <line x1="256" y1="110" x2="256" y2="196" stroke="#60a5fa" stroke-width="6" stroke-dasharray="8,6"/>
+  <line x1="256" y1="316" x2="256" y2="392" stroke="#10b981" stroke-width="6" stroke-dasharray="8,6"/>
+  <line x1="196" y1="256" x2="128" y2="256" stroke="#3b82f6" stroke-width="6"/>
+  <line x1="316" y1="256" x2="384" y2="256" stroke="#8b5cf6" stroke-width="6"/>
+
+  <!-- Inner Symbol: Dollar / Growth Sparkle -->
+  <text x="256" y="278" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="78" font-weight="900" fill="#ffffff" text-anchor="middle">⚡</text>
+
+  <!-- Autonomous Subagent Rings -->
+  <circle cx="256" cy="440" r="8" fill="#10b981"/>
+  <circle cx="230" cy="440" r="6" fill="#60a5fa"/>
+  <circle cx="282" cy="440" r="6" fill="#a855f7"/>
+</svg>

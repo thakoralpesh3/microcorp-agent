@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroCorp AI - Autonomous Laptop Enterprise</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Top Nav -->
+        <header class="top-nav">
+            <div class="brand-title">
+                <i class="fa-solid fa-microchip"></i>
+                <span>MicroCorp AI</span>
+                <span class="live-pulse" title="System Operational"></span>
+                <small style="font-size: 13px; color: var(--text-muted); font-weight: 400; margin-left: 8px;">Autonomous Laptop Enterprise</small>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><i class="fa-solid fa-gavel"></i> 100% Lawful Work Only</span>
+                <span class="badge-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;"><i class="fa-solid fa-arrows-rotate"></i> Autonomy: Active</span>
+                <span class="badge-tag" id="activeModelBadge"><i class="fa-solid fa-brain"></i> gemini-3.5-flash-lite</span>
+                <a href="/terms" target="_blank" class="btn-action" style="text-decoration: none; padding: 6px 12px;">
+                    <i class="fa-solid fa-scale-balanced"></i> Terms & Governance
+                </a>
+                <button class="btn-action" onclick="togglePause()" id="pauseBtn">
+                    <i class="fa-solid fa-pause"></i> <span id="pauseText">Pause Loop</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hardware & Laptop Safety Telemetry -->
+        <section class="telemetry-grid">
+            <div class="glass-card metric-card">
+                <div class="metric-title"><i class="fa-solid fa-microchip"></i> Laptop CPU</div>
+                <div class="metric-value" id="cpuVal">--%</div>
+                <div class="metric-bar-bg">
+                    <div class="metric-bar-fill" id="cpuBar" style="width: 0%; background: var(--primary);"></div>
+                </div>
+            </div>
+
+            <div class="glass-card metric-card">
+                <div class="metric-title"><i class="fa-solid fa-memory"></i> Laptop RAM</div>
+                <div class="metric-value" id="ramVal">--%</div>
+                <div class="metric-bar-bg">
+                    <div class="metric-bar-fill" id="ramBar" style="width: 0%; background: var(--purple);"></div>
+                </div>
+            </div>
+
+            <div class="glass-card metric-card">
+                <div class="metric-title"><i class="fa-solid fa-battery-half"></i> Battery & Power</div>
+                <div class="metric-value" id="batteryVal">--%</div>
+                <small id="batteryState" style="color: var(--text-muted); font-size: 12px;">Checking power source...</small>
+            </div>
+
+            <div class="glass-card metric-card">
+                <div class="metric-title"><i class="fa-solid fa-users-gear"></i> Active Subagents</div>
+                <div class="metric-value" id="subagentVal" style="color: #60a5fa;">--</div>
+                <small id="subagentScalingState" style="color: var(--text-muted); font-size: 12px;">Auto-scaler armed</small>
+            </div>
+
+            <div class="glass-card metric-card">
+                <div class="metric-title"><i class="fa-solid fa-sack-dollar"></i> Estimated Net Profit</div>
+                <div class="metric-value" id="netProfitVal" style="color: var(--success);">$0.00</div>
+                <small id="treasuryStats" style="color: var(--text-muted); font-size: 12px;">Costs: $0.000 • Gross: $0.00</small>
+            </div>
+        </section>
+
+        <!-- Quick Sprint Controls & Custom Task Launcher -->
+        <section class="glass-card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="font-size: 16px;"><i class="fa-solid fa-bolt"></i> Executive Task & Sprint Center</h3>
+                    <p style="color: var(--text-muted); font-size: 13px;">Trigger autonomous passive income workstreams or submit on-demand tasks to test dynamic department scaling.</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-action" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4);" onclick="triggerAutonomousCycle()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Self-Run Income Cycle (Full Auto)
+                    </button>
+                    <button class="btn-action" onclick="triggerSprint('digital_products', 'Developer Cheatsheet & Prompt Pack')">
+                        <i class="fa-solid fa-box-open"></i> Create Digital Asset
+                    </button>
+                    <button class="btn-action" onclick="triggerSprint('content_newsletter', 'AI Agents & Local Tech Digest')">
+                        <i class="fa-solid fa-newspaper"></i> Synthesize Newsletter
+                    </button>
+                    <button class="btn-action" onclick="triggerSprint('gig_proposal', 'Remote Software Automation Pitch')">
+                        <i class="fa-solid fa-file-signature"></i> Draft Remote Gig Proposal
+                    </button>
+                    <button class="btn-action purple" onclick="triggerSprint('intelligence', 'Full Market Signal Sweep')">
+                        <i class="fa-solid fa-radar"></i> Harvest Market Signals
+                    </button>
+                    <button class="btn-action purple" onclick="testDynamicBurst()">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i> Test Load Surge (Spawn Subagents)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Task Drawer -->
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--card-border); display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="customTaskTitle" placeholder="Custom Task Title (e.g. NextJS 15 Architecture Cheat Sheet)" style="flex: 2; min-width: 260px; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); color: #fff; padding: 10px 14px; border-radius: 8px;">
+                <select id="customTaskDomain" style="flex: 1; min-width: 180px; background: rgba(18, 24, 38, 0.9); border: 1px solid var(--card-border); color: #fff; padding: 10px 14px; border-radius: 8px;">
+                    <option value="digital_products">Digital Products Lab</option>
+                    <option value="content_newsletter">Content & Newsletter</option>
+                    <option value="gig_proposal">Gig & Proposal Desk</option>
+                    <option value="intelligence">Market Intelligence</option>
+                    <option value="seo_growth">Dynamic: SEO & Growth Hub</option>
+                    <option value="code_audit">Dynamic: Code Security Audit</option>
+                </select>
+                <button class="btn-action" onclick="submitCustomTask()" style="background: var(--primary); color: #fff;">
+                    <i class="fa-solid fa-paper-plane"></i> Dispatch Task
+                </button>
+            </div>
+
+            <!-- Customer Work Order & Client Intake Portal with Anti-Illicit Work Rejection -->
+            <div style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.25); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <strong style="color: #f8fafc; font-size: 14px;"><i class="fa-solid fa-user-shield"></i> Customer Work Order & Client Intake Portal</strong>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">Submit incoming customer freelance contracts. If a customer requests any kind of illegal work, MicroCorp AI categorically rejects the order.</div>
+                    </div>
+                    <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="fa-solid fa-shield-halved"></i> Customer Lawful Screen Active</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
+                    <input type="text" id="customerName" placeholder="Client / Customer Name (e.g. Initech Corp)" style="background: rgba(18, 24, 38, 0.9); border: 1px solid var(--card-border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px;">
+                    <input type="text" id="customerOrderTitle" placeholder="Project Title (e.g. Distributed Auth Service)" style="background: rgba(18, 24, 38, 0.9); border: 1px solid var(--card-border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px;">
+                </div>
+                <div style="margin-top: 10px;">
+                    <textarea id="customerRequirements" rows="2" placeholder="Describe customer requirements or paste client job description..." style="width: 100%; box-sizing: border-box; background: rgba(18, 24, 38, 0.9); border: 1px solid var(--card-border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
+                    <small style="color: var(--text-muted); font-size: 11px;"><i class="fa-solid fa-scale-balanced"></i> Zero-tolerance for cyberattacks, DDoS, fake reviews, cracking/piracy, or non-consensual PII scraping.</small>
+                    <button class="btn-action purple" onclick="submitCustomerOrder()" style="padding: 8px 16px;">
+                        <i class="fa-solid fa-file-shield"></i> Screen & Submit Customer Order
+                    </button>
+                </div>
+                <!-- Dynamic Customer Refusal Notice Banner -->
+                <div id="customerNoticeBanner" style="display: none; margin-top: 12px; padding: 12px; border-radius: 8px;"></div>
+            </div>
+        </section>
+
+        <!-- Main Layout: Org Chart & Deliverables Vault -->
+        <main class="main-grid">
+            <!-- Left: Organizational Department & Subagent Fleet -->
+            <section class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 16px;"><i class="fa-solid fa-sitemap"></i> Corporate Org Hierarchy & Subagents</h3>
+                    <span class="badge-tag" id="deptCountBadge">4 Departments</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Dynamic subagents scale up when department queues back up, and retire gracefully when tasks complete.</p>
+
+                <div class="dept-grid" id="departmentsContainer">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- Right: Live Active Subagents & Queue Pipeline -->
+            <section class="glass-card">
+                <h3 style="font-size: 16px;"><i class="fa-solid fa-list-check"></i> Task Backlog & Subagent Fleet</h3>
+                <div style="margin-top: 12px; display: flex; gap: 10px;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; flex: 1; text-align: center;">
+                        <span style="font-size: 11px; color: var(--text-muted);">PENDING</span>
+                        <h4 id="pendingCount" style="font-size: 20px; color: #f59e0b;">0</h4>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; flex: 1; text-align: center;">
+                        <span style="font-size: 11px; color: var(--text-muted);">COMPLETED</span>
+                        <h4 id="completedCount" style="font-size: 20px; color: #10b981;">0</h4>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <h4 style="font-size: 13px; color: var(--text-muted); text-transform: uppercase;">Active Subagent Workers</h4>
+                    <div id="subagentsList" style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;">
+                        <!-- Subagent worker rows -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Autonomous Work Discovery & Full Planning Radar -->
+        <section class="glass-card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <h3 style="font-size: 16px;"><i class="fa-solid fa-compass-drafting"></i> Autonomous Work Discovery & 100% Feasibility Plans</h3>
+                <div style="display: flex; gap: 8px;">
+                    <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="fa-solid fa-shield-halved"></i> Legal Compliance Shield Armed</span>
+                    <span class="badge-tag" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="fa-solid fa-filter-circle-dollar"></i> 100% Finishable Filter Armed</span>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Online tasks scanned and greenlit only if the agent can complete 100% of the deliverable end-to-end within strict legal and ethical compliance (zero cyberattack, fraud, or piracy tasks).</p>
+
+            <div id="plansGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; margin-top: 14px;">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </section>
+
+        <!-- Deliverables Vault & Treasury Ledger -->
+        <section class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 16px;"><i class="fa-solid fa-vault"></i> Deliverables Vault & Treasury Ledger</h3>
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">Ready For Review</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">All commercial assets generated autonomously on this laptop. Click any deliverable to preview HTML or access the source files.</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Deliverable / Task</th>
+                        <th>Category</th>
+                        <th>Est. Value</th>
+                        <th>API Cost</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="deliverablesTableBody">
+                    <!-- Dynamic deliverables rows -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Interactive Subagent / Agent Work Inspector Modal -->
+        <div id="inspectorModal" class="modal-overlay" onclick="closeInspector(event)">
+            <div class="modal-card" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="agent-avatar" id="modalAvatar"><i class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <h3 id="modalAgentName" style="font-size: 18px; margin: 0; color: #f8fafc;">Subagent Name</h3>
+                            <small id="modalAgentRole" style="color: var(--text-muted); font-size: 12px;">Role & Department</small>
+                        </div>
+                    </div>
+                    <button class="modal-close" onclick="closeInspector()">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Live Status & Activity -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <span id="modalStatusBadge" class="badge-tag" style="font-size: 12px;">WORKING</span>
+                        <span id="modalTimeMetric" style="color: var(--text-muted); font-size: 12px;"><i class="fa-solid fa-clock"></i> Started: Just now</span>
+                    </div>
+
+                    <!-- Current Work Assignment Section -->
+                    <div class="inspector-box">
+                        <div class="inspector-label"><i class="fa-solid fa-briefcase"></i> Current Task / Work Assignment</div>
+                        <h4 id="modalTaskTitle" style="font-size: 15px; margin-top: 6px; color: #f8fafc; line-height: 1.4;">Task Title</h4>
+                        <div style="margin-top: 8px; display: flex; gap: 8px;">
+                            <span id="modalDomainBadge" class="badge-tag">digital_products</span>
+                            <span id="modalDeptBadge" class="badge-tag" style="background: rgba(139, 92, 246, 0.2); color: #c084fc;">Department</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Section with Live Progress Bar -->
+                    <div class="inspector-box" style="margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="inspector-label"><i class="fa-solid fa-bars-progress"></i> Work Progress</div>
+                            <span id="modalProgressPercent" style="font-size: 16px; font-weight: 700; color: #60a5fa;">0%</span>
+                        </div>
+                        <div class="progress-track" style="margin-top: 8px;">
+                            <div id="modalProgressBar" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div id="modalPhaseText" style="font-size: 12px; color: #cbd5e1; margin-top: 8px; font-weight: 500;">
+                            Phase: Idle / Ready for sprint
+                        </div>
+                    </div>
+
+                    <!-- Phased Milestones & ETA Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div class="inspector-box">
+                            <div class="inspector-label"><i class="fa-solid fa-hourglass-half"></i> Estimated Completion (ETA)</div>
+                            <div id="modalEtaVal" style="font-size: 17px; font-weight: 700; color: #34d399; margin-top: 4px;">~35s remaining</div>
+                            <small id="modalElapsedVal" style="color: var(--text-muted); font-size: 11px;">Elapsed: 12s</small>
+                        </div>
+                        <div class="inspector-box">
+                            <div class="inspector-label"><i class="fa-solid fa-trophy"></i> Historical Output</div>
+                            <div id="modalCompletedTasks" style="font-size: 17px; font-weight: 700; color: #c084fc; margin-top: 4px;">0 Finished</div>
+                            <small style="color: var(--text-muted); font-size: 11px;">100% Turnkey Delivery</small>
+                        </div>
+                    </div>
+
+                    <!-- Live Autonomous Pipeline Steps -->
+                    <div class="inspector-box" style="margin-top: 12px;">
+                        <div class="inspector-label"><i class="fa-solid fa-shoe-prints"></i> Live Pipeline Execution Steps</div>
+                        <ul id="modalStepList" class="step-list" style="margin-top: 8px;">
+                            <li id="modalStep1" class="step-item"><i class="fa-solid fa-circle-check"></i> Step 1: Legal Compliance, Market Intelligence & 100% Feasibility Vetting</li>
+                            <li id="modalStep2" class="step-item"><i class="fa-solid fa-spinner fa-spin"></i> Step 2: Milestone Authoring & Production Code Synthesis</li>
+                            <li id="modalStep3" class="step-item"><i class="fa-regular fa-circle"></i> Step 3: Self-Verification Checklist & Quality Audit</li>
+                            <li id="modalStep4" class="step-item"><i class="fa-regular fa-circle"></i> Step 4: ZIP Packaging, Terms & Marketplace Listing Drop</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-action" onclick="closeInspector()">Close</button>
+                    <a id="modalDeliverableLink" href="#" target="_blank" class="btn-action purple" style="display: none; text-decoration: none;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Current Output
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
