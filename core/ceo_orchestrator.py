@@ -22,6 +22,7 @@ from core.resource_guardian import guardian
 from core.department_scaler import scaler
 from core.treasury import treasury
 from core.legal_guardian import legal_guardian
+from core.git_sync import git_sync
 
 # Import Core Departments
 from departments.intelligence import IntelligenceDepartment
@@ -173,6 +174,42 @@ class CEOOrchestrator:
                 payload={"topic": topic, "product_type": "Developer Reference & Architecture Kit"}
             )
 
+    def run_freelance_sprint(self, job_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Harvests freelance gigs (Fiverr, Upwork, Freelancer, RemoteOK),
+        selects a 100% legal & feasible project, decomposes it into milestones,
+        distributes to departmental subagents, packages deliverables, credits treasury,
+        and pushes changes to GitHub.
+        """
+        from tools.freelance_harvester import freelance_harvester
+        from core.freelance_distributor import freelance_distributor
+
+        target_gig = None
+        if job_id:
+            target_gig = freelance_harvester.get_job_by_id(job_id)
+
+        if not target_gig:
+            gigs = freelance_harvester.fetch_all_platform_gigs()
+            # Select first approved lawful and turnkey feasible gig
+            for g in gigs:
+                if g.get("is_legal") and g.get("is_turnkey_feasible"):
+                    target_gig = g
+                    break
+
+        if not target_gig:
+            return {
+                "status": "NO_WORK_AVAILABLE",
+                "summary": "No approved legal freelance gigs found meeting 100% turnkey criteria."
+            }
+
+        logger.info(f"🚀 Distributing freelance gig '{target_gig['title']}' ({target_gig['platform']}) across subagents...")
+        result = freelance_distributor.plan_and_distribute_gig(target_gig, auto_git_sync=True)
+        return result
+
+    def sync_with_github(self, commit_message: Optional[str] = None) -> Dict[str, Any]:
+        """Manually or autonomously triggers immediate commit & push to GitHub."""
+        return git_sync.sync_to_github(commit_message)
+
     def get_enterprise_overview(self) -> Dict[str, Any]:
         """Provides executive telemetry for dashboard and CLI."""
         telemetry = guardian.get_system_telemetry()
@@ -199,8 +236,10 @@ class CEOOrchestrator:
             "queue_stats": q_stats,
             "treasury": finances,
             "recent_plans": plans,
-            "legal_compliance": legal_guardian.get_compliance_metrics()
+            "legal_compliance": legal_guardian.get_compliance_metrics(),
+            "git_status": git_sync.get_sync_status()
         }
 
 # Global CEO instance
 ceo = CEOOrchestrator()
+

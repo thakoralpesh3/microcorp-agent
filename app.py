@@ -196,6 +196,63 @@ async def get_subagent_endpoint(subagent_id: str):
         raise HTTPException(status_code=404, detail="Subagent not found.")
     return detail
 
+@app.get("/api/freelance/jobs")
+async def get_freelance_jobs():
+    from tools.freelance_harvester import freelance_harvester
+    return freelance_harvester.fetch_all_platform_gigs()
+
+class FreelanceDistributeRequest(BaseModel):
+    job_id: Optional[str] = None
+    platform: Optional[str] = "Fiverr"
+    title: Optional[str] = None
+    description: Optional[str] = None
+    budget: Optional[float] = 200.0
+    client_name: Optional[str] = "Client"
+
+@app.post("/api/freelance/distribute")
+async def distribute_freelance_work(req: Optional[FreelanceDistributeRequest] = None):
+    import uuid
+    from tools.freelance_harvester import freelance_harvester
+    from core.freelance_distributor import freelance_distributor
+
+    target_job = None
+    if req and req.job_id:
+        target_job = freelance_harvester.get_job_by_id(req.job_id)
+
+    if not target_job and req and req.title:
+        target_job = {
+            "job_id": f"custom_{uuid.uuid4().hex[:8]}",
+            "platform": req.platform or "Fiverr",
+            "title": req.title,
+            "description": req.description or "",
+            "budget": req.budget or 200.0,
+            "client_name": req.client_name or "Client"
+        }
+
+    if not target_job:
+        gigs = freelance_harvester.fetch_all_platform_gigs()
+        approved = [g for g in gigs if g.get("is_legal") and g.get("is_turnkey_feasible")]
+        if not approved:
+            raise HTTPException(status_code=404, detail="No approved turnkey freelance gigs found.")
+        target_job = approved[0]
+
+    result = freelance_distributor.plan_and_distribute_gig(target_job, auto_git_sync=True)
+    return result
+
+class GitSyncRequest(BaseModel):
+    commit_message: Optional[str] = None
+
+@app.get("/api/git/status")
+async def get_git_status():
+    from core.git_sync import git_sync
+    return git_sync.get_sync_status()
+
+@app.post("/api/git/sync")
+async def trigger_git_sync(req: Optional[GitSyncRequest] = None):
+    from core.git_sync import git_sync
+    msg = req.commit_message if req else None
+    return git_sync.sync_to_github(msg)
+
 @app.get("/api/plans")
 async def get_plans_api():
     from core.database import get_recent_plans

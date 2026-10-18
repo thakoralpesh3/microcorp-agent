@@ -17,6 +17,7 @@ DELIVERABLE_VALUE_BENCHMARKS = {
     "newsletter_edition": 25.0,   # Sponsorship/subscriber value per edition
     "affiliate_guide": 45.0,      # Lifetime affiliate commission value
     "freelance_proposal": 250.0,  # Expected project fee for tailored proposal
+    "freelance_turnkey": 280.0,   # Completed turnkey client delivery fee
     "lead_dataset": 35.0          # B2B verified niche dataset
 }
 
@@ -51,6 +52,24 @@ class Treasury:
             "estimated_value_usd": est_val,
             "token_cost_usd": token_cost,
             "roi_ratio": round(est_val / max(token_cost, 0.0001), 1)
+        }
+
+    @staticmethod
+    def log_transaction(category: str, description: str, amount: float, is_revenue: bool = True, deliverable_path: str = "") -> Dict[str, Any]:
+        """Logs custom revenue or financial transactions directly into the ledger."""
+        token_cost = 0.005 if is_revenue else 0.0
+        record_treasury_event(
+            category=category,
+            title=description,
+            amount_est_usd=amount,
+            token_cost_usd=token_cost,
+            deliverable_path=deliverable_path,
+            status="completed"
+        )
+        return {
+            "title": description,
+            "amount": amount,
+            "is_revenue": is_revenue
         }
 
     @staticmethod

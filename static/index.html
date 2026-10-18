@@ -21,6 +21,12 @@
                 <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><i class="fa-solid fa-gavel"></i> 100% Lawful Work Only</span>
                 <span class="badge-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;"><i class="fa-solid fa-arrows-rotate"></i> Autonomy: Active</span>
                 <span class="badge-tag" id="activeModelBadge"><i class="fa-solid fa-brain"></i> gemini-3.5-flash-lite</span>
+                <a href="https://github.com/thakoralpesh3/microcorp-agent" target="_blank" class="badge-tag" id="githubStatusBadge" style="background: rgba(36, 41, 47, 0.8); color: #f0f6fc; text-decoration: none; border: 1px solid rgba(255,255,255,0.15);" title="Open GitHub Repository">
+                    <i class="fa-brands fa-github"></i> <span id="gitBranchText">GitHub: main</span>
+                </a>
+                <button class="btn-action" onclick="syncWithGithub()" id="gitSyncBtn" style="padding: 6px 12px;" title="Push all code, deliverables, and state changes to GitHub">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> <span id="gitSyncText">Sync to GitHub</span>
+                </button>
                 <a href="/terms" target="_blank" class="btn-action" style="text-decoration: none; padding: 6px 12px;">
                     <i class="fa-solid fa-scale-balanced"></i> Terms & Governance
                 </a>
@@ -176,6 +182,39 @@
                 </div>
             </section>
         </main>
+
+        <!-- Freelancing Radar & Multi-Department Work Distributor (Fiverr, Upwork, Freelancer, RemoteOK) -->
+        <section class="glass-card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="font-size: 16px;">
+                        <i class="fa-solid fa-briefcase" style="color: #60a5fa;"></i> Freelancing Radar & Multi-Department Work Distributor
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">
+                        Harvets live project gigs across <strong>Fiverr</strong>, <strong>Upwork</strong>, <strong>Freelancer</strong>, and <strong>RemoteOK</strong>.
+                        Decomposes tasks into a 100% turnkey plan and distributes execution across departmental subagents.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action" onclick="fetchFreelanceRadar()" id="refreshFreelanceBtn" style="padding: 7px 14px;">
+                        <i class="fa-solid fa-arrows-rotate"></i> Scan Platforms
+                    </button>
+                    <button class="btn-action purple" onclick="autoDistributeFreelanceGig()" id="autoDistributeBtn" style="padding: 7px 14px;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Distribute Top Gig
+                    </button>
+                </div>
+            </div>
+
+            <!-- Freelance Jobs Container -->
+            <div id="freelanceJobsContainer" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px;">
+                <div style="color: var(--text-muted); font-size: 12px; padding: 12px; grid-column: 1 / -1;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Initializing freelance platform radar...
+                </div>
+            </div>
+
+            <!-- Live Distribution Banner -->
+            <div id="freelanceDistributionBanner" style="display: none; margin-top: 14px; padding: 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.85); border: 1px solid var(--card-border);"></div>
+        </section>
 
         <!-- Autonomous Work Discovery & Full Planning Radar -->
         <section class="glass-card" style="margin-bottom: 24px;">

@@ -58,6 +58,19 @@ function renderDashboard(data) {
     document.getElementById("treasuryStats").textContent = 
         `Costs: $${treasury.total_api_costs || '0.000'} • Gross: $${treasury.estimated_gross_revenue || '0.00'}`;
 
+    // 3b. GitHub Sync State
+    const git = data.git_status || {};
+    const gitBadge = document.getElementById("githubStatusBadge");
+    if (gitBadge && git.is_git_repo) {
+        const isClean = git.is_clean;
+        const branch = git.branch || "main";
+        const commitHash = (git.last_commit && git.last_commit.hash) || "";
+        const changedCount = git.changed_files_count || 0;
+        document.getElementById("gitBranchText").textContent = `GitHub: ${branch}@${commitHash}`;
+        gitBadge.style.borderColor = isClean ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)";
+        gitBadge.title = isClean ? "100% Synced with GitHub remote" : `${changedCount} local changes pending sync`;
+    }
+
     // 4. Departments
     const depts = data.departments || [];
     document.getElementById("deptCountBadge").textContent = `${depts.length} Departments`;
@@ -518,18 +531,186 @@ async function testDynamicBurst() {
     fetchTelemetry();
 }
 
-async function togglePause() {
+// ==========================================
+// Freelancing Radar & Work Distributor
+// ==========================================
+let cachedFreelanceGigs = [];
+
+async function fetchFreelanceRadar() {
+    const container = document.getElementById("freelanceJobsContainer");
+    const refreshBtn = document.getElementById("refreshFreelanceBtn");
+    if (refreshBtn) refreshBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Scanning...`;
+
     try {
-        const res = await fetch("/api/toggle_pause", { method: "POST" });
+        const res = await fetch("/api/freelance/jobs");
+        const gigs = await res.json();
+        cachedFreelanceGigs = gigs;
+
+        if (!gigs || gigs.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); font-size: 13px; padding: 14px;">No active platform gigs found at this time.</div>`;
+            return;
+        }
+
+        container.innerHTML = gigs.map(g => {
+            const isLegal = g.is_legal;
+            const isFeasible = g.is_turnkey_feasible;
+            const platform = g.platform || "Fiverr";
+            
+            // Platform badge styles
+            let platBg = "rgba(16, 185, 129, 0.2)";
+            let platColor = "#10b981";
+            if (platform === "Upwork") { platBg = "rgba(14, 165, 233, 0.2)"; platColor = "#38bdf8"; }
+            else if (platform === "Freelancer") { platBg = "rgba(99, 102, 241, 0.2)"; platColor = "#818cf8"; }
+            else if (platform === "RemoteOK") { platBg = "rgba(249, 115, 22, 0.2)"; platColor = "#fb923c"; }
+
+            const legalBadge = isLegal 
+                ? `<span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 7px; border-radius: 999px; font-weight: 600;"><i class="fa-solid fa-shield-halved"></i> LAWFUL</span>`
+                : `<span style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 2px 7px; border-radius: 999px; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation"></i> UNLAWFUL</span>`;
+
+            return `
+                <div class="glass-card" style="padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 11px; font-weight: 700; background: ${platBg}; color: ${platColor}; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">
+                                <i class="fa-solid fa-tag"></i> ${platform}
+                            </span>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                ${legalBadge}
+                                <span style="font-size: 12px; font-weight: 700; color: #34d399;">$${g.budget || 200}</span>
+                            </div>
+                        </div>
+                        <h4 style="font-size: 14px; font-weight: 600; color: #f1f5f9; line-height: 1.4;">${g.title}</h4>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Client: <span style="color: #cbd5e1;">${g.client_name || 'Verified Client'}</span></div>
+                        <p style="font-size: 12px; color: #94a3b8; margin-top: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            ${g.description || ''}
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; color: ${isFeasible ? '#60a5fa' : '#94a3b8'};">
+                            <i class="fa-solid fa-circle-check"></i> ${isFeasible ? '100% Turnkey Feasible' : 'Requires Review'}
+                        </span>
+                        <button class="btn-action purple" onclick="distributeGig('${g.job_id}')" style="padding: 5px 12px; font-size: 11px;">
+                            <i class="fa-solid fa-sitemap"></i> Distribute Work
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    } catch (e) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; color: var(--danger); font-size: 12px;">Failed to scan platforms: ${e}</div>`;
+    } finally {
+        if (refreshBtn) refreshBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Scan Platforms`;
+    }
+}
+
+async function distributeGig(jobId) {
+    const banner = document.getElementById("freelanceDistributionBanner");
+    banner.style.display = "block";
+    banner.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 20px; color: #a855f7;"></i>
+            <div>
+                <h4 style="font-size: 14px; color: #f1f5f9;">Autonomous Work Decomposition & Multi-Department Execution in Progress...</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                    Decomposing project into 100% turnkey milestones across Digital Products Lab, Technical Documentation Bureau, and Proposal Desk...
+                </p>
+            </div>
+        </div>
+    `;
+
+    try {
+        const res = await fetch("/api/freelance/distribute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ job_id: jobId })
+        });
         const d = await res.json();
-        isPaused = d.is_paused;
-        document.getElementById("pauseText").textContent = isPaused ? "Resume Loop" : "Pause Loop";
+
+        if (d.status === "COMPLETED") {
+            const milestonesHtml = (d.milestone_results || []).map(m => `
+                <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                    <div style="font-weight: 600; color: #60a5fa;"><i class="fa-solid fa-check"></i> Milestone ${m.milestone}: ${m.department}</div>
+                    <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">${m.summary || 'Completed deliverable produced'}</div>
+                </div>
+            `).join("");
+
+            banner.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; margin-bottom: 6px;">
+                            <i class="fa-solid fa-circle-check"></i> 100% Turnkey Execution Complete
+                        </span>
+                        <h4 style="font-size: 15px; color: #f1f5f9; margin-top: 4px;">${d.title} (${d.platform})</h4>
+                        <p style="font-size: 12px; color: #a7f3d0; margin-top: 2px;">
+                            Earned <strong style="font-size: 14px;">$${d.net_passive_income}</strong> Net Passive Income credited to Treasury!
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/view_deliverable/${encodeURIComponent(d.deliverable_html.split('deliverables/')[1] || '')}" target="_blank" class="btn-action" style="text-decoration: none; padding: 6px 12px; font-size: 12px;">
+                            <i class="fa-solid fa-eye"></i> Preview HTML
+                        </a>
+                        <a href="/view_deliverable/${encodeURIComponent(d.deliverable_zip.split('deliverables/')[1] || '')}" class="btn-action purple" style="text-decoration: none; padding: 6px 12px; font-size: 12px;">
+                            <i class="fa-solid fa-download"></i> Download Client ZIP
+                        </a>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px;">
+                    ${milestonesHtml}
+                </div>
+            `;
+            fetchTelemetry();
+        } else if (d.status === "REJECTED_UNLAWFUL") {
+            banner.innerHTML = `
+                <div style="color: #f87171;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <strong>REJECTED BY LEGAL GUARDIAN:</strong> ${d.summary}
+                </div>
+            `;
+        }
+    } catch (e) {
+        banner.innerHTML = `<div style="color: var(--danger); font-size: 12px;">Execution failed: ${e}</div>`;
+    }
+}
+
+async function autoDistributeFreelanceGig() {
+    const btn = document.getElementById("autoDistributeBtn");
+    if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Auto-Executing...`;
+    await distributeGig(null);
+    if (btn) btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Distribute Top Gig`;
+}
+
+// ==========================================
+// GitHub Auto-Sync Engine Integration
+// ==========================================
+async function syncWithGithub() {
+    const btn = document.getElementById("gitSyncBtn");
+    const textSpan = document.getElementById("gitSyncText");
+    if (textSpan) textSpan.textContent = "Syncing to GitHub...";
+    if (btn) btn.disabled = true;
+
+    try {
+        const res = await fetch("/api/git/sync", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`✅ ${data.message}\nCommit: ${data.commit ? data.commit.hash : 'HEAD'}`);
+        } else {
+            alert(`⚠️ Git Sync notice: ${data.error || 'Check terminal or network'}`);
+        }
         fetchTelemetry();
     } catch (e) {
-        console.error("Pause toggle failed:", e);
+        alert("Error syncing to GitHub: " + e);
+    } finally {
+        if (textSpan) textSpan.textContent = "Sync to GitHub";
+        if (btn) btn.disabled = false;
     }
 }
 
 // Initial fetch & loop every 2.5 seconds
 fetchTelemetry();
+fetchFreelanceRadar();
 setInterval(fetchTelemetry, 2500);
+

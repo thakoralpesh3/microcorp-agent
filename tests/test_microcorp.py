@@ -318,5 +318,95 @@ print('Hello MicroCorp')
         self.assertTrue(Path(res["deliverable_path"]).exists())
         print(f"Gig Proposal department generated official Refusal Notice: {res['deliverable_path']}")
 
+    def test_11_freelance_platform_harvester(self):
+        """
+        Verifies harvesting freelance gigs across Fiverr, Upwork, Freelancer, and RemoteOK,
+        ensuring every job undergoes Legal Guardian screening and feasibility evaluation.
+        """
+        from tools.freelance_harvester import freelance_harvester
+        gigs = freelance_harvester.fetch_all_platform_gigs()
+        self.assertGreater(len(gigs), 0)
+
+        # Check fields
+        platforms = {g["platform"] for g in gigs}
+        self.assertTrue(any(p in platforms for p in ["Fiverr", "Upwork", "Freelancer", "RemoteOK"]))
+
+        first_gig = gigs[0]
+        self.assertIn("job_id", first_gig)
+        self.assertIn("title", first_gig)
+        self.assertIn("budget", first_gig)
+        self.assertIn("is_legal", first_gig)
+        self.assertIn("is_turnkey_feasible", first_gig)
+        print(f"Harvested {len(gigs)} freelance gigs across platforms: {platforms}. Top: '{first_gig['title']}' (${first_gig['budget']})")
+
+        # Test legal rejection of illicit freelance job
+        from core.legal_guardian import legal_guardian
+        illegal_gig_audit = legal_guardian.audit_customer_order(
+            project_title="Develop dark web DDoS flooder script",
+            requirements="Flood target IP addresses with SYN packets",
+            client_name="Anonymous"
+        )
+        self.assertFalse(illegal_gig_audit["is_legal"])
+        self.assertEqual(illegal_gig_audit["verdict"], "REJECTED_UNLAWFUL")
+        print("Freelance Harvester legal gate verified: Illicit job strictly rejected.")
+
+    def test_12_multi_department_freelance_distribution(self):
+        """
+        Verifies 100% turnkey planning, multi-department task decomposition,
+        subagent execution across 3 departments, deliverable packaging, and treasury credit.
+        """
+        from core.freelance_distributor import freelance_distributor
+
+        sample_gig = {
+            "job_id": "test_fiverr_fastapi",
+            "platform": "Fiverr",
+            "title": "FastAPI Async Webhook Microservice with Docker & Docs",
+            "description": "Need a clean, production-ready Python service with async endpoints, comprehensive markdown docs, and deployment dockerfile.",
+            "budget": 300.0,
+            "currency": "USD",
+            "client_name": "Cloud Launch Inc",
+            "skills": ["Python", "FastAPI", "Docker", "Asyncio"]
+        }
+
+        # 1. Test 100% Turnkey Planning
+        planning_res = freelance_distributor.plan_freelance_gig(sample_gig)
+        self.assertTrue(planning_res["is_legal"])
+        self.assertEqual(planning_res["verdict"], "APPROVED_LAWFUL")
+        plan = planning_res["plan"]
+        self.assertIsNotNone(plan)
+        self.assertEqual(len(plan["milestones"]), 3)
+        self.assertEqual(plan["budget"], 300.0)
+        self.assertEqual(plan["estimated_net_income"], 240.0)
+        print(f"100% Turnkey Plan Formulated: '{plan['title']}' with 3 departmental milestones.")
+
+        # 2. Test Multi-Department Subagent Execution
+        exec_res = freelance_distributor.plan_and_distribute_gig(sample_gig, auto_git_sync=False)
+        self.assertEqual(exec_res["status"], "COMPLETED")
+        self.assertTrue(exec_res["is_legal"])
+        self.assertEqual(exec_res["net_passive_income"], 240.0)
+        self.assertTrue(Path(exec_res["deliverable_zip"]).exists())
+        self.assertTrue(Path(exec_res["deliverable_html"]).exists())
+        self.assertEqual(len(exec_res["milestone_results"]), 3)
+
+        # Verify treasury logged the revenue
+        summary = treasury.get_financial_summary()
+        self.assertGreaterEqual(summary["estimated_gross_revenue"], 240.0)
+        print(f"Multi-Department Freelance Execution Verified: Delivered {exec_res['deliverable_zip']}. Passive Income credited: ${exec_res['net_passive_income']}")
+
+    def test_13_git_sync_engine(self):
+        """
+        Verifies GitHub integration: repository detection, branch, remote URL,
+        working tree status, and commit tracking.
+        """
+        from core.git_sync import git_sync
+        status = git_sync.get_sync_status()
+        self.assertTrue(status.get("is_git_repo"))
+        self.assertEqual(status.get("branch"), "main")
+        self.assertIn("microcorp-agent", status.get("remote_url", ""))
+        self.assertIn("last_commit", status)
+        self.assertIn("hash", status["last_commit"])
+        print(f"GitHub Sync Engine Verified: Branch={status['branch']}, Remote={status['remote_url']}, LastCommit={status['last_commit']['hash']}")
+
 if __name__ == "__main__":
     unittest.main()
+
