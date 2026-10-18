@@ -21,12 +21,13 @@ data/*.db
 data/*.db-journal
 data/*.log
 data/*.pid
+data/*.json
+!data/.gitkeep
 
 # Deliverables generated locally
-deliverables/**/*.zip
-deliverables/**/*.html
-deliverables/**/*.md
+deliverables/**/*
 !deliverables/**/.gitkeep
+
 
 # IDE and OS files
 .vscode/

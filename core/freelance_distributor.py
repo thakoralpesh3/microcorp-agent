@@ -154,6 +154,8 @@ class FreelanceWorkDistributor:
         description = gig.get("description", "")
         platform = plan["platform"]
         client_name = plan["client_name"]
+        budget = plan["budget"]
+        net_passive = plan["estimated_net_income"]
 
         self.active_distributions[plan_id] = {
             "plan": plan,
@@ -273,6 +275,15 @@ python main.py
 - [x] Legal & Ethical Guardian approval: Verified compliant with cyber law and terms.
 - [x] Zero-warning syntax validation.
 - [x] Full commercial ownership transferred to client under MicroCorp Commercial License.
+
+---
+
+## 5. Official Commercial Invoice & Instant UPI Settlement
+- **Agreed Contract Value:** ${budget:.2f} USD (~₹{round(budget * 86.5)} INR)
+- **Settlement Gateway:** Instant Unified Payments Interface (UPI)
+- **Official Payee UPI ID:** `talpesh100@ybl`
+- **Beneficiary Name:** Alpesh Thakor
+- **Status:** Turnkey Work Completed & Verified
 
 ---
 

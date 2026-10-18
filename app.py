@@ -4,7 +4,9 @@ FastAPI web dashboard + Autonomous background CEO runner.
 """
 
 import os
+import re
 import sys
+import uuid
 import argparse
 import uvicorn
 from pathlib import Path
@@ -308,6 +310,267 @@ async def view_deliverable(file_path: str):
     elif target.suffix.lower() == ".zip":
         return FileResponse(path=str(target), media_type="application/zip", filename=target.name)
     return FileResponse(path=str(target))
+
+# ==========================================
+# Real Passive Income: Storefront & UPI Checkout
+# ==========================================
+
+class UTRVerificationRequest(BaseModel):
+    order_id: str
+    utr_number: str
+    amount_inr: float
+    asset_id: str
+    customer_email: Optional[str] = ""
+
+@app.get("/api/payout/config")
+async def get_payout_config():
+    from core.upi_payment import upi_gateway
+    return upi_gateway.get_payment_summary()
+
+@app.post("/api/payment/verify")
+async def verify_payment_endpoint(req: UTRVerificationRequest):
+    from core.upi_payment import upi_gateway
+    res = upi_gateway.verify_utr_payment(
+        order_id=req.order_id,
+        utr_number=req.utr_number,
+        amount_inr=req.amount_inr,
+        customer_email=req.customer_email,
+        asset_title=req.asset_id.replace("_", " ").title()
+    )
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error"))
+    return {
+        **res,
+        "download_url": f"/download_purchased/{req.asset_id}"
+    }
+
+@app.get("/download_purchased/{asset_id}")
+async def download_purchased_asset(asset_id: str):
+    # Find zip file matching asset_id
+    matches = list(DELIVERABLES_DIR.glob(f"**/*{asset_id}*.zip"))
+    if not matches:
+        raise HTTPException(status_code=404, detail="Purchased asset archive not found.")
+    target_zip = matches[0]
+    return FileResponse(path=str(target_zip), media_type="application/zip", filename=target_zip.name)
+
+STORE_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroCorp AI - Official Digital Storefront</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { max-width: 1100px; margin: 30px auto; padding: 20px; }
+        .hero { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1px solid var(--card-border); padding: 36px; border-radius: 16px; margin-bottom: 28px; }
+        .payout-tag { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <a href="/" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Console Dashboard</a>
+        <div class="payout-tag">
+            <i class="fa-solid fa-circle-check"></i> Official Payout: <strong>__PAYOUT_UPI_ID__</strong> (__PAYEE_NAME__)
+        </div>
+    </div>
+
+    <div class="hero">
+        <span class="badge-tag" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; margin-bottom: 12px; display: inline-block;">MICROCORP AI ENTERPRISE STOREFRONT</span>
+        <h1 style="color: #f8fafc; font-size: 32px; margin: 6px 0 12px 0;">Commercial Developer Toolkits & Digital Products</h1>
+        <p style="color: #94a3b8; font-size: 15px; max-width: 750px; line-height: 1.6;">
+            Battle-tested architecture cheatsheets, automated prompt engineering packs, and micro-SaaS boilerplates.
+            Purchase directly with zero intermediary fees using any Indian UPI app (PhonePe, Google Pay, Paytm, BHIM).
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;">
+        __PRODUCTS_CARDS__
+    </div>
+</body>
+</html>"""
+
+CHECKOUT_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant UPI Checkout - __TITLE__</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { max-width: 780px; margin: 40px auto; padding: 20px; }
+        .checkout-box { background: rgba(18, 24, 38, 0.95); border: 1px solid var(--card-border); border-radius: 14px; padding: 36px; }
+        .qr-card { background: #ffffff; padding: 12px; border-radius: 12px; border: 2px solid #86efac; display: inline-flex; align-items: center; justify-content: center; width: 220px; height: 220px; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 20px;">
+        <a href="/store" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Back to Store</a>
+    </div>
+
+    <div class="checkout-box">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px;">
+            <div>
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><i class="fa-solid fa-bolt"></i> Instant UPI Settlement</span>
+                <h2 style="color: #f8fafc; font-size: 24px; margin-top: 8px;">__TITLE__</h2>
+                <small style="color: var(--text-muted);">Commercial License • Instant ZIP Delivery</small>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 28px; font-weight: 800; color: #34d399;">₹__AMOUNT_INR__</span>
+                <span style="display: block; font-size: 13px; color: #94a3b8;">(~__PRICE_USD__ USD)</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 30px; margin-top: 26px; flex-wrap: wrap; align-items: center;">
+            <div class="qr-card">
+                __QR_SVG__
+            </div>
+            <div style="flex: 1; min-width: 260px;">
+                <h4 style="color: #f1f5f9; font-size: 16px; margin: 0 0 10px 0;">Scan to Pay with Any UPI App</h4>
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; margin-bottom: 14px;">
+                    <div style="font-size: 12px; color: var(--text-muted);">Official Payee UPI ID:</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                        <strong style="color: #34d399; font-size: 15px; font-family: monospace;">__UPI_ID__</strong>
+                        <button class="btn-action" onclick="navigator.clipboard.writeText('__UPI_ID__'); alert('Copied UPI ID: __UPI_ID__')" style="padding: 4px 10px; font-size: 11px;">Copy</button>
+                    </div>
+                    <div style="font-size: 12px; color: #cbd5e1; margin-top: 4px;">Name: <strong>__PAYEE_NAME__</strong></div>
+                </div>
+
+                <a href="__UPI_URI__" class="btn-action purple" style="display: block; text-align: center; padding: 12px; text-decoration: none; font-size: 14px; font-weight: 700;">
+                    <i class="fa-solid fa-mobile-screen"></i> Pay on Mobile App (PhonePe / GPay)
+                </a>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <h4 style="color: #f1f5f9; font-size: 15px;"><i class="fa-solid fa-key"></i> Step 2: Confirm Payment & Unlock Download</h4>
+            <p style="color: var(--text-muted); font-size: 13px; margin: 4px 0 16px 0;">After sending ₹__AMOUNT_INR__ to <code>__UPI_ID__</code>, enter your 12-digit UPI UTR / Transaction Reference Number below to immediately unlock your product.</p>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+                <input type="text" id="utrNumber" placeholder="Enter 12-digit UPI UTR / Transaction ID (e.g. 429182749102)" style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px;">
+                <button class="btn-action" onclick="verifyUTR()" id="verifyBtn" style="background: #10b981; color: #fff; border: none; font-weight: 700; padding: 12px;">
+                    Verify & Download
+                </button>
+            </div>
+            <div id="utrResult" style="margin-top: 14px; display: none; padding: 14px; border-radius: 8px;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function verifyUTR() {
+            var utr = document.getElementById("utrNumber").value.trim();
+            var btn = document.getElementById("verifyBtn");
+            var resDiv = document.getElementById("utrResult");
+            if (!utr) { alert("Please enter the UTR or Transaction ID from your payment app."); return; }
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+            btn.disabled = true;
+
+            try {
+                var res = await fetch("/api/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        order_id: "__ORDER_ID__",
+                        utr_number: utr,
+                        amount_inr: __AMOUNT_INR__,
+                        asset_id: "__ASSET_ID__"
+                    })
+                });
+                var d = await res.json();
+                resDiv.style.display = "block";
+                if (res.ok && d.success) {
+                    resDiv.style.background = "rgba(16, 185, 129, 0.2)";
+                    resDiv.style.border = "1px solid #10b981";
+                    resDiv.innerHTML = '<div style="color: #34d399; font-weight: 700; font-size: 15px;"><i class="fa-solid fa-circle-check"></i> Payment Verified!</div>' +
+                        '<p style="color: #cbd5e1; font-size: 13px; margin: 6px 0 12px 0;">' + d.message + '</p>' +
+                        '<a href="' + d.download_url + '" class="btn-action" style="background: #10b981; color: #fff; text-decoration: none; display: inline-block; padding: 10px 18px; font-weight: 700;">' +
+                        '<i class="fa-solid fa-download"></i> Download Purchased Asset (ZIP)</a>';
+                } else {
+                    resDiv.style.background = "rgba(239, 68, 68, 0.2)";
+                    resDiv.style.border = "1px solid #ef4444";
+                    resDiv.innerHTML = '<span style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> ' + (d.detail || d.error || 'Verification failed. Please check the UTR number.') + '</span>';
+                }
+            } catch (e) {
+                resDiv.style.display = "block";
+                resDiv.style.background = "rgba(239, 68, 68, 0.2)";
+                resDiv.innerHTML = '<span style="color: #f87171;">Error: ' + e + '</span>';
+            } finally {
+                btn.innerHTML = 'Verify & Download';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>"""
+
+@app.get("/store", response_class=HTMLResponse)
+async def public_storefront():
+    from core.upi_payment import upi_gateway
+    ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
+    products = []
+    if ready_dir.exists():
+        for zip_p in sorted(ready_dir.glob("*.zip"), reverse=True):
+            clean_name = zip_p.stem
+            size_kb = round(zip_p.stat().st_size / 1024, 1)
+            title_guess = re.sub(r'^\d+_\d+_', '', clean_name).replace("_", " ").title()
+            products.append({
+                "slug": clean_name,
+                "title": title_guess,
+                "size_kb": size_kb,
+                "price_usd": 19.0,
+                "price_inr": 1649,
+                "download_name": zip_p.name
+            })
+            
+    products_cards_html = ""
+    for p in products[:12]:
+        products_cards_html += f"""
+        <div style="background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">DIGITAL ASSET</span>
+                <h3 style="color: #f1f5f9; font-size: 17px; margin: 10px 0 6px 0; line-height: 1.4;">{p['title']}</h3>
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">Production-grade architecture guide, copy-paste code snippets, documentation, and commercial license.</p>
+                <div style="color: #64748b; font-size: 12px; margin-top: 8px;"><i class="fa-solid fa-file-zipper"></i> Packaged ZIP ({p['size_kb']} KB)</div>
+            </div>
+            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 20px; font-weight: 800; color: #34d399;">₹{p['price_inr']}</span>
+                    <small style="color: #94a3b8; font-size: 12px; display: block;">(~${p['price_usd']:.2f} USD)</small>
+                </div>
+                <a href="/checkout/{p['slug']}" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-bolt"></i> Buy with UPI
+                </a>
+            </div>
+        </div>
+        """
+
+    empty_msg = '<div style="color: var(--text-muted); padding: 30px; grid-column: 1 / -1; text-align: center;">No commercial products ready yet. The agent is continuously manufacturing assets in the background.</div>'
+    html = STORE_TEMPLATE.replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
+                          .replace("__PAYEE_NAME__", upi_gateway.payee_name) \
+                          .replace("__PRODUCTS_CARDS__", products_cards_html or empty_msg)
+    return HTMLResponse(content=html)
+
+@app.get("/checkout/{asset_id}", response_class=HTMLResponse)
+async def checkout_page(asset_id: str):
+    from core.upi_payment import upi_gateway
+    title = asset_id.replace("_", " ").title()
+    category = "digital_product"
+    
+    pkg = upi_gateway.create_checkout_package(asset_id=asset_id, title=title, category=category, price_usd=19.0)
+
+    html = CHECKOUT_TEMPLATE.replace("__TITLE__", title) \
+                            .replace("__AMOUNT_INR__", str(pkg['amount_inr'])) \
+                            .replace("__PRICE_USD__", f"${pkg['price_usd']:.2f}") \
+                            .replace("__QR_SVG__", pkg['qr_svg']) \
+                            .replace("__UPI_ID__", pkg['upi_id']) \
+                            .replace("__PAYEE_NAME__", pkg['payee_name']) \
+                            .replace("__UPI_URI__", pkg['upi_uri']) \
+                            .replace("__ORDER_ID__", pkg['order_id']) \
+                            .replace("__ASSET_ID__", asset_id)
+
+    return HTMLResponse(content=html)
 
 def main():
     parser = argparse.ArgumentParser(description="MicroCorp AI Enterprise Launcher")

@@ -12,7 +12,8 @@ from typing import Dict, Any, Optional
 import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from config import DELIVERABLES_DIR
+from config import DELIVERABLES_DIR, PAYOUT_UPI_ID, PAYEE_NAME, USD_TO_INR_RATE
+from core.upi_payment import upi_gateway
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -104,6 +105,44 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="content">
             {html_body}
         </div>
+        <div class="payment-box" style="margin-top: 35px; padding: 24px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <span style="background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Instant UPI Settlement</span>
+                    <h3 style="margin: 6px 0 2px 0; color: #166534; font-size: 18px;">Commercial Access & License Purchase</h3>
+                    <p style="margin: 0; color: #15803d; font-size: 13px;">To obtain full commercial distribution rights, send payment directly to official enterprise UPI ID.</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 22px; font-weight: 800; color: #15803d;">₹{amount_inr}</span>
+                    <small style="color: #4b5563; display: block; font-size: 12px;">(~${price_usd:.2f} USD)</small>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 20px; align-items: center; margin-top: 16px; flex-wrap: wrap;">
+                <div style="width: 140px; height: 140px; background: #ffffff; padding: 6px; border-radius: 8px; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    {qr_svg_inline}
+                </div>
+                <div style="flex: 1; min-width: 220px;">
+                    <div style="font-size: 13px; color: #1f2937; margin-bottom: 6px;">
+                        <strong>Payee UPI ID:</strong> <code style="font-size: 14px; background: #ffffff; color: #15803d; border: 1px solid #86efac; padding: 3px 8px; border-radius: 4px;">{payout_upi_id}</code>
+                    </div>
+                    <div style="font-size: 12px; color: #4b5563; margin-bottom: 4px;">
+                        <strong>Payee Name:</strong> {payee_name}
+                    </div>
+                    <div style="font-size: 12px; color: #4b5563; margin-bottom: 12px;">
+                        <strong>Accepted Apps:</strong> PhonePe, Google Pay, Paytm, BHIM, Cred
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{upi_uri}" style="display: inline-block; background: #16a34a; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                            ⚡ Pay with UPI App
+                        </a>
+                        <a href="/checkout/{safe_slug}" style="display: inline-block; background: #ffffff; color: #166534; border: 1px solid #16a34a; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                            Verify UTR / Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="footer">
             <span>Asset ID: {safe_slug}</span>
             <span>MicroCorp AI Autonomous Venture</span>
@@ -176,20 +215,32 @@ class Packager:
         return "MicroCorp AI - Standard Commercial Usage Permitted. 100% Host Owner Copyright."
 
     @staticmethod
-    def generate_marketplace_listing(title: str, category: str, markdown_content: str) -> str:
+    def generate_marketplace_listing(title: str, category: str, markdown_content: str, price_usd: float = 19.0) -> str:
         """Generates a complete ready-to-paste marketplace listing (Gumroad/ProductHunt/GitHub)."""
-        summary_snippet = markdown_content[:250].replace("#", "").strip()
         tags = ["development", "cheatsheet", "automation", "python", "developer-tools", "ai"]
         if "async" in title.lower() or "concurrency" in title.lower():
             tags.extend(["concurrency", "performance"])
         if "prompt" in title.lower():
             tags.extend(["prompt-engineering", "llm"])
 
+        price_inr = round(price_usd * USD_TO_INR_RATE)
+
         listing = f"""# Marketplace Listing Copy & Product Sheet
 **Product Title:** {title}
-**Suggested Retail Price:** $14.99 - $24.99 USD
+**Suggested Retail Price:** ${price_usd:.2f} USD (~₹{price_inr} INR)
 **Category:** {category.replace('_', ' ').title()}
 **License:** Commercial & Personal Use Included
+**Direct Payout UPI:** `{PAYOUT_UPI_ID}` ({PAYEE_NAME})
+
+---
+
+## 📌 Direct Purchase via UPI (Zero Platform Fees)
+To purchase directly with instant download rights:
+1. Transfer **₹{price_inr} INR** via any UPI app (PhonePe, Google Pay, Paytm, BHIM) to:
+   - **UPI ID:** `{PAYOUT_UPI_ID}`
+   - **Payee:** {PAYEE_NAME}
+   - **Transaction Note:** `{title[:30]}`
+2. Submit your 12-digit bank UTR to `/checkout/{re.sub(r'[^a-zA-Z0-9_\-]', '_', title.lower())[:30]}` to unlock download.
 
 ---
 
@@ -206,19 +257,21 @@ and practical implementation guides designed for modern engineers and builders.
 - 🛠️ **Production-Ready Code Snippets** (Tested, copy-paste ready)
 - ⚠️ **Anti-Patterns & Edge Cases Guide**
 - 📜 **Commercial Usage License & Full Terms**
+- 💳 **Direct UPI Payment QR & Verified Invoice**
 
 ### Target Tags / Keywords:
 `{", ".join(tags)}`
 
 ---
-*Generated autonomously by MicroCorp AI Enterprise.*
+*Generated autonomously by MicroCorp AI Enterprise with Direct Payout to {PAYOUT_UPI_ID}.*
 """
         return listing
 
     @staticmethod
     def save_deliverable(category: str, title: str, markdown_content: str, create_zip: bool = True) -> Dict[str, Any]:
         """
-        Saves a deliverable as Markdown and HTML, archives into a ZIP file with Terms and Marketplace listing.
+        Saves a deliverable as Markdown and HTML, archives into a ZIP file with Terms,
+        Marketplace listing, instant UPI QR code, and payment instructions.
         Returns paths and metadata.
         """
         category_dir = DELIVERABLES_DIR / category
@@ -234,29 +287,55 @@ and practical implementation guides designed for modern engineers and builders.
         html_file = category_dir / f"{base_filename}.html"
         zip_file = category_dir / f"{base_filename}.zip"
         listing_file = category_dir / f"{base_filename}_LISTING.md"
+        qr_file = category_dir / f"{base_filename}_QR.svg"
+        payment_file = category_dir / f"{base_filename}_PAYMENT.md"
+
+        # 0. Create UPI Checkout Package
+        price_usd = 19.0 if category == "digital_product" else (25.0 if "newsletter" in category else 45.0)
+        checkout_pkg = upi_gateway.create_checkout_package(
+            asset_id=safe_slug,
+            title=title,
+            category=category,
+            price_usd=price_usd
+        )
+        amount_inr = checkout_pkg["amount_inr"]
+        qr_svg_str = checkout_pkg["qr_svg"]
+        payment_instructions_md = checkout_pkg["payment_instructions_md"]
+
+        with open(qr_file, "w", encoding="utf-8") as f:
+            f.write(qr_svg_str)
+
+        with open(payment_file, "w", encoding="utf-8") as f:
+            f.write(payment_instructions_md)
         
         # 1. Save Markdown
         with open(md_file, "w", encoding="utf-8") as f:
             f.write(markdown_content)
 
         # 2. Save Marketplace Listing
-        marketplace_copy = Packager.generate_marketplace_listing(title, category, markdown_content)
+        marketplace_copy = Packager.generate_marketplace_listing(title, category, markdown_content, price_usd=price_usd)
         with open(listing_file, "w", encoding="utf-8") as f:
             f.write(marketplace_copy)
             
-        # 3. Render & Save HTML
+        # 3. Render & Save HTML with embedded UPI QR & checkout
         html_body = simple_markdown_to_html(markdown_content)
         rendered_html = HTML_TEMPLATE.format(
             title=title,
             category=category.replace("_", " ").title(),
             timestamp=datetime.now().strftime("%B %d, %Y %H:%M"),
             safe_slug=base_filename,
-            html_body=html_body
+            html_body=html_body,
+            amount_inr=int(amount_inr),
+            price_usd=price_usd,
+            payout_upi_id=PAYOUT_UPI_ID,
+            payee_name=PAYEE_NAME,
+            upi_uri=checkout_pkg["upi_uri"],
+            qr_svg_inline=qr_svg_str
         )
         with open(html_file, "w", encoding="utf-8") as f:
             f.write(rendered_html)
             
-        # 4. Create ZIP package with Terms and Conditions & License
+        # 4. Create ZIP package with Terms, Payment QR, and Instructions
         zip_path_str = ""
         terms_text = Packager._get_terms_and_conditions_text()
         if create_zip:
@@ -264,13 +343,20 @@ and practical implementation guides designed for modern engineers and builders.
                 zf.write(md_file, arcname=f"{safe_slug}/README.md")
                 zf.write(html_file, arcname=f"{safe_slug}/index.html")
                 zf.write(listing_file, arcname=f"{safe_slug}/MARKETPLACE_LISTING.md")
+                zf.write(qr_file, arcname=f"{safe_slug}/PAYMENT_QR.svg")
+                zf.write(payment_file, arcname=f"{safe_slug}/PAYMENT_INSTRUCTIONS.md")
                 
                 # License text
-                license_text = f"COMMERCIAL PRODUCT LICENSE\nProduct: {title}\nProduced By: MicroCorp AI\nCommercial and Personal Use Permitted.\nHost Owner retains 100% distribution rights."
+                license_text = f"COMMERCIAL PRODUCT LICENSE\nProduct: {title}\nProduced By: MicroCorp AI\nCommercial and Personal Use Permitted.\nPayee UPI ID: {PAYOUT_UPI_ID} ({PAYEE_NAME})\nHost Owner retains 100% distribution rights."
                 zf.writestr(f"{safe_slug}/LICENSE.txt", license_text)
                 
                 # Terms and Conditions
                 zf.writestr(f"{safe_slug}/TERMS_AND_CONDITIONS.txt", terms_text)
+
+                # Invoice text
+                invoice_text = f"MICROCORP AI COMMERCIAL INVOICE\nItem: {title}\nPrice: ₹{amount_inr:.2f} INR (~${price_usd:.2f} USD)\nPayee UPI ID: {PAYOUT_UPI_ID}\nPayee Name: {PAYEE_NAME}\nStatus: Verified For Instant Delivery\n"
+                zf.writestr(f"{safe_slug}/INVOICE.txt", invoice_text)
+
             zip_path_str = str(zip_file)
             
             # Copy zip to ready_to_monetize for instant access
@@ -289,6 +375,12 @@ and practical implementation guides designed for modern engineers and builders.
             "zip_path": zip_path_str,
             "primary_path": zip_path_str or str(html_file),
             "listing_path": str(listing_file),
+            "qr_path": str(qr_file),
+            "payment_path": str(payment_file),
+            "payout_upi_id": PAYOUT_UPI_ID,
+            "amount_inr": amount_inr,
+            "price_usd": price_usd,
+            "upi_uri": checkout_pkg["upi_uri"],
             "size_bytes": md_file.stat().st_size
         }
 

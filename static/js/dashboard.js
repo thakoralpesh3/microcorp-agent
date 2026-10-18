@@ -709,8 +709,24 @@ async function syncWithGithub() {
     }
 }
 
+async function fetchPayoutStatus() {
+    try {
+        const res = await fetch("/api/payout/config");
+        if (res.ok) {
+            const data = await res.json();
+            const revEl = document.getElementById("realUpiRevenue");
+            if (revEl) revEl.textContent = `₹${data.total_revenue_inr || '0.00'}`;
+            const txtEl = document.getElementById("upiPayoutIdText");
+            if (txtEl) txtEl.textContent = `UPI: ${data.payout_upi_id} (${data.total_transactions} orders)`;
+        }
+    } catch(e) {}
+}
+
 // Initial fetch & loop every 2.5 seconds
 fetchTelemetry();
 fetchFreelanceRadar();
+fetchPayoutStatus();
 setInterval(fetchTelemetry, 2500);
+setInterval(fetchPayoutStatus, 5000);
+
 

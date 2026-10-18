@@ -85,3 +85,10 @@ AUTO_SPRINT_INTERVAL_MINUTES = 15 # Automatically triggers self-directed income 
 MAX_AUTO_SPRINTS_PER_DAY = 48    # Safeguard to prevent uncontrolled API usage
 ENABLE_AUTO_HARVEST = True       # Continuously discover and execute online opportunities
 
+# Real-World Passive Income & UPI Payout Gateway
+PAYOUT_UPI_ID = os.environ.get("PAYOUT_UPI_ID", "talpesh100@ybl")
+PAYEE_NAME = os.environ.get("PAYEE_NAME", "Alpesh Thakor")
+DEFAULT_CURRENCY = "INR"
+USD_TO_INR_RATE = 86.50          # Benchmark exchange rate for international pricing
+
+

@@ -407,6 +407,82 @@ print('Hello MicroCorp')
         self.assertIn("hash", status["last_commit"])
         print(f"GitHub Sync Engine Verified: Branch={status['branch']}, Remote={status['remote_url']}, LastCommit={status['last_commit']['hash']}")
 
+    def test_14_upi_payment_generation_and_verification(self):
+        """
+        Verifies real-world passive income collection via UPI ID talpesh100@ybl:
+        - Validates UPI URI formulation with payee name and currency
+        - Validates SVG QR code generation
+        - Validates UTR bank reference verification and duplicate rejection
+        - Validates deliverable packaging embeds PAYMENT_QR.svg and PAYMENT_INSTRUCTIONS.md in ZIP
+        """
+        import zipfile
+        import uuid
+        from config import PAYOUT_UPI_ID, PAYEE_NAME
+        from core.upi_payment import upi_gateway
+        from tools.packager import packager
+
+        # 1. Validate Config
+        self.assertEqual(PAYOUT_UPI_ID, "talpesh100@ybl")
+        self.assertEqual(PAYEE_NAME, "Alpesh Thakor")
+
+        # 2. Test UPI URI Generation
+        uri = upi_gateway.generate_upi_uri(amount_inr=1499.0, note="MicroCorp Python Toolkit", transaction_ref="TX_TEST123")
+        self.assertIn("upi://pay", uri)
+        self.assertIn("talpesh100%40ybl", uri)
+        self.assertIn("cu=INR", uri)
+        self.assertIn("1499.00", uri)
+        print(f"UPI URI Generated for {PAYOUT_UPI_ID}: {uri}")
+
+        # 3. Test Vector SVG QR Generation
+        qr_svg = upi_gateway.generate_qr_svg(uri)
+        self.assertIn("<svg", qr_svg)
+        self.assertIn("</svg>", qr_svg)
+        print(f"SVG Vector QR Code generated successfully. Length: {len(qr_svg)} bytes.")
+
+        # 4. Test Checkout Package Creation
+        checkout_pkg = upi_gateway.create_checkout_package("test_cheatsheet", "AsyncIO Cheatsheet", "digital_product", price_usd=19.0)
+        self.assertEqual(checkout_pkg["upi_id"], "talpesh100@ybl")
+        self.assertEqual(checkout_pkg["payee_name"], "Alpesh Thakor")
+        self.assertGreater(checkout_pkg["amount_inr"], 1000)
+        self.assertIn("Direct UPI Payment Instructions", checkout_pkg["payment_instructions_md"])
+
+        # 5. Test UTR Payment Verification
+        test_utr = f"UTR{uuid.uuid4().hex[:8].upper()}"
+        verify_res = upi_gateway.verify_utr_payment(
+            order_id=checkout_pkg["order_id"],
+            utr_number=test_utr,
+            amount_inr=checkout_pkg["amount_inr"],
+            customer_email="buyer@example.com",
+            asset_title=checkout_pkg["title"]
+        )
+        self.assertTrue(verify_res["success"])
+        self.assertEqual(verify_res["payee_upi"], "talpesh100@ybl")
+        print(f"UTR Bank Payment Verified: {verify_res['message']}")
+
+        # 6. Test Duplicate UTR Replay Protection
+        duplicate_res = upi_gateway.verify_utr_payment(
+            order_id="NEW_ORDER",
+            utr_number=test_utr,
+            amount_inr=checkout_pkg["amount_inr"]
+        )
+        self.assertFalse(duplicate_res["success"])
+        self.assertIn("already been redeemed", duplicate_res["error"])
+        print("Payment Replay Protection verified: Duplicate UTR blocked.")
+
+        # 7. Test Deliverable Packager embeds PAYMENT_QR and INVOICE
+        sample_md = "# Monetized Digital Asset\nProduction patterns with direct UPI settlement."
+        pkg = packager.save_deliverable("digital_product", "Monetized UPI Product", sample_md, create_zip=True)
+        self.assertTrue(Path(pkg["qr_path"]).exists())
+        self.assertTrue(Path(pkg["payment_path"]).exists())
+        
+        with zipfile.ZipFile(pkg["zip_path"], 'r') as zf:
+            names = zf.namelist()
+            self.assertTrue(any("PAYMENT_QR.svg" in n for n in names))
+            self.assertTrue(any("PAYMENT_INSTRUCTIONS.md" in n for n in names))
+            self.assertTrue(any("INVOICE.txt" in n for n in names))
+        print(f"Deliverable ZIP verified: Contains PAYMENT_QR.svg, PAYMENT_INSTRUCTIONS.md, and INVOICE.txt with UPI {PAYOUT_UPI_ID}.")
+
 if __name__ == "__main__":
     unittest.main()
+
 
