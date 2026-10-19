@@ -3,18 +3,22 @@
 set -e
 
 DIR="/media/alpesh/Software & Work/Agents/microcorp-agent"
+PARTITION_UUID="00A8230DA8230130"
+if [ ! -d "$DIR" ]; then
+    udisksctl mount -b "/dev/disk/by-uuid/$PARTITION_UUID" >/dev/null 2>&1 || true
+    sleep 1
+fi
+
 cd "$DIR"
 
 # Check if server is already responding on port 8585
-if ! curl -s --head --request GET http://127.0.0.1:8585 | grep "200 OK" > /dev/null; then
-    # Start app.py in background if not already running
-    nohup python3 app.py --port 8585 --host 127.0.0.1 > "$DIR/data/app.log" 2>&1 &
-    PID=$!
-    echo $PID > "$DIR/data/server.pid"
-    disown $PID 2>/dev/null || true
+if ! curl -s http://127.0.0.1:8585/api/telemetry > /dev/null 2>&1; then
+    # Start app.py in background completely detached with setsid
+    mkdir -p "$DIR/data"
+    setsid python3 app.py --port 8585 --host 127.0.0.1 </dev/null >> "$DIR/data/app.log" 2>&1 &
     
     # Wait for server to come online
-    for i in {1..10}; do
+    for i in {1..20}; do
         sleep 0.5
         if curl -s http://127.0.0.1:8585/api/telemetry > /dev/null 2>&1; then
             break
