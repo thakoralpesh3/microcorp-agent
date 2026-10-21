@@ -511,6 +511,23 @@ function closeAssetViewer(event) {
     }
 }
 
+function copyCustomerInstructions() {
+    const titleEl = document.getElementById("assetViewerTitle");
+    const title = titleEl ? titleEl.textContent : "Turnkey Deliverable";
+    const text = `🚀 How to Use Your Deliverable in 60 Seconds:
+1. Unzip the package anywhere on your computer.
+2. Double-click START_HERE.html to open your interactive visual dashboard & 1-click code copier.
+3. 1-Click Launch:
+   - On Windows: Double-click RUN_WINDOWS.bat.
+   - On Mac/Linux: Run bash RUN_MAC_LINUX.sh or python3 main.py.
+4. Open main.py for clean modular source code ready for production!`;
+    navigator.clipboard.writeText(text).then(function() {
+        alert("Copied 60-second customer instructions to clipboard!");
+    }).catch(function() {
+        prompt("Copy customer instructions:", text);
+    });
+}
+
 // ==========================================
 // Internal Corporate Event Inspector Modal Handlers
 // ==========================================
