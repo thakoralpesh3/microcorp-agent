@@ -331,20 +331,29 @@ async def view_deliverable(file_path: str, download: bool = False, format: Optio
 
     # 3. Handle ZIP archives accessed via browser navigation -> Show HTML preview
     if target.suffix.lower() == ".zip":
+        # Sibling START_HERE.html check (highest priority customer onboarding)
+        start_sibling = target.parent / f"{target.stem}_START_HERE.html"
+        if start_sibling.exists():
+            return FileResponse(path=str(start_sibling), media_type="text/html")
+
         # Sibling HTML check
         html_sibling = target.with_suffix(".html")
         if html_sibling.exists():
             return FileResponse(path=str(html_sibling), media_type="text/html")
         
         # Sibling HTML anywhere in deliverables
-        sibling_matches = list(DELIVERABLES_DIR.rglob(f"{target.stem}.html"))
+        sibling_matches = list(DELIVERABLES_DIR.rglob(f"{target.stem}_START_HERE.html")) or list(DELIVERABLES_DIR.rglob(f"{target.stem}.html"))
         if sibling_matches:
             return FileResponse(path=str(sibling_matches[0]), media_type="text/html")
 
-        # Inspect inside the ZIP archive for index.html or README.md
+        # Inspect inside the ZIP archive for START_HERE.html or index.html or README.md
         try:
             import zipfile
             with zipfile.ZipFile(target, "r") as zf:
+                start_names = [n for n in zf.namelist() if n.lower().endswith("start_here.html")]
+                if start_names:
+                    content = zf.read(start_names[0]).decode("utf-8", errors="replace")
+                    return HTMLResponse(content=content)
                 html_names = [n for n in zf.namelist() if n.lower().endswith(".html")]
                 if html_names:
                     content = zf.read(html_names[0]).decode("utf-8", errors="replace")
@@ -684,8 +693,16 @@ CHECKOUT_TEMPLATE = """<!DOCTYPE html>
                     resDiv.style.border = "1px solid #10b981";
                     resDiv.innerHTML = '<div style="color: #34d399; font-weight: 700; font-size: 15px;"><i class="fa-solid fa-circle-check"></i> Payment Verified!</div>' +
                         '<p style="color: #cbd5e1; font-size: 13px; margin: 6px 0 12px 0;">' + d.message + '</p>' +
-                        '<a href="' + d.download_url + '" class="btn-action" style="background: #10b981; color: #fff; text-decoration: none; display: inline-block; padding: 10px 18px; font-weight: 700;">' +
-                        '<i class="fa-solid fa-download"></i> Download Purchased Asset (ZIP)</a>';
+                        '<a href="' + d.download_url + '" class="btn-action" style="background: #10b981; color: #fff; text-decoration: none; display: inline-block; padding: 12px 22px; font-weight: 700; font-size: 14px;">' +
+                        '<i class="fa-solid fa-download"></i> Download Purchased Asset (ZIP)</a>' +
+                        '<div style="margin-top: 18px; padding: 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; text-align: left;">' +
+                            '<div style="color: #34d399; font-weight: 700; font-size: 13px; margin-bottom: 6px;"><i class="fa-solid fa-rocket"></i> How to Use Your Download in 60 Seconds:</div>' +
+                            '<ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #cbd5e1; line-height: 1.7;">' +
+                                '<li><strong>Unzip</strong> the downloaded file to any folder on your computer.</li>' +
+                                '<li><strong>Double-click <code>START_HERE.html</code></strong> to open your interactive dashboard, read documentation, and copy code snippets with 1 click.</li>' +
+                                '<li><strong>1-Click Launch:</strong> On Windows double-click <code>RUN_WINDOWS.bat</code>, or on Mac/Linux run <code>bash RUN_MAC_LINUX.sh</code>.</li>' +
+                            '</ol>' +
+                        '</div>';
                 } else {
                     resDiv.style.background = "rgba(239, 68, 68, 0.2)";
                     resDiv.style.border = "1px solid #ef4444";

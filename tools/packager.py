@@ -1055,11 +1055,40 @@ and practical implementation guides designed for modern engineers and builders.
         except Exception:
             ecom_files = {}
             
-        # 4. Create ZIP package with Terms, Payment QR, and Instructions
+        # 3c. Generate Customer 1-Click Launchers and Interactive START_HERE.html
+        code_content, reqs_content = extract_or_generate_code(markdown_content, title, category)
+        windows_bat, mac_linux_sh, quickstart_txt = generate_run_scripts(title, category)
+        start_here_html = generate_start_here_html(
+            title=title,
+            category=category,
+            safe_slug=base_filename,
+            code_content=code_content,
+            markdown_content=markdown_content,
+            amount_inr=amount_inr,
+            price_usd=price_usd,
+            reqs_content=reqs_content
+        )
+        start_here_file = category_dir / f"{base_filename}_START_HERE.html"
+        try:
+            with open(start_here_file, "w", encoding="utf-8") as f:
+                f.write(start_here_html)
+        except Exception:
+            pass
+
+        # 4. Create ZIP package with Customer Quickstart, Launchers, Terms, Payment QR, and Instructions
         zip_path_str = ""
         terms_text = Packager._get_terms_and_conditions_text()
         if create_zip:
             with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zf:
+                # Customer Onboarding & 1-Click Launchers (Priority Root Files)
+                zf.writestr(f"{safe_slug}/START_HERE.html", start_here_html)
+                zf.writestr(f"{safe_slug}/RUN_WINDOWS.bat", windows_bat)
+                zf.writestr(f"{safe_slug}/RUN_MAC_LINUX.sh", mac_linux_sh)
+                zf.writestr(f"{safe_slug}/QUICKSTART.txt", quickstart_txt)
+                zf.writestr(f"{safe_slug}/main.py", code_content)
+                zf.writestr(f"{safe_slug}/requirements.txt", reqs_content)
+
+                # Standard Deliverable Artifacts
                 zf.write(md_file, arcname=f"{safe_slug}/README.md")
                 zf.write(html_file, arcname=f"{safe_slug}/index.html")
                 zf.write(listing_file, arcname=f"{safe_slug}/MARKETPLACE_LISTING.md")
@@ -1085,7 +1114,7 @@ and practical implementation guides designed for modern engineers and builders.
 
             zip_path_str = str(zip_file)
             
-            # Copy zip and html preview to ready_to_monetize for instant access and previews
+            # Copy zip, html preview, and start_here preview to ready_to_monetize
             try:
                 import shutil
                 ready_zip = ready_dir / f"{base_filename}.zip"
@@ -1093,6 +1122,9 @@ and practical implementation guides designed for modern engineers and builders.
                 ready_html = ready_dir / f"{base_filename}.html"
                 if html_file.exists():
                     shutil.copy2(html_file, ready_html)
+                ready_start = ready_dir / f"{base_filename}_START_HERE.html"
+                if start_here_file.exists():
+                    shutil.copy2(start_here_file, ready_start)
             except Exception:
                 pass
             
@@ -1111,6 +1143,7 @@ and practical implementation guides designed for modern engineers and builders.
             "price_usd": price_usd,
             "upi_uri": checkout_pkg["upi_uri"],
             "size_bytes": md_file.stat().st_size,
+            "start_here_path": str(start_here_file) if 'start_here_file' in locals() and start_here_file.exists() else "",
             "ecommerce_listings": ecom_files
         }
 
