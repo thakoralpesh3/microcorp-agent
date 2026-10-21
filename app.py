@@ -11,8 +11,9 @@ import argparse
 import uvicorn
 from pathlib import Path
 from contextlib import asynccontextmanager
+from datetime import datetime
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
@@ -469,13 +470,43 @@ STORE_TEMPLATE = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MicroCorp AI - Official Digital Storefront</title>
+    <title>MicroCorp AI - Official Commercial Digital Storefront</title>
+    <meta name="description" content="MicroCorp AI Official Storefront: Over 170+ production developer toolkits, architecture blueprints, cheatsheets, and prompt engineering systems with instant UPI delivery to talpesh100@ybl.">
+    <meta name="keywords" content="developer tools, python cheatsheets, architecture guides, prompt packs, micro-saas boilerplates, upi digital product">
+    <!-- OpenGraph Social Sharing Meta Tags -->
+    <meta property="og:title" content="MicroCorp AI - Commercial Developer Toolkits & Digital Blueprints">
+    <meta property="og:description" content="Battle-tested production kits, cheatsheets, and architecture boilerplates. Instant UPI checkout (PhonePe, GPay, Paytm) to talpesh100@ybl.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/store">
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MicroCorp AI - Commercial Developer Toolkits">
+    <meta name="twitter:description" content="Battle-tested production kits, cheatsheets, and boilerplates with instant UPI download.">
+    <!-- Schema.org JSON-LD Structured Data for Google/Bing Indexing -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MicroCorp AI Storefront",
+      "url": "/store",
+      "description": "Commercial developer toolkits, architectural blueprints, and cheatsheets with instant UPI download.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "MicroCorp AI Enterprise",
+        "founder": "Alpesh Thakor"
+      }
+    }
+    </script>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { max-width: 1100px; margin: 30px auto; padding: 20px; }
-        .hero { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1px solid var(--card-border); padding: 36px; border-radius: 16px; margin-bottom: 28px; }
+        .hero { background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1px solid var(--card-border); padding: 36px; border-radius: 16px; margin-bottom: 24px; }
         .payout-tag { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .cat-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .cat-btn:hover, .cat-btn.active { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; }
+        .search-box { width: 100%; box-sizing: border-box; background: rgba(18, 24, 38, 0.95); border: 1px solid var(--card-border); color: #f8fafc; padding: 14px 18px; border-radius: 12px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .search-box:focus { border-color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -501,9 +532,60 @@ STORE_TEMPLATE = """<!DOCTYPE html>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;">
+    <!-- Live Store Search & Category Filter Navigation -->
+    <div style="margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div>
+            <input type="text" id="storeSearchInput" class="search-box" oninput="applyFilters()" placeholder="🔍 Instant Search by keyword (e.g. Python, Async, API, CSS, Security, Scraper, Docker...)" autofocus>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 12px; color: var(--text-muted); margin-right: 4px;">Filter Tier:</span>
+            <button onclick="setCategory('all')" class="cat-btn active" id="btn_all">All Products</button>
+            <button onclick="setCategory('cheatsheet')" class="cat-btn" id="btn_cheatsheet">Cheatsheets (₹399)</button>
+            <button onclick="setCategory('research')" class="cat-btn" id="btn_research">Research (₹799)</button>
+            <button onclick="setCategory('toolkit')" class="cat-btn" id="btn_toolkit">Toolkits (₹1,799)</button>
+            <button onclick="setCategory('enterprise')" class="cat-btn" id="btn_enterprise">Enterprise (₹3,999)</button>
+        </div>
+    </div>
+
+    <div id="storeGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;">
         __PRODUCTS_CARDS__
     </div>
+
+    <div id="noMatchMessage" style="display: none; text-align: center; padding: 40px; color: var(--text-muted); background: rgba(18, 24, 38, 0.5); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); margin-top: 20px;">
+        <i class="fa-solid fa-magnifying-glass" style="font-size: 28px; margin-bottom: 10px; color: #64748b;"></i>
+        <h3 style="color: #cbd5e1; margin: 4px 0;">No matching toolkits found</h3>
+        <p style="font-size: 13px;">Try searching for another keyword like "Python", "API", or select "All".</p>
+    </div>
+
+    <script>
+        var selectedCat = 'all';
+        function setCategory(cat) {
+            selectedCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
+            var b = document.getElementById('btn_' + cat);
+            if (b) b.classList.add('active');
+            applyFilters();
+        }
+        function applyFilters() {
+            var q = (document.getElementById('storeSearchInput').value || '').toLowerCase().trim();
+            var cards = document.querySelectorAll('.product-card');
+            var visible = 0;
+            cards.forEach(function(card) {
+                var searchBlob = (card.getAttribute('data-search') || '').toLowerCase();
+                var catBlob = (card.getAttribute('data-category') || '').toLowerCase();
+                var qMatch = !q || searchBlob.indexOf(q) !== -1;
+                var catMatch = selectedCat === 'all' || catBlob.indexOf(selectedCat) !== -1;
+                if (qMatch && catMatch) {
+                    card.style.display = 'flex';
+                    visible++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            var msg = document.getElementById('noMatchMessage');
+            if (msg) msg.style.display = (visible === 0) ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>"""
 
@@ -648,9 +730,11 @@ async def public_storefront():
             })
             
     products_cards_html = ""
-    for p in products[:16]:
+    for p in products[:60]:
+        cat_tag = "cheatsheet" if "cheatsheet" in p['tier_name'].lower() else ("research" if "research" in p['tier_name'].lower() else ("enterprise" if "enterprise" in p['tier_name'].lower() else "toolkit"))
+        search_blob = f"{p['title']} {p['description']} {p['slug']} {p['tier_name']}".lower().replace('"', '&quot;')
         products_cards_html += f"""
-        <div style="background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="product-card" data-category="{cat_tag}" data-search="{search_blob}" style="background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <span style="{p['badge_style']} font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">{p['badge']}</span>
                 <h3 style="color: #f1f5f9; font-size: 17px; margin: 10px 0 6px 0; line-height: 1.4;">{p['title']}</h3>
@@ -680,8 +764,88 @@ async def public_storefront():
     empty_msg = '<div style="color: var(--text-muted); padding: 30px; grid-column: 1 / -1; text-align: center;">No commercial products ready yet. The agent is continuously manufacturing assets in the background.</div>'
     html = STORE_TEMPLATE.replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
                           .replace("__PAYEE_NAME__", upi_gateway.payee_name) \
+                          .replace("__TOTAL_COUNT__", str(len(products))) \
                           .replace("__PRODUCTS_CARDS__", products_cards_html or empty_msg)
     return HTMLResponse(content=html)
+
+@app.get("/sitemap.xml")
+async def sitemap_endpoint():
+    from core.tunnel_gateway import public_gateway
+    base_url = public_gateway.get_public_url() or "http://127.0.0.1:8585"
+    ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
+    urls = [
+        f"<url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>",
+        f"<url><loc>{base_url}/store</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>",
+        f"<url><loc>{base_url}/terms</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>"
+    ]
+    if ready_dir.exists():
+        for p in sorted(ready_dir.glob("*.html")):
+            clean_name = p.stem
+            urls.append(f"<url><loc>{base_url}/view_deliverable/ready_to_monetize/{clean_name}.html</loc><changefreq>daily</changefreq><priority>0.8</priority></url>")
+            urls.append(f"<url><loc>{base_url}/checkout/{clean_name}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>")
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{"".join(urls)}
+</urlset>"""
+    return Response(content=xml, media_type="application/xml")
+
+@app.get("/robots.txt")
+async def robots_endpoint():
+    from core.tunnel_gateway import public_gateway
+    base_url = public_gateway.get_public_url() or "http://127.0.0.1:8585"
+    txt = f"""User-agent: *
+Allow: /
+Allow: /store
+Allow: /checkout/
+Allow: /view_deliverable/
+Sitemap: {base_url}/sitemap.xml
+"""
+    return Response(content=txt, media_type="text/plain")
+
+@app.get("/api/freelance/recent_deliveries")
+async def get_recent_freelance_deliveries():
+    fl_dir = DELIVERABLES_DIR / "freelance_turnkey"
+    deliveries = []
+    if fl_dir.exists():
+        for zip_f in sorted(fl_dir.glob("*.zip"), key=os.path.getmtime, reverse=True)[:10]:
+            stem = zip_f.stem
+            html_f = zip_f.with_suffix(".html")
+            msg_f = zip_f.parent / f"{stem}_CLIENT_MESSAGE.txt"
+            msg_text = msg_f.read_text(encoding="utf-8") if msg_f.exists() else ""
+            parts = stem.split("_", 2)
+            platform = "Fiverr"
+            if len(parts) > 2:
+                for p_name in ["fiverr", "upwork", "freelancer", "remoteok"]:
+                    if p_name in stem.lower():
+                        platform = p_name.title()
+                        break
+            deliveries.append({
+                "slug": stem,
+                "title": stem.replace("_", " ").title(),
+                "platform": platform,
+                "zip_path": f"/view_deliverable/freelance_turnkey/{zip_f.name}?download=true",
+                "html_path": f"/view_deliverable/freelance_turnkey/{html_f.name}" if html_f.exists() else f"/view_deliverable/freelance_turnkey/{zip_f.name}",
+                "client_message": msg_text,
+                "size_kb": round(zip_f.stat().st_size / 1024, 1),
+                "created_at": datetime.fromtimestamp(zip_f.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+            })
+    return deliveries
+
+@app.get("/api/promotions/latest")
+async def get_latest_promotions():
+    promo_dir = DELIVERABLES_DIR / "promotions"
+    promos = []
+    if promo_dir.exists():
+        for p in sorted(promo_dir.glob("*.md"), key=os.path.getmtime, reverse=True)[:5]:
+            try:
+                promos.append({
+                    "filename": p.name,
+                    "title": p.stem.replace("_", " ").title(),
+                    "content": p.read_text(encoding="utf-8")
+                })
+            except Exception:
+                pass
+    return promos
 
 @app.get("/checkout/{asset_id}", response_class=HTMLResponse)
 async def checkout_page(asset_id: str):

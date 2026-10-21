@@ -907,8 +907,120 @@ async function openEcommerceChannelModal() {
 fetchTelemetry();
 fetchFreelanceRadar();
 fetchPayoutStatus();
+fetchRecentFreelanceDeliveries();
+fetchPromotionalLaunchpad();
 setInterval(fetchTelemetry, 2500);
 setInterval(fetchPayoutStatus, 5000);
+setInterval(fetchRecentFreelanceDeliveries, 15000);
+
+// ==========================================
+// Freelance Client Delivery Desk Handlers
+// ==========================================
+async function fetchRecentFreelanceDeliveries() {
+    const container = document.getElementById("freelanceDeliveriesContainer");
+    if (!container) return;
+    try {
+        const res = await fetch("/api/freelance/recent_deliveries");
+        if (!res.ok) return;
+        const deliveries = await res.json();
+        if (deliveries.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); font-size: 12px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px;">No completed freelance client packages yet. Trigger 'Auto-Distribute Top Gig' or let the autonomous cycle complete one.</div>`;
+            return;
+        }
+        container.innerHTML = deliveries.map(d => {
+            const safeMsg = (d.client_message || "").replace(/`/g, "\\`").replace(/\$/g, "\\$");
+            return `
+                <div style="background: rgba(18, 24, 38, 0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px;">
+                                <i class="fa-solid fa-check-circle"></i> Ready To Deliver (${d.platform})
+                            </span>
+                            <small style="color: var(--text-muted); font-size: 11px;">${d.created_at}</small>
+                        </div>
+                        <h4 style="font-size: 14px; color: #f1f5f9; margin: 8px 0 4px 0; line-height: 1.3;">${d.title}</h4>
+                        <div style="font-size: 11px; color: #94a3b8;"><i class="fa-solid fa-file-zipper"></i> Turnkey Client ZIP (${d.size_kb} KB)</div>
+                    </div>
+                    <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button onclick="copyClientMessage(\`${safeMsg}\`)" class="btn-action" style="padding: 5px 10px; font-size: 11px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Copy professional delivery pitch to paste on Fiverr/Upwork">
+                            <i class="fa-solid fa-copy"></i> Copy Client Note
+                        </button>
+                        <a href="${d.zip_path}" class="btn-action purple" style="text-decoration: none; padding: 5px 10px; font-size: 11px;" title="Download release ZIP to attach for client">
+                            <i class="fa-solid fa-download"></i> ZIP
+                        </a>
+                        <button onclick="openAssetViewer('${d.html_path}', '${(d.title).replace(/'/g, "\\'")}', '${d.zip_path}', 'freelance_turnkey', '1499')" class="btn-action" style="padding: 5px 10px; font-size: 11px;" title="Preview deliverable in browser">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    } catch(e) {
+        console.error("Error fetching freelance deliveries:", e);
+    }
+}
+
+function copyClientMessage(msg) {
+    if (!msg) {
+        alert("Client delivery message is empty for this package.");
+        return;
+    }
+    navigator.clipboard.writeText(msg).then(() => {
+        alert("✅ Client Delivery Message copied to clipboard!\n\nYou can now paste it directly into Fiverr or Upwork to complete the order.");
+    }).catch(() => {
+        prompt("Copy Client Delivery Note (paste into Fiverr/Upwork):", msg);
+    });
+}
+
+// ==========================================
+// Promotional Launchpad Handlers
+// ==========================================
+async function fetchPromotionalLaunchpad() {
+    const container = document.getElementById("promotionsContainer");
+    if (!container) return;
+    try {
+        const res = await fetch("/api/promotions/latest");
+        if (!res.ok) return;
+        const promos = await res.json();
+        if (promos.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); font-size: 12px; padding: 12px;">Marketing packs will appear here after autonomous production cycles.</div>`;
+            return;
+        }
+        container.innerHTML = promos.map(p => {
+            const safeContent = (p.content || "").replace(/`/g, "\\`").replace(/\$/g, "\\$");
+            return `
+                <div style="background: rgba(18, 24, 38, 0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="badge-tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 11px;">
+                                <i class="fa-solid fa-share-nodes"></i> Reddit / Twitter / Dev.to Pack
+                            </span>
+                        </div>
+                        <h4 style="font-size: 13px; color: #f1f5f9; margin: 8px 0 6px 0; line-height: 1.3;">${p.title}</h4>
+                        <p style="font-size: 11px; color: #94a3b8; line-height: 1.4; max-height: 55px; overflow: hidden; text-overflow: ellipsis;">
+                            ${p.content.substring(0, 140)}...
+                        </p>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 8px;">
+                        <button onclick="copyPromoPost(\`${safeContent}\`)" class="btn-action" style="padding: 5px 12px; font-size: 11px; background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);">
+                            <i class="fa-solid fa-copy"></i> Copy Social Post
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    } catch(e) {
+        console.error("Error fetching promotional launchpad:", e);
+    }
+}
+
+function copyPromoPost(content) {
+    navigator.clipboard.writeText(content).then(() => {
+        alert("✅ Promotional post copied to clipboard!\n\nPaste into Reddit (r/Python, r/webdev), Twitter/X, or LinkedIn to drive paying traffic to your Storefront.");
+    }).catch(() => {
+        prompt("Copy promotional post:", content);
+    });
+}
 
 
 

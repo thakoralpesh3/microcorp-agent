@@ -253,6 +253,21 @@
 
             <!-- Live Distribution Banner -->
             <div id="freelanceDistributionBanner" style="display: none; margin-top: 14px; padding: 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.85); border: 1px solid var(--card-border);"></div>
+            <!-- Freelance Client Delivery Desk -->
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <h4 style="font-size: 14px; margin: 0; color: #f8fafc;"><i class="fa-solid fa-truck-ramp-box"></i> Freelance Client Delivery Desk (Fiverr / Upwork Turnkey Packages)</h4>
+                        <small style="color: var(--text-muted); font-size: 11px;">Completed client contracts with ready-to-paste delivery pitch messages for instant client approval.</small>
+                    </div>
+                    <button class="btn-action" onclick="fetchRecentFreelanceDeliveries()" style="padding: 5px 10px; font-size: 11px;">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh Deliveries
+                    </button>
+                </div>
+                <div id="freelanceDeliveriesContainer" style="margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px;">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
         </section>
 
         <!-- Autonomous Work Discovery & Full Planning Radar -->
@@ -269,6 +284,8 @@
             <div id="plansGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; margin-top: 14px;">
                 <!-- Populated dynamically via JS -->
             </div>
+        </section>
+
         <!-- Omnichannel E-Commerce & Marketplace Syndication Hub -->
         <section class="glass-card" style="margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -302,6 +319,24 @@
                 <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 10px;">
                     <div style="font-size: 12px; font-weight: 700; color: #34d399; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-bolt"></i> Instamojo & Direct UPI</div>
                     <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Instant Indian UPI settlement directly to talpesh100@ybl with automated file delivery.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Viral Promotional Launchpad & Marketing Syndication -->
+        <section class="glass-card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="font-size: 16px;"><i class="fa-solid fa-bullhorn" style="color: #fbbf24;"></i> Promotional Launchpad & Viral Traffic Generator</h3>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">1-Click ready-to-post marketing copy for Reddit (r/Python, r/webdev), Twitter/X threads, and LinkedIn to drive traffic to your UPI Storefront.</p>
+                </div>
+                <button class="btn-action" onclick="fetchPromotionalLaunchpad()" style="padding: 7px 14px; font-size: 12px;">
+                    <i class="fa-solid fa-arrows-rotate"></i> Refresh Marketing Copy
+                </button>
+            </div>
+            <div id="promotionsContainer" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px;">
+                <div style="color: var(--text-muted); font-size: 12px; padding: 12px; grid-column: 1 / -1;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading promotional packs...
                 </div>
             </div>
         </section>

@@ -326,6 +326,32 @@ python main.py
             except Exception as e:
                 sync_result = {"success": False, "error": str(e)}
 
+        # -------------------------------------------------------------
+        # Generate Ready-to-Paste Client Delivery Note (Fiverr/Upwork)
+        # -------------------------------------------------------------
+        client_delivery_message = f"""Hi {client_name},
+
+I am delighted to deliver your completed project: **{title}**!
+
+Everything has been engineered 100% turnkey to professional production standards with clean architecture, comprehensive setup documentation, and verification checks.
+
+📦 **What is Included in Your Delivery Package:**
+- ✅ Complete, clean modular source code & configuration scaffolding.
+- ✅ Step-by-step installation, environment setup, and API reference manual.
+- ✅ Automated verification checks and quality audit certificate.
+- ✅ Full commercial ownership license transfer.
+
+Attached is your turnkey release package ZIP. Please test and review. If you need any adjustments or future extensions, I am always here to assist you!
+
+Thank you for your partnership,
+Alpesh Thakor • MicroCorp AI Autonomous Fleet (UPI: talpesh100@ybl)
+"""
+        try:
+            msg_file = Path(delivery_pkg["html_path"]).with_name(f"{Path(delivery_pkg['html_path']).stem}_CLIENT_MESSAGE.txt")
+            msg_file.write_text(client_delivery_message, encoding="utf-8")
+        except Exception:
+            pass
+
         return {
             "status": "COMPLETED",
             "is_legal": True,
@@ -336,6 +362,7 @@ python main.py
             "net_passive_income": net_passive,
             "deliverable_zip": delivery_pkg["zip_path"],
             "deliverable_html": delivery_pkg["html_path"],
+            "client_delivery_message": client_delivery_message,
             "milestone_results": self.active_distributions[plan_id]["milestone_results"],
             "git_sync": sync_result,
             "summary": f"Completed 100% turnkey plan across 3 departments for '{title}'. Earned ${net_passive} net passive income."
