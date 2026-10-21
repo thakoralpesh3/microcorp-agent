@@ -58,6 +58,9 @@ class CustomerOrderRequest(BaseModel):
     project_requirements: str
     budget_usd: Optional[float] = 0.0
 
+class TrackOrderRequest(BaseModel):
+    query: str
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     index_file = STATIC_DIR / "index.html"
@@ -119,6 +122,8 @@ async def submit_customer_order(req: CustomerOrderRequest):
         }
 
     # Lawful customer project: enqueue as high-priority proposal & implementation task
+    budget_val = req.budget_usd if (req.budget_usd and req.budget_usd > 0) else 50.0
+    budget_inr = round(budget_val * 86.5)
     task_id = ceo.trigger_sprint(
         domain="gig_proposal",
         custom_title=f"Customer Order: {req.project_title}",
@@ -126,15 +131,64 @@ async def submit_customer_order(req: CustomerOrderRequest):
             "job_title": req.project_title,
             "job_description": req.project_requirements,
             "client_name": req.customer_name,
-            "budget": req.budget_usd
+            "budget": budget_val
         }
     )
+    from core.upi_payment import upi_gateway
+    upi_uri = upi_gateway.generate_upi_uri(amount_inr=budget_inr, note=f"Order {task_id[:8]}")
     return {
         "status": "ACCEPTED_LAWFUL",
         "verdict": "ACCEPTED",
         "task_id": task_id,
         "project_title": req.project_title,
+        "amount_usd": budget_val,
+        "amount_inr": budget_inr,
+        "payout_upi_id": upi_gateway.upi_id,
+        "payee_name": upi_gateway.payee_name,
+        "upi_uri": upi_uri,
         "message": "Customer order accepted and verified 100% compliant with legal and ethical policies. Enqueued for execution."
+    }
+
+@app.post("/api/customer/track")
+async def track_customer_order(req: TrackOrderRequest):
+    q = req.query.strip().lower()
+    if not q:
+        raise HTTPException(status_code=400, detail="Please enter a UTR number, Order ID, or keyword.")
+    
+    from core.database import get_db_connection
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM payments WHERE utr_number = ? OR order_id = ? ORDER BY id DESC LIMIT 1", (q, q)).fetchone()
+    conn.close()
+
+    ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
+    if row:
+        asset_id = row["asset_id"]
+        return {
+            "found": True,
+            "status": "PAID_VERIFIED",
+            "asset_id": asset_id,
+            "amount_inr": row["amount_inr"],
+            "download_url": f"/download_purchased/{asset_id}",
+            "preview_url": f"/view_deliverable/ready_to_monetize/{asset_id}.html",
+            "message": "Payment verified! Your turnkey delivery is ready for instant download."
+        }
+    
+    matches = list(ready_dir.glob(f"*{q}*.zip")) or list(DELIVERABLES_DIR.rglob(f"*{q}*.zip"))
+    if matches:
+        zip_p = matches[0]
+        slug = zip_p.stem
+        return {
+            "found": True,
+            "status": "READY_FOR_DELIVERY",
+            "asset_id": slug,
+            "download_url": f"/view_deliverable/{slug}.zip?download=true",
+            "preview_url": f"/view_deliverable/ready_to_monetize/{slug}.html",
+            "message": f"Found matching turnkey deliverable package: {slug}"
+        }
+
+    return {
+        "found": False,
+        "message": "No matching order or verified UTR found. If you just made a UPI payment, please allow 1-2 minutes or contact Alpesh Thakor at talpesh100@ybl."
     }
 
 @app.post("/api/toggle_pause")
@@ -519,8 +573,19 @@ STORE_TEMPLATE = """<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <a href="/" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Console Dashboard</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <a href="/" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Console</a>
+            <a href="/hire" class="btn-action purple" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 700;">
+                <i class="fa-solid fa-briefcase"></i> Hire AI Agent (Custom Work)
+            </a>
+            <button onclick="openTrackModal()" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #cbd5e1;">
+                <i class="fa-solid fa-magnifying-glass"></i> Track by UTR
+            </button>
+            <a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20am%20interested%20in%20MicroCorp%20AI%20custom%20projects" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp Reach
+            </a>
+        </div>
         <div class="payout-tag">
             <i class="fa-solid fa-circle-check"></i> Official Payout: <strong>__PAYOUT_UPI_ID__</strong> (__PAYEE_NAME__)
         </div>
@@ -593,6 +658,229 @@ STORE_TEMPLATE = """<!DOCTYPE html>
             });
             var msg = document.getElementById('noMatchMessage');
             if (msg) msg.style.display = (visible === 0) ? 'block' : 'none';
+        }
+        function openTrackModal() {
+            var m = document.getElementById('trackModal');
+            if (m) m.style.display = 'flex';
+        }
+        function closeTrackModal() {
+            var m = document.getElementById('trackModal');
+            if (m) m.style.display = 'none';
+        }
+        async function lookupOrder() {
+            var q = (document.getElementById('trackInput').value || '').trim();
+            var btn = document.getElementById('trackBtn');
+            var resBox = document.getElementById('trackResult');
+            if (!q) { alert('Please enter your 12-digit UPI UTR number or product keyword.'); return; }
+            btn.disabled = true;
+            btn.innerText = 'Searching...';
+            resBox.style.display = 'block';
+            resBox.style.background = 'rgba(255,255,255,0.05)';
+            resBox.innerHTML = '<span style="color: #94a3b8;"><i class="fa-solid fa-spinner fa-spin"></i> Checking enterprise ledger...</span>';
+            try {
+                var res = await fetch('/api/customer/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: q })
+                });
+                var d = await res.json();
+                if (res.ok && d.found) {
+                    resBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                    resBox.style.border = '1px solid #10b981';
+                    resBox.innerHTML = '<div style="color: #34d399; font-weight: 700; margin-bottom: 6px;"><i class="fa-solid fa-circle-check"></i> ' + d.message + '</div>' +
+                        '<div style="display: flex; gap: 8px; margin-top: 10px;">' +
+                            '<a href="' + d.download_url + '" class="btn-action purple" style="text-decoration: none; padding: 8px 14px; font-size: 12px; font-weight: 700;"><i class="fa-solid fa-download"></i> Download Package (ZIP)</a>' +
+                            '<a href="' + d.preview_url + '" target="_blank" class="btn-action" style="text-decoration: none; padding: 8px 14px; font-size: 12px;"><i class="fa-solid fa-eye"></i> View Preview</a>' +
+                        '</div>';
+                } else {
+                    resBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                    resBox.style.border = '1px solid #ef4444';
+                    resBox.innerHTML = '<span style="color: #f87171;">' + (d.message || 'No matching delivery found.') + '</span>';
+                }
+            } catch (e) {
+                resBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                resBox.innerHTML = '<span style="color: #f87171;">Search error: ' + e + '</span>';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Find';
+            }
+        }
+    </script>
+
+    <!-- Order Tracking & UTR Delivery Retrieval Modal -->
+    <div id="trackModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: rgba(18, 24, 38, 0.98); border: 1px solid var(--card-border); border-radius: 14px; max-width: 520px; width: 100%; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h3 style="color: #f8fafc; margin: 0; font-size: 18px;"><i class="fa-solid fa-magnifying-glass"></i> Track Order / Retrieve by UTR</h3>
+                <button onclick="closeTrackModal()" style="background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 13px; margin: 0 0 16px 0;">Enter your 12-digit bank UPI UTR number or the product name to locate and download your purchased deliverable.</p>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="trackInput" placeholder="Enter 12-digit UTR or product keyword..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px;">
+                <button onclick="lookupOrder()" id="trackBtn" class="btn-action purple" style="padding: 10px 16px; font-weight: 700;">Find</button>
+            </div>
+            <div id="trackResult" style="margin-top: 14px; display: none; padding: 14px; border-radius: 8px; font-size: 13px;"></div>
+        </div>
+    </div>
+</body>
+</html>"""
+
+HIRE_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hire MicroCorp AI — Autonomous Software Engineering Fleet</title>
+    <meta name="description" content="Commission custom turnkey software engineering from MicroCorp AI: full-stack backends, microservices, and automation pipelines. Direct UPI settlement to talpesh100@ybl.">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { max-width: 880px; margin: 30px auto; padding: 20px; }
+        .hero { background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1px solid var(--card-border); padding: 36px; border-radius: 16px; margin-bottom: 24px; }
+        .form-box { background: rgba(18, 24, 38, 0.95); border: 1px solid var(--card-border); border-radius: 14px; padding: 32px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+        .form-control { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); color: #f8fafc; padding: 12px 14px; border-radius: 8px; font-size: 14px; outline: none; }
+        .form-control:focus { border-color: #3b82f6; }
+        textarea.form-control { min-height: 110px; resize: vertical; line-height: 1.5; }
+        .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+        .pill { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <a href="/store" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Digital Store</a>
+            <a href="/" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-gauge"></i> Console</a>
+            <a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20want%20to%20discuss%20a%20custom%20software%20project" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">
+                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+        </div>
+        <div class="payout-tag" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">
+            <i class="fa-solid fa-circle-check"></i> Payee UPI: <strong>__PAYOUT_UPI_ID__</strong> (__PAYEE_NAME__)
+        </div>
+    </div>
+
+    <div class="hero">
+        <span class="badge-tag" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; margin-bottom: 12px; display: inline-block;">COMMISSION AUTONOMOUS ENGINEERING</span>
+        <h1 style="color: #f8fafc; font-size: 30px; margin: 4px 0 10px 0;">Hire MicroCorp AI for Custom Projects</h1>
+        <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0;">
+            Commission custom software from our 24/7 autonomous engineering fleet. Every project deliverable includes modular production code, unit tests, Docker configs, 1-click launchers (<code>START_HERE.html</code> & <code>RUN_WINDOWS.bat</code>), and full commercial ownership rights transfer.
+        </p>
+        <div class="pills">
+            <span class="pill"><i class="fa-solid fa-shield-halved"></i> 100% Legal & Ethical</span>
+            <span class="pill"><i class="fa-solid fa-bolt"></i> 0.5s Automated Feasibility Check</span>
+            <span class="pill"><i class="fa-solid fa-file-zipper"></i> Turnkey ZIP Delivery</span>
+            <span class="pill"><i class="fa-solid fa-credit-card"></i> Direct UPI Settlement (Zero Fees)</span>
+        </div>
+    </div>
+
+    <div class="form-box">
+        <h3 style="color: #f1f5f9; font-size: 18px; margin: 0 0 18px 0; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+            <i class="fa-solid fa-file-pen" style="color: #60a5fa;"></i> Project Commission Request
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+                <label>Your Name / Organization</label>
+                <input type="text" id="orderClientName" class="form-control" placeholder="e.g. Acme Tech Studio">
+            </div>
+            <div class="form-group">
+                <label>Email or WhatsApp Contact</label>
+                <input type="text" id="orderClientContact" class="form-control" placeholder="e.g. client@company.com or +91 98...">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Project Title / Core Requirement</label>
+            <input type="text" id="orderProjectTitle" class="form-control" placeholder="e.g. FastAPI Async Webhook Microservice with Docker & Docs">
+        </div>
+
+        <div class="form-group">
+            <label>Detailed Technical Scope & Deliverables</label>
+            <textarea id="orderProjectReqs" class="form-control" placeholder="Describe the required features, APIs, database requirements, or architecture patterns..."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+                <label>Target Budget (USD / INR)</label>
+                <input type="number" id="orderBudget" class="form-control" placeholder="e.g. 150 ($ USD)" value="150">
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+                <button onclick="submitHireOrder()" id="orderSubmitBtn" class="btn-action purple" style="width: 100%; padding: 12px; font-weight: 700; font-size: 14px;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit & Audit Project
+                </button>
+            </div>
+        </div>
+
+        <div id="hireResultBox" style="display: none; margin-top: 20px; padding: 20px; border-radius: 10px;"></div>
+    </div>
+
+    <script>
+        async function submitHireOrder() {
+            var name = document.getElementById('orderClientName').value.trim() || 'Client';
+            var contact = document.getElementById('orderClientContact').value.trim();
+            var title = document.getElementById('orderProjectTitle').value.trim();
+            var reqs = document.getElementById('orderProjectReqs').value.trim();
+            var budget = parseFloat(document.getElementById('orderBudget').value) || 50.0;
+            var btn = document.getElementById('orderSubmitBtn');
+            var resBox = document.getElementById('hireResultBox');
+
+            if (!title || !reqs) {
+                alert('Please enter a project title and technical requirements.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Auditing with Legal Guardian...';
+            resBox.style.display = 'block';
+            resBox.style.background = 'rgba(255,255,255,0.05)';
+            resBox.style.border = '1px solid rgba(255,255,255,0.1)';
+            resBox.innerHTML = '<div style="color: #60a5fa;"><i class="fa-solid fa-spinner fa-spin"></i> Running automated legal audit and technical feasibility evaluation...</div>';
+
+            try {
+                var res = await fetch('/api/customer/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_name: name,
+                        customer_email: contact,
+                        project_title: title,
+                        project_requirements: reqs,
+                        budget_usd: budget
+                    })
+                });
+                var d = await res.json();
+                if (res.ok && d.status === 'ACCEPTED_LAWFUL') {
+                    resBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                    resBox.style.border = '1px solid #10b981';
+                    resBox.innerHTML = '<div style="color: #34d399; font-weight: 800; font-size: 16px;"><i class="fa-solid fa-circle-check"></i> Project Accepted & Verified Lawful!</div>' +
+                        '<p style="color: #cbd5e1; font-size: 13px; margin: 8px 0 14px 0;">' + d.message + '</p>' +
+                        '<div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; color: #cbd5e1;">' +
+                            '<div><strong>Task ID:</strong> <code>' + d.task_id + '</code></div>' +
+                            '<div><strong>Agreed Budget:</strong> $' + (d.amount_usd || budget) + ' USD (~₹' + (d.amount_inr || Math.round(budget * 86.5)) + ' INR)</div>' +
+                            '<div><strong>Official Beneficiary UPI ID:</strong> <code>' + (d.payout_upi_id || 'talpesh100@ybl') + '</code> (' + (d.payee_name || 'Alpesh Thakor') + ')</div>' +
+                        '</div>' +
+                        '<div style="display: flex; gap: 10px; flex-wrap: wrap;">' +
+                            '<a href="' + (d.upi_uri || 'upi://pay?pa=talpesh100@ybl') + '" class="btn-action purple" style="text-decoration: none; padding: 10px 18px; font-weight: 700;">' +
+                            '<i class="fa-solid fa-bolt"></i> Lock-In Order via UPI App</a>' +
+                            '<a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20just%20submitted%20project%20order%20' + d.task_id + ':%20' + encodeURIComponent(title) + '" target="_blank" class="btn-action" style="text-decoration: none; padding: 10px 18px; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">' +
+                            '<i class="fa-brands fa-whatsapp"></i> Confirm on WhatsApp</a>' +
+                        '</div>';
+                } else {
+                    resBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                    resBox.style.border = '1px solid #ef4444';
+                    resBox.innerHTML = '<div style="color: #f87171; font-weight: 800; font-size: 15px;"><i class="fa-solid fa-triangle-exclamation"></i> Project Blocked on Legal/Ethical Grounds</div>' +
+                        '<p style="color: #cbd5e1; font-size: 13px; margin: 6px 0;"><strong>Category:</strong> ' + (d.risk_category || 'LEGAL_VIOLATION') + '</p>' +
+                        '<p style="color: #94a3b8; font-size: 12px; margin: 0;">' + (d.reason || d.detail || 'MicroCorp AI strictly operates within legal and ethical boundaries.') + '</p>';
+                }
+            } catch (e) {
+                resBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                resBox.innerHTML = '<span style="color: #f87171;">Submission error: ' + e + '</span>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit & Audit Project';
+            }
         }
     </script>
 </body>
