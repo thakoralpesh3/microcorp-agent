@@ -745,9 +745,21 @@ async function fetchPayoutStatus() {
         if (res.ok) {
             const data = await res.json();
             const revEl = document.getElementById("realUpiRevenue");
-            if (revEl) revEl.textContent = `₹${data.total_revenue_inr || '0.00'}`;
+            if (revEl) {
+                if (data.total_transactions === 0) {
+                    revEl.textContent = "₹0.00";
+                } else {
+                    revEl.textContent = `₹${Number(data.total_revenue_inr || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                }
+            }
             const txtEl = document.getElementById("upiPayoutIdText");
-            if (txtEl) txtEl.textContent = `UPI: ${data.payout_upi_id} (${data.total_transactions} orders)`;
+            if (txtEl) {
+                if (data.total_transactions === 0) {
+                    txtEl.textContent = `Direct to ${data.payout_upi_id} (Awaiting 1st Live Order)`;
+                } else {
+                    txtEl.textContent = `Direct Bank Deposit (${data.total_transactions} live order${data.total_transactions > 1 ? 's' : ''})`;
+                }
+            }
         }
     } catch(e) {}
 }

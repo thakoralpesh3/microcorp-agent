@@ -30,6 +30,7 @@ class UPIPaymentGateway:
         self.payee_name = PAYEE_NAME
         self.usd_to_inr = USD_TO_INR_RATE
         self.currency = DEFAULT_CURRENCY
+        self._test_transactions = []
         self._load_transactions()
 
     def _load_transactions(self):
@@ -146,11 +147,13 @@ class UPIPaymentGateway:
         utr_number: str,
         amount_inr: float,
         customer_email: Optional[str] = "",
-        asset_title: str = "Digital Product"
+        asset_title: str = "Digital Product",
+        is_test: bool = False
     ) -> Dict[str, Any]:
         """
         Verifies customer-submitted UTR (12-digit bank reference) or UPI transaction ID,
         records real passive income in Treasury, and unlocks product download.
+        When is_test=True, validates format and logic without polluting production ledgers or real bank accounting.
         """
         clean_utr = utr_number.strip().replace(" ", "").upper()
 
@@ -162,14 +165,15 @@ class UPIPaymentGateway:
             }
 
         # Check for replay duplicate
-        for tx in self.transactions:
+        check_list = self._test_transactions if is_test else self.transactions
+        for tx in check_list:
             if tx.get("utr_number") == clean_utr:
                 return {
                     "success": False,
                     "error": f"UTR '{clean_utr}' has already been redeemed for order {tx.get('order_id')}."
                 }
 
-        # Log real transaction
+        # Format receipt
         amount_usd = round(amount_inr / self.usd_to_inr, 2)
         receipt = {
             "order_id": order_id,
@@ -180,18 +184,23 @@ class UPIPaymentGateway:
             "customer_email": customer_email,
             "asset_title": asset_title,
             "timestamp": datetime.now().isoformat(),
-            "status": "VERIFIED_CONFIRMED"
+            "status": "TEST_VERIFIED" if is_test else "VERIFIED_CONFIRMED"
         }
-        self.transactions.append(receipt)
-        self._save_transactions()
 
-        # Record real cash credit in Treasury ledger
-        treasury.log_transaction(
-            category="upi_passive_income",
-            description=f"UPI Payment Received ({clean_utr}): {asset_title}",
-            amount=amount_usd,
-            is_revenue=True
-        )
+        if is_test:
+            self._test_transactions.append(receipt)
+        else:
+            # Log real customer transaction to persistent storage
+            self.transactions.append(receipt)
+            self._save_transactions()
+
+            # Record real cash credit in Treasury ledger
+            treasury.log_transaction(
+                category="upi_passive_income",
+                description=f"UPI Payment Received ({clean_utr}): {asset_title}",
+                amount=amount_usd,
+                is_revenue=True
+            )
 
         return {
             "success": True,
@@ -200,7 +209,8 @@ class UPIPaymentGateway:
             "amount_inr": amount_inr,
             "amount_usd": amount_usd,
             "payee_upi": self.upi_id,
-            "message": f"Payment of ₹{amount_inr:.2f} successfully verified to UPI ID {self.upi_id}. Deliverable unlocked!",
+            "is_test": is_test,
+            "message": f"Payment of ₹{amount_inr:.2f} successfully verified to UPI ID {self.upi_id}. Deliverable unlocked!" if not is_test else f"[Test Mode] UTR format verified for ₹{amount_inr:.2f}.",
             "receipt": receipt
         }
 
@@ -214,7 +224,9 @@ class UPIPaymentGateway:
             "total_transactions": len(self.transactions),
             "total_revenue_inr": round(total_inr, 2),
             "total_revenue_usd": round(total_usd, 2),
-            "recent_transactions": self.transactions[-5:]
+            "recent_transactions": self.transactions[-5:],
+            "settlement_type": "DIRECT_INSTANT_BANK_DEPOSIT",
+            "settlement_note": "Direct bank settlement via UPI. Customer payments go straight into your bank account."
         }
 
 # Singleton instance

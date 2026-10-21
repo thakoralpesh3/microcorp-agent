@@ -453,7 +453,8 @@ print('Hello MicroCorp')
             utr_number=test_utr,
             amount_inr=checkout_pkg["amount_inr"],
             customer_email="buyer@example.com",
-            asset_title=checkout_pkg["title"]
+            asset_title=checkout_pkg["title"],
+            is_test=True
         )
         self.assertTrue(verify_res["success"])
         self.assertEqual(verify_res["payee_upi"], "talpesh100@ybl")
@@ -463,7 +464,8 @@ print('Hello MicroCorp')
         duplicate_res = upi_gateway.verify_utr_payment(
             order_id="NEW_ORDER",
             utr_number=test_utr,
-            amount_inr=checkout_pkg["amount_inr"]
+            amount_inr=checkout_pkg["amount_inr"],
+            is_test=True
         )
         self.assertFalse(duplicate_res["success"])
         self.assertIn("already been redeemed", duplicate_res["error"])

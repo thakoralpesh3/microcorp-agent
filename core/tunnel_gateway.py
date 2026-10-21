@@ -125,6 +125,7 @@ class PublicTunnelGateway:
 
     def _on_tunnel_connected(self, url: str):
         """Fires when a new live public URL is assigned by Cloudflare."""
+        self.public_url = url
         store_url = f"{url}/store"
         logger.info(f"✨ PUBLIC CLOUDFLARE STORE ONLINE: {store_url}")
         
