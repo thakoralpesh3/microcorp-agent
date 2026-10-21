@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from config import DELIVERABLES_DIR, PAYOUT_UPI_ID, PAYEE_NAME, USD_TO_INR_RATE
 from core.upi_payment import upi_gateway
 from core.pricing_engine import pricing_engine
+from core.ecommerce_syndicator import ecommerce_syndicator
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -351,6 +352,21 @@ and practical implementation guides designed for modern engineers and builders.
         )
         with open(html_file, "w", encoding="utf-8") as f:
             f.write(rendered_html)
+
+        # 3b. Generate Multi-Channel E-Commerce Marketplace Listings
+        ecom_files = {}
+        try:
+            ecom_files = ecommerce_syndicator.export_syndication_folder(
+                target_dir=category_dir,
+                asset_id=safe_slug,
+                title=title,
+                category=category,
+                markdown_content=markdown_content,
+                custom_price_usd=custom_price_usd,
+                custom_price_inr=custom_price_inr
+            )
+        except Exception:
+            ecom_files = {}
             
         # 4. Create ZIP package with Terms, Payment QR, and Instructions
         zip_path_str = ""
@@ -373,6 +389,12 @@ and practical implementation guides designed for modern engineers and builders.
                 # Invoice text
                 invoice_text = f"MICROCORP AI COMMERCIAL INVOICE\nItem: {title}\nPrice: ₹{amount_inr:.2f} INR (~${price_usd:.2f} USD)\nPayee UPI ID: {PAYOUT_UPI_ID}\nPayee Name: {PAYEE_NAME}\nStatus: Verified For Instant Delivery\n"
                 zf.writestr(f"{safe_slug}/INVOICE.txt", invoice_text)
+
+                # Embed Multi-Channel E-Commerce Marketplace Listings
+                for ch_name, ch_path_str in ecom_files.items():
+                    ch_path = Path(ch_path_str)
+                    if ch_path.exists():
+                        zf.write(ch_path, arcname=f"{safe_slug}/ECOMMERCE_LISTINGS/{ch_path.name}")
 
             zip_path_str = str(zip_file)
             
@@ -398,7 +420,8 @@ and practical implementation guides designed for modern engineers and builders.
             "amount_inr": amount_inr,
             "price_usd": price_usd,
             "upi_uri": checkout_pkg["upi_uri"],
-            "size_bytes": md_file.stat().st_size
+            "size_bytes": md_file.stat().st_size,
+            "ecommerce_listings": ecom_files
         }
 
 packager = Packager()

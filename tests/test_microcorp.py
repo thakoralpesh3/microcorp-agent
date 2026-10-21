@@ -601,8 +601,88 @@ print('Hello MicroCorp')
 
         print("Pricing Engine & Packager Integration Verified: All 5 product tiers and dynamic invoices active.")
 
+    def test_18_ecommerce_syndication_engine(self):
+        """
+        Verifies Omnichannel E-Commerce & Marketplace Syndication:
+        - Amazon KDP metadata formatting (eBook & POD paperback, 7 search keywords, BISAC categories)
+        - Flipkart & Meesho physical reference manual bridge (HSN 4901.10.10 0% GST exempt, 5 bullet points)
+        - Gumroad & Instamojo digital download specifications
+        - Deliverables Packager embeds ECOMMERCE_LISTINGS folder inside ZIP archives
+        """
+        import zipfile
+        from core.ecommerce_syndicator import ecommerce_syndicator
+        from tools.packager import packager
+
+        # 1. Test Amazon KDP Listing
+        kdp = ecommerce_syndicator.generate_amazon_kdp_listing(
+            title="FastAPI Async Microservice Blueprint",
+            category="developer_toolkit",
+            markdown_content="# FastAPI Guide\nProduction patterns for high-concurrency microservices.",
+            price_usd=21.99,
+            price_inr=1799
+        )
+        self.assertEqual(kdp["platform"], "Amazon KDP")
+        self.assertEqual(len(kdp["keywords"]), 7)
+        self.assertTrue(any("tutorial" in k for k in kdp["keywords"]))
+        self.assertIn("COM051010", kdp["bisac_categories"][0])
+        self.assertIn("trim_size", kdp["paperback_specs"])
+        self.assertIn("AMAZON KDP", kdp["markdown_spec"].upper())
+        print("Amazon KDP Spec Verified: 7 Search Keywords, BISAC Categories, Paperback POD specs generated.")
+
+        # 2. Test Flipkart & Meesho Listing
+        fk = ecommerce_syndicator.generate_flipkart_meesho_spec(
+            title="FastAPI Async Microservice Blueprint",
+            category="developer_toolkit",
+            markdown_content="# FastAPI Guide\nProduction patterns.",
+            price_usd=21.99,
+            price_inr=1799
+        )
+        self.assertEqual(fk["platform"], "Flipkart & Meesho")
+        self.assertEqual(fk["hsn_code"], "4901.10.10")
+        self.assertEqual(len(fk["bullet_points"]), 5)
+        self.assertEqual(fk["weight_grams"], 120)
+        self.assertIn("0% GST", fk["markdown_spec"])
+        print(f"Flipkart/Meesho Spec Verified: HSN {fk['hsn_code']} (0% GST), 5 Bullet Points, {fk['weight_grams']}g spiral manual packaging.")
+
+        # 3. Test Gumroad & Instamojo specs
+        gumroad = ecommerce_syndicator.generate_gumroad_listing(
+            title="FastAPI Async Microservice Blueprint",
+            category="developer_toolkit",
+            markdown_content="# FastAPI Guide",
+            price_usd=21.99,
+            price_inr=1799
+        )
+        self.assertEqual(gumroad["platform"], "Gumroad")
+        self.assertIn("talpesh100@ybl", gumroad["markdown_spec"])
+
+        instamojo = ecommerce_syndicator.generate_instamojo_spec(
+            title="FastAPI Async Microservice Blueprint",
+            category="developer_toolkit",
+            markdown_content="# FastAPI Guide",
+            price_usd=21.99,
+            price_inr=1799
+        )
+        self.assertEqual(instamojo["platform"], "Instamojo & Cosmofeed")
+        self.assertEqual(instamojo["price_inr"], 1799)
+        print("Gumroad and Instamojo digital creator listings verified.")
+
+        # 4. Test Deliverable Packager embeds ECOMMERCE_LISTINGS in ZIP archive
+        sample_md = "# E-Commerce Deliverable\nComplete full-stack code kit with multi-channel listings."
+        pkg = packager.save_deliverable("developer_toolkit", "FullStack ECommerce Kit", sample_md, create_zip=True)
+        self.assertIn("ecommerce_listings", pkg)
+        self.assertTrue(len(pkg["ecommerce_listings"]) >= 4)
+
+        with zipfile.ZipFile(pkg["zip_path"], 'r') as zf:
+            names = zf.namelist()
+            self.assertTrue(any("ECOMMERCE_LISTINGS/AMAZON_KDP_LISTING.md" in n for n in names))
+            self.assertTrue(any("ECOMMERCE_LISTINGS/FLIPKART_MEESHO_SPEC.md" in n for n in names))
+            self.assertTrue(any("ECOMMERCE_LISTINGS/GUMROAD_LISTING.md" in n for n in names))
+            self.assertTrue(any("ECOMMERCE_LISTINGS/INSTAMOJO_UPI_SPEC.md" in n for n in names))
+        print("Deliverable Packager Verified: Automatically bundled ECOMMERCE_LISTINGS into ZIP.")
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

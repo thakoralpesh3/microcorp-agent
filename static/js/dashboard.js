@@ -775,6 +775,22 @@ function copyPublicStoreUrl() {
     });
 }
 
+// E-Commerce Channel Modal
+async function openEcommerceChannelModal() {
+    try {
+        const res = await fetch("/api/ecommerce/channels");
+        const data = await res.json();
+        let msg = "🏪 MicroCorp AI Omnichannel E-Commerce Specs:\n\n";
+        data.channels.forEach(ch => {
+            msg += `• [${ch.badge}] ${ch.name}\n  Type: ${ch.type}\n  Fulfillment: ${ch.fulfillment || ch.payout || ch.royalty}\n  GST Required: ${ch.gst_required ? 'Yes (HSN ' + ch.hsn_code + ')' : 'No (Individual royalty/creator model)'}\n\n`;
+        });
+        msg += "To get the complete ready-to-list package for any product, open the Storefront (/store) and click 'Marketplace Pack' on any product card.";
+        alert(msg);
+    } catch(e) {
+        alert("E-Commerce Channel specifications available in deliverables/ ready_to_monetize ZIP archives under ECOMMERCE_LISTINGS/.");
+    }
+}
+
 // Initial fetch & loop every 2.5 seconds
 fetchTelemetry();
 fetchFreelanceRadar();

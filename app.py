@@ -563,14 +563,19 @@ async def public_storefront():
                 <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">{p['description']}</p>
                 <div style="color: #64748b; font-size: 12px; margin-top: 8px;"><i class="fa-solid fa-file-zipper"></i> Packaged ZIP ({p['size_kb']} KB)</div>
             </div>
-            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <span style="font-size: 20px; font-weight: 800; color: #34d399;">₹{p['price_inr']}</span>
                     <small style="color: #94a3b8; font-size: 12px; display: block;">(~${p['price_usd']:.2f} USD)</small>
                 </div>
-                <a href="/checkout/{p['slug']}" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-bolt"></i> Buy with UPI
-                </a>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <a href="/api/ecommerce/syndicate/{p['slug']}" target="_blank" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;" title="View Amazon, Flipkart, Meesho, and Gumroad Seller Pack">
+                        <i class="fa-solid fa-cart-shopping"></i> Marketplace Pack
+                    </a>
+                    <a href="/checkout/{p['slug']}" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-bolt"></i> Buy with UPI
+                    </a>
+                </div>
             </div>
         </div>
         """
@@ -612,6 +617,75 @@ async def checkout_page(asset_id: str):
 async def get_pricing_catalog():
     from core.pricing_engine import pricing_engine
     return pricing_engine.get_catalog()
+
+@app.get("/api/ecommerce/channels")
+async def get_ecommerce_channels():
+    from core.ecommerce_syndicator import ecommerce_syndicator
+    return {
+        "payout_upi_id": ecommerce_syndicator.payout_upi_id,
+        "payee_name": ecommerce_syndicator.payee_name,
+        "channels": [
+            {
+                "id": "amazon_kdp",
+                "name": "Amazon Kindle Direct Publishing",
+                "badge": "Amazon KDP",
+                "type": "Digital eBook & Print-on-Demand Paperback",
+                "royalty": "70% Digital Royalty",
+                "fulfillment": "100% Automated by Amazon (zero inventory)",
+                "gst_required": False,
+                "supported_marketplaces": ["Amazon.in", "Amazon.com", "Amazon.co.uk"]
+            },
+            {
+                "id": "flipkart_meesho",
+                "name": "Flipkart & Meesho Commerce",
+                "badge": "Flipkart / Meesho",
+                "type": "Physical Spiral Handbook & USB Code Kit",
+                "hsn_code": "4901.10.10 (Printed Technical Books)",
+                "gst_rate": "0% (GST Exempt in India)",
+                "fulfillment": "Courier Pickup via Shadowfax / Delhivery / Ekart",
+                "gst_required": True
+            },
+            {
+                "id": "gumroad",
+                "name": "Gumroad Global Creator Store",
+                "badge": "Gumroad",
+                "type": "Direct Global Digital Download",
+                "payout": "Direct Bank Deposit / Stripe / PayPal",
+                "gst_required": False
+            },
+            {
+                "id": "instamojo",
+                "name": "Instamojo & Cosmofeed India",
+                "badge": "Instamojo UPI",
+                "type": "Instant Indian UPI Digital File Delivery",
+                "payout": f"Direct Instant UPI to {ecommerce_syndicator.payout_upi_id}",
+                "gst_required": False
+            }
+        ]
+    }
+
+@app.get("/api/ecommerce/syndicate/{asset_id}")
+async def get_ecommerce_syndication(asset_id: str):
+    from core.ecommerce_syndicator import ecommerce_syndicator
+    title = re.sub(r'^\d+_\d+_', '', asset_id).replace("_", " ").title()
+    category = "digital_product"
+    
+    # Try reading existing README or markdown if available
+    md_content = f"# {title}\nProduction developer toolkit engineered by MicroCorp AI."
+    matches = list(DELIVERABLES_DIR.glob(f"**/*{asset_id}*.md"))
+    if matches:
+        try:
+            md_content = matches[0].read_text(encoding="utf-8")
+        except Exception:
+            pass
+
+    bundle = ecommerce_syndicator.generate_all_marketplace_packages(
+        asset_id=asset_id,
+        title=title,
+        category=category,
+        markdown_content=md_content
+    )
+    return bundle
 
 def main():
     parser = argparse.ArgumentParser(description="MicroCorp AI Enterprise Launcher")
