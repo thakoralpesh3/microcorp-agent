@@ -540,7 +540,69 @@ print('Hello MicroCorp')
             self.assertIn("Reddit Post", promo_text)
         print(f"Public Marketing Engine Verified: Generated {Path(promo_file).name} with UPI talpesh100@ybl.")
 
+    def test_17_pricing_engine_tier_classification(self):
+        """
+        Verifies dynamic product and work pricing engine:
+        - Classifies cheatsheets to Tier 1 (₹399 / $4.99)
+        - Classifies research digests to Tier 2 (₹799 / $9.99)
+        - Classifies production toolkits to Tier 3 (₹1,799 / $21.99)
+        - Classifies enterprise full-stack systems to Tier 4 (₹3,999 / $49.00)
+        - Handles custom freelance contract budgets (e.g. $280 USD)
+        - Verifies packager embed of tiered pricing in ZIP invoice
+        """
+        import zipfile
+        from core.pricing_engine import pricing_engine
+        from tools.packager import packager
+
+        # 1. Cheatsheet Tier
+        cheat_p = pricing_engine.get_pricing_for_asset("Python AsyncIO Cheatsheet", "cheatsheet")
+        self.assertEqual(cheat_p["tier_id"], "cheatsheet")
+        self.assertEqual(cheat_p["price_inr"], 399)
+        self.assertEqual(cheat_p["badge"], "CHEATSHEET")
+
+        # 2. Newsletter / Research Tier
+        news_p = pricing_engine.get_pricing_for_asset("The Future of CSS Tech Digest", "newsletter")
+        self.assertEqual(news_p["tier_id"], "newsletter")
+        self.assertEqual(news_p["price_inr"], 799)
+        self.assertEqual(news_p["badge"], "RESEARCH DIGEST")
+
+        # 3. Production Toolkit / Microservice Tier
+        tool_p = pricing_engine.get_pricing_for_asset("FastAPI Async Webhook Microservice", "developer_toolkit")
+        self.assertEqual(tool_p["tier_id"], "developer_toolkit")
+        self.assertEqual(tool_p["price_inr"], 1799)
+        self.assertEqual(tool_p["badge"], "PRODUCTION TOOLKIT")
+
+        # 4. Enterprise Full-Stack Tier
+        full_p = pricing_engine.get_pricing_for_asset("Full-Stack FastAPI Backend with JWT Auth and Docker Setup", "full_stack")
+        self.assertEqual(full_p["tier_id"], "full_stack")
+        self.assertEqual(full_p["price_inr"], 3999)
+        self.assertEqual(full_p["badge"], "ENTERPRISE SYSTEM")
+
+        # 5. Freelance Turnkey Contract with Custom Budget
+        custom_p = pricing_engine.get_pricing_for_asset(
+            title="Fiverr Client Contract: Stripe Webhook Gateway",
+            category="freelance_turnkey",
+            custom_price_usd=280.0
+        )
+        self.assertEqual(custom_p["tier_id"], "freelance_turnkey")
+        self.assertEqual(custom_p["price_usd"], 280.0)
+        self.assertGreater(custom_p["price_inr"], 20000)
+        self.assertTrue(custom_p["is_custom_quote"])
+
+        # 6. Verify Packager embeds the correct tier price in deliverable ZIP
+        sample_md = "# Cheatsheet Guide\nAsyncio quick patterns."
+        pkg = packager.save_deliverable("cheatsheet", "AsyncIO Quick Cheatsheet", sample_md, create_zip=True)
+        self.assertEqual(pkg["amount_inr"], 399)
+
+        with zipfile.ZipFile(pkg["zip_path"], 'r') as zf:
+            invoice_txt = zf.read([n for n in zf.namelist() if "INVOICE.txt" in n][0]).decode("utf-8")
+            self.assertIn("₹399.00", invoice_txt)
+            self.assertIn("talpesh100@ybl", invoice_txt)
+
+        print("Pricing Engine & Packager Integration Verified: All 5 product tiers and dynamic invoices active.")
+
 if __name__ == "__main__":
     unittest.main()
+
 
 

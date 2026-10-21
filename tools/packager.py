@@ -14,6 +14,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from config import DELIVERABLES_DIR, PAYOUT_UPI_ID, PAYEE_NAME, USD_TO_INR_RATE
 from core.upi_payment import upi_gateway
+from core.pricing_engine import pricing_engine
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -268,7 +269,14 @@ and practical implementation guides designed for modern engineers and builders.
         return listing
 
     @staticmethod
-    def save_deliverable(category: str, title: str, markdown_content: str, create_zip: bool = True) -> Dict[str, Any]:
+    def save_deliverable(
+        category: str,
+        title: str,
+        markdown_content: str,
+        create_zip: bool = True,
+        custom_price_usd: Optional[float] = None,
+        custom_price_inr: Optional[float] = None
+    ) -> Dict[str, Any]:
         """
         Saves a deliverable as Markdown and HTML, archives into a ZIP file with Terms,
         Marketplace listing, instant UPI QR code, and payment instructions.
@@ -290,13 +298,22 @@ and practical implementation guides designed for modern engineers and builders.
         qr_file = category_dir / f"{base_filename}_QR.svg"
         payment_file = category_dir / f"{base_filename}_PAYMENT.md"
 
-        # 0. Create UPI Checkout Package
-        price_usd = 19.0 if category == "digital_product" else (25.0 if "newsletter" in category else 45.0)
+        # 0. Calculate Dynamic Tier Pricing
+        pricing = pricing_engine.get_pricing_for_asset(
+            title=title,
+            category=category,
+            custom_price_usd=custom_price_usd,
+            custom_price_inr=custom_price_inr
+        )
+        price_usd = pricing["price_usd"]
+        custom_inr = pricing["price_inr"]
+
         checkout_pkg = upi_gateway.create_checkout_package(
             asset_id=safe_slug,
             title=title,
             category=category,
-            price_usd=price_usd
+            price_usd=price_usd,
+            custom_price_inr=custom_inr
         )
         amount_inr = checkout_pkg["amount_inr"]
         qr_svg_str = checkout_pkg["qr_svg"]

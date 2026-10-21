@@ -399,6 +399,12 @@ STORE_TEMPLATE = """<!DOCTYPE html>
             Battle-tested architecture cheatsheets, automated prompt engineering packs, and micro-SaaS boilerplates.
             Purchase directly with zero intermediary fees using any Indian UPI app (PhonePe, Google Pay, Paytm, BHIM).
         </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px;">
+            <span style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-code"></i> Cheatsheets: ₹399</span>
+            <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-book-open"></i> Research: ₹799</span>
+            <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-cubes"></i> Toolkits: ₹1,799</span>
+            <span style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-layer-group"></i> Enterprise: ₹3,999</span>
+        </div>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;">
@@ -525,32 +531,36 @@ CHECKOUT_TEMPLATE = """<!DOCTYPE html>
 @app.get("/store", response_class=HTMLResponse)
 async def public_storefront():
     from core.upi_payment import upi_gateway
+    from core.pricing_engine import pricing_engine
     ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
     products = []
-    from core.growth_engine import growth_engine
-    dyn_usd, dyn_inr = growth_engine.compute_dynamic_product_price(complexity_score=1.0)
     if ready_dir.exists():
         for zip_p in sorted(ready_dir.glob("*.zip"), reverse=True):
             clean_name = zip_p.stem
             size_kb = round(zip_p.stat().st_size / 1024, 1)
             title_guess = re.sub(r'^\d+_\d+_', '', clean_name).replace("_", " ").title()
+            pricing = pricing_engine.get_pricing_for_asset(title=title_guess)
             products.append({
                 "slug": clean_name,
                 "title": title_guess,
                 "size_kb": size_kb,
-                "price_usd": dyn_usd,
-                "price_inr": dyn_inr,
+                "price_usd": pricing["price_usd"],
+                "price_inr": pricing["price_inr"],
+                "badge": pricing["badge"],
+                "badge_style": pricing["badge_style"],
+                "tier_name": pricing["tier_name"],
+                "description": pricing["description"],
                 "download_name": zip_p.name
             })
             
     products_cards_html = ""
-    for p in products[:12]:
+    for p in products[:16]:
         products_cards_html += f"""
         <div style="background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">DIGITAL ASSET</span>
+                <span style="{p['badge_style']} font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">{p['badge']}</span>
                 <h3 style="color: #f1f5f9; font-size: 17px; margin: 10px 0 6px 0; line-height: 1.4;">{p['title']}</h3>
-                <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">Production-grade architecture guide, copy-paste code snippets, documentation, and commercial license.</p>
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">{p['description']}</p>
                 <div style="color: #64748b; font-size: 12px; margin-top: 8px;"><i class="fa-solid fa-file-zipper"></i> Packaged ZIP ({p['size_kb']} KB)</div>
             </div>
             <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
@@ -574,10 +584,17 @@ async def public_storefront():
 @app.get("/checkout/{asset_id}", response_class=HTMLResponse)
 async def checkout_page(asset_id: str):
     from core.upi_payment import upi_gateway
-    title = asset_id.replace("_", " ").title()
-    from core.growth_engine import growth_engine
-    dyn_usd, _ = growth_engine.compute_dynamic_product_price(complexity_score=1.0)
-    pkg = upi_gateway.create_checkout_package(asset_id=asset_id, title=title, category=category, price_usd=dyn_usd)
+    from core.pricing_engine import pricing_engine
+    title = re.sub(r'^\d+_\d+_', '', asset_id).replace("_", " ").title()
+    category = "digital_product"
+    pricing = pricing_engine.get_pricing_for_asset(title=title, category=category)
+    pkg = upi_gateway.create_checkout_package(
+        asset_id=asset_id,
+        title=title,
+        category=category,
+        price_usd=pricing["price_usd"],
+        custom_price_inr=pricing["price_inr"]
+    )
 
     html = CHECKOUT_TEMPLATE.replace("__TITLE__", title) \
                             .replace("__AMOUNT_INR__", str(pkg['amount_inr'])) \
@@ -590,6 +607,11 @@ async def checkout_page(asset_id: str):
                             .replace("__ASSET_ID__", asset_id)
 
     return HTMLResponse(content=html)
+
+@app.get("/api/pricing/catalog")
+async def get_pricing_catalog():
+    from core.pricing_engine import pricing_engine
+    return pricing_engine.get_catalog()
 
 def main():
     parser = argparse.ArgumentParser(description="MicroCorp AI Enterprise Launcher")

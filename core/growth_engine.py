@@ -196,14 +196,15 @@ class EnterpriseGrowthEngine:
             "status": "EXPANDED" if evolutions_made else "OPTIMIZED"
         }
 
-    def compute_dynamic_product_price(self, category: str = "digital_product", complexity_score: float = 1.0) -> Tuple[float, int]:
-        """Computes escalated product pricing based on corporate tier and asset depth."""
-        state = self.get_growth_state()
-        base_usd = state.get("base_price_usd", 19.0)
+    def compute_dynamic_product_price(self, category: str = "digital_product", title: str = "", complexity_score: float = 1.0) -> Tuple[float, int]:
+        """Computes tailored product pricing based on product type, tier, and complexity."""
+        from core.pricing_engine import pricing_engine
+        pricing = pricing_engine.get_pricing_for_asset(title=title, category=category)
+        tier_usd = pricing["price_usd"]
         
-        # Multiply by complexity score (1.0 to 2.5)
-        price_usd = round(base_usd * max(1.0, complexity_score), 2)
-        price_inr = round(price_usd * USD_TO_INR_RATE)
+        # Scale if complexity_score > 1.0
+        price_usd = round(tier_usd * max(1.0, complexity_score), 2)
+        price_inr = round(pricing["price_inr"] * max(1.0, complexity_score))
         return price_usd, price_inr
 
 # Global singleton
