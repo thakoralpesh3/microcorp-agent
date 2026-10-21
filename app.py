@@ -353,6 +353,23 @@ async def download_purchased_asset(asset_id: str):
     target_zip = matches[0]
     return FileResponse(path=str(target_zip), media_type="application/zip", filename=target_zip.name)
 
+@app.get("/api/gateway/public_url")
+async def get_gateway_public_url():
+    from core.tunnel_gateway import public_gateway
+    return public_gateway.get_gateway_status()
+
+@app.get("/api/gateway/qr.svg")
+async def get_gateway_qr_svg():
+    from config import PUBLIC_QR_FILE
+    if PUBLIC_QR_FILE.exists():
+        return FileResponse(path=str(PUBLIC_QR_FILE), media_type="image/svg+xml")
+    raise HTTPException(status_code=404, detail="Public mobile QR code not yet generated.")
+
+@app.get("/api/growth/metrics")
+async def get_growth_metrics():
+    from core.growth_engine import growth_engine
+    return growth_engine.get_growth_state()
+
 STORE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -510,6 +527,8 @@ async def public_storefront():
     from core.upi_payment import upi_gateway
     ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
     products = []
+    from core.growth_engine import growth_engine
+    dyn_usd, dyn_inr = growth_engine.compute_dynamic_product_price(complexity_score=1.0)
     if ready_dir.exists():
         for zip_p in sorted(ready_dir.glob("*.zip"), reverse=True):
             clean_name = zip_p.stem
@@ -519,8 +538,8 @@ async def public_storefront():
                 "slug": clean_name,
                 "title": title_guess,
                 "size_kb": size_kb,
-                "price_usd": 19.0,
-                "price_inr": 1649,
+                "price_usd": dyn_usd,
+                "price_inr": dyn_inr,
                 "download_name": zip_p.name
             })
             
@@ -556,9 +575,9 @@ async def public_storefront():
 async def checkout_page(asset_id: str):
     from core.upi_payment import upi_gateway
     title = asset_id.replace("_", " ").title()
-    category = "digital_product"
-    
-    pkg = upi_gateway.create_checkout_package(asset_id=asset_id, title=title, category=category, price_usd=19.0)
+    from core.growth_engine import growth_engine
+    dyn_usd, _ = growth_engine.compute_dynamic_product_price(complexity_score=1.0)
+    pkg = upi_gateway.create_checkout_package(asset_id=asset_id, title=title, category=category, price_usd=dyn_usd)
 
     html = CHECKOUT_TEMPLATE.replace("__TITLE__", title) \
                             .replace("__AMOUNT_INR__", str(pkg['amount_inr'])) \

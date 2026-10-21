@@ -23,6 +23,7 @@ from core.department_scaler import scaler
 from core.treasury import treasury
 from core.legal_guardian import legal_guardian
 from core.git_sync import git_sync
+from config import ENABLE_PUBLIC_TUNNEL, ENABLE_GITHUB_RELEASES
 
 # Import Core Departments
 from departments.intelligence import IntelligenceDepartment
@@ -54,17 +55,31 @@ class CEOOrchestrator:
         scaler.register_department(self.gig_proposal_dept)
 
     def start(self):
-        """Starts the autonomous executive loop in a background thread."""
+        """Starts the autonomous executive loop and public tunnel in background threads."""
         if self.is_running:
             return
         self.is_running = True
         self.is_paused = False
+        
+        # Start public Cloudflare tunnel if enabled
+        if ENABLE_PUBLIC_TUNNEL:
+            try:
+                from core.tunnel_gateway import public_gateway
+                public_gateway.start_tunnel()
+            except Exception as e:
+                logger.warning(f"Could not start public Cloudflare tunnel: {e}")
+
         self._thread = threading.Thread(target=self._run_loop, daemon=True, name="CEO-Orchestrator")
         self._thread.start()
         logger.info(f"👑 CEO {self.name} has assumed command of {self.company}.")
 
     def stop(self):
         self.is_running = False
+        try:
+            from core.tunnel_gateway import public_gateway
+            public_gateway.stop_tunnel()
+        except Exception:
+            pass
         logger.info(f"👑 CEO {self.name} paused enterprise operations.")
 
     def trigger_sprint(self, domain: Optional[str] = None, custom_title: Optional[str] = None, payload: Optional[Dict[str, Any]] = None) -> str:
@@ -156,23 +171,57 @@ class CEOOrchestrator:
             time.sleep(LOOP_INTERVAL_SECONDS)
 
     def run_autonomous_income_cycle(self):
-        """Autonomously searches online opportunities, filters for 100% finishable work, plans, and executes."""
+        """Autonomously searches online opportunities, filters for 100% finishable work, plans, executes, and publishes."""
+        from core.growth_engine import growth_engine
+        # 1. Trigger corporate self-growth and dynamic department evaluation
+        try:
+            growth_res = growth_engine.evaluate_and_grow()
+            if growth_res.get("evolutions_triggered"):
+                logger.info(f"🌱 Enterprise Growth Event: {growth_res['evolutions_triggered']}")
+        except Exception as e:
+            logger.debug(f"Growth evaluation error: {e}")
+
+        # 2. Search, plan and enqueue 100% turnkey work
+        plan_res = None
         try:
             from core.autonomous_planner import autonomous_planner
             plan_res = autonomous_planner.search_and_plan_autonomous_work()
             if plan_res:
                 logger.info(f"✨ Autonomous Strategy: Greenlit plan '{plan_res['title']}' with {plan_res['feasibility_score']*100:.0f}% feasibility.")
-                return plan_res
         except Exception as e:
             logger.warning(f"Planner exception, using fallback opportunity rotation: {e}")
             from tools.web_researcher import web_researcher
             trends = web_researcher.fetch_trending_tech()
             topic = trends[0]["title"] if trends else "Python Cloud Microservices"
-            return self.trigger_sprint(
+            self.trigger_sprint(
                 domain="digital_products",
                 custom_title=f"Autonomous Asset: {topic[:45]}",
                 payload={"topic": topic, "product_type": "Developer Reference & Architecture Kit"}
             )
+
+        # 3. Public GitHub Release Distribution for top completed package
+        if ENABLE_GITHUB_RELEASES:
+            try:
+                from core.public_distribution import public_distribution
+                from config import DELIVERABLES_DIR
+                ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
+                if ready_dir.exists():
+                    zip_files = sorted(ready_dir.glob("*.zip"), key=os.path.getmtime, reverse=True)
+                    if zip_files:
+                        latest_zip = zip_files[0]
+                        title_clean = latest_zip.stem.replace("_", " ").title()
+                        price_usd, price_inr = growth_engine.compute_dynamic_product_price(complexity_score=1.2)
+                        public_distribution.publish_asset_to_github_release(
+                            zip_path=str(latest_zip),
+                            title=title_clean,
+                            description=f"Autonomous production-grade toolkit on {title_clean}.",
+                            price_usd=price_usd,
+                            price_inr=price_inr
+                        )
+            except Exception as e:
+                logger.debug(f"Public distribution error: {e}")
+
+        return plan_res
 
     def run_freelance_sprint(self, job_id: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -190,7 +239,6 @@ class CEOOrchestrator:
 
         if not target_gig:
             gigs = freelance_harvester.fetch_all_platform_gigs()
-            # Select first approved lawful and turnkey feasible gig
             for g in gigs:
                 if g.get("is_legal") and g.get("is_turnkey_feasible"):
                     target_gig = g
@@ -220,6 +268,9 @@ class CEOOrchestrator:
         finances = treasury.get_financial_summary()
         from core.database import get_recent_plans
         plans = get_recent_plans(limit=6)
+        
+        from core.growth_engine import growth_engine
+        from core.tunnel_gateway import public_gateway
 
         return {
             "company": self.company,
@@ -236,6 +287,8 @@ class CEOOrchestrator:
             "queue_stats": q_stats,
             "treasury": finances,
             "recent_plans": plans,
+            "growth": growth_engine.get_growth_state(),
+            "public_gateway": public_gateway.get_gateway_status(),
             "legal_compliance": legal_guardian.get_compliance_metrics(),
             "git_status": git_sync.get_sync_status()
         }

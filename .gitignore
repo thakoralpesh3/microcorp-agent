@@ -22,6 +22,7 @@ data/*.db-journal
 data/*.log
 data/*.pid
 data/*.json
+data/*.svg
 !data/.gitkeep
 
 # Deliverables generated locally

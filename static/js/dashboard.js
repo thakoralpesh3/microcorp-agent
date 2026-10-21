@@ -71,6 +71,36 @@ function renderDashboard(data) {
         gitBadge.title = isClean ? "100% Synced with GitHub remote" : `${changedCount} local changes pending sync`;
     }
 
+    // 3c. Public Cloudflare Gateway State
+    const gateway = data.public_gateway || {};
+    const tunnelBadge = document.getElementById("publicTunnelStatusBadge");
+    const storeLink = document.getElementById("publicStorefrontLink");
+    if (tunnelBadge && storeLink) {
+        if (gateway.is_active && gateway.public_url) {
+            tunnelBadge.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #34d399;"></i> Online: ${gateway.public_url.replace("https://", "")}`;
+            tunnelBadge.style.background = "rgba(16, 185, 129, 0.2)";
+            tunnelBadge.style.color = "#34d399";
+            tunnelBadge.style.borderColor = "rgba(16, 185, 129, 0.4)";
+            storeLink.href = gateway.store_url || `${gateway.public_url}/store`;
+        } else if (gateway.public_url) {
+            tunnelBadge.innerHTML = `<i class="fa-solid fa-globe"></i> ${gateway.public_url.replace("https://", "")}`;
+            tunnelBadge.style.background = "rgba(59, 130, 246, 0.2)";
+            tunnelBadge.style.color = "#60a5fa";
+            storeLink.href = `${gateway.public_url}/store`;
+        } else {
+            tunnelBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Tunnel Syncing...`;
+            tunnelBadge.style.background = "rgba(245, 158, 11, 0.2)";
+            tunnelBadge.style.color = "#fbbf24";
+        }
+    }
+
+    // 3d. Autonomous Growth & Evolution Tier
+    const growth = data.growth || {};
+    const growthBadge = document.getElementById("growthTierBadge");
+    if (growthBadge && growth.tier_name) {
+        growthBadge.innerHTML = `<i class="fa-solid fa-seedling"></i> ${growth.tier_badge || growth.tier_name} (Base: $${growth.base_price_usd} / ₹${growth.base_price_inr})`;
+    }
+
     // 4. Departments
     const depts = data.departments || [];
     document.getElementById("deptCountBadge").textContent = `${depts.length} Departments`;
@@ -722,11 +752,23 @@ async function fetchPayoutStatus() {
     } catch(e) {}
 }
 
+// Copy live public store URL
+function copyPublicStoreUrl() {
+    const gateway = latestTelemetry && latestTelemetry.public_gateway;
+    const url = (gateway && gateway.store_url) || (gateway && gateway.public_url ? `${gateway.public_url}/store` : window.location.origin + "/store");
+    navigator.clipboard.writeText(url).then(() => {
+        alert("Copied Public Storefront URL:\n" + url);
+    }).catch(() => {
+        prompt("Copy Public Storefront URL:", url);
+    });
+}
+
 // Initial fetch & loop every 2.5 seconds
 fetchTelemetry();
 fetchFreelanceRadar();
 fetchPayoutStatus();
 setInterval(fetchTelemetry, 2500);
 setInterval(fetchPayoutStatus, 5000);
+
 
 

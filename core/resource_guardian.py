@@ -60,14 +60,21 @@ class ResourceGuardian:
         """
         telemetry = self.get_system_telemetry()
         
+        import gc
+        if telemetry["memory_percent"] > 82.0 or telemetry["cpu_percent"] > 75.0:
+            gc.collect()
+
         if telemetry["cpu_percent"] > MAX_CPU_PERCENT:
-            return False, f"CPU usage high ({telemetry['cpu_percent']}% > {MAX_CPU_PERCENT}%). Throttling subagents."
+            return False, f"CPU critical ({telemetry['cpu_percent']}% > {MAX_CPU_PERCENT}%). Throttling subagents."
 
         if telemetry["memory_percent"] > MAX_MEMORY_PERCENT:
-            return False, f"Memory usage high ({telemetry['memory_percent']}% > {MAX_MEMORY_PERCENT}%). Pausing spawns."
+            return False, f"Memory critical ({telemetry['memory_percent']}% > {MAX_MEMORY_PERCENT}%). Pausing spawns."
 
         if not telemetry["is_charging"] and telemetry["battery_percent"] < MIN_BATTERY_PERCENT:
-            return False, f"Battery low ({telemetry['battery_percent']}% and unplugged). Conserving laptop power."
+            return False, f"Battery critical ({telemetry['battery_percent']}% and unplugged). Conserving laptop power."
+
+        if telemetry["memory_percent"] > 80.0 or telemetry["cpu_percent"] > 70.0:
+            return True, "Eco-Mode active: Low-footprint sequential execution enabled."
 
         return True, "Hardware operating smoothly within nominal thresholds."
 
@@ -78,11 +85,11 @@ class ResourceGuardian:
         mem = telemetry["memory_percent"]
         is_charging = telemetry["is_charging"]
 
-        if cpu > 70 or mem > 75:
-            return 1  # Minimum load mode
-        elif cpu > 50 or mem > 60:
+        if cpu > 80 or mem > 85:
+            return 1  # Low-footprint Eco mode
+        elif cpu > 65 or mem > 75:
             return 2  # Moderate load mode
-        elif not is_charging and telemetry["battery_percent"] < 40:
+        elif not is_charging and telemetry["battery_percent"] < 30:
             return 2  # Battery saver mode
         
         return base_cap

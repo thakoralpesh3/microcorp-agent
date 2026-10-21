@@ -203,6 +203,8 @@ def upsert_department(dept_id: str, name: str, head_title: str, description: str
         conn.commit()
         conn.close()
 
+create_department = upsert_department
+
 def update_department_status(dept_id: str, status: str, subagents_count: Optional[int] = None):
     with _lock:
         conn = get_connection()
@@ -213,6 +215,9 @@ def update_department_status(dept_id: str, status: str, subagents_count: Optiona
             cursor.execute("UPDATE departments SET status = ? WHERE dept_id = ?", (status, dept_id))
         conn.commit()
         conn.close()
+
+def update_department_subagent_count(dept_id: str, count: int):
+    update_department_status(dept_id, status="active", subagents_count=count)
 
 def get_all_departments() -> List[Dict[str, Any]]:
     conn = get_connection()

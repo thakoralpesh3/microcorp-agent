@@ -482,6 +482,62 @@ print('Hello MicroCorp')
             self.assertTrue(any("INVOICE.txt" in n for n in names))
         print(f"Deliverable ZIP verified: Contains PAYMENT_QR.svg, PAYMENT_INSTRUCTIONS.md, and INVOICE.txt with UPI {PAYOUT_UPI_ID}.")
 
+    def test_15_public_tunnel_gateway(self):
+        """Verifies public Cloudflare tunnel status, URL caching, and mobile QR code generation."""
+        import config
+        from core.tunnel_gateway import public_gateway
+        status = public_gateway.get_gateway_status()
+        self.assertIn("payout_upi_id", status)
+        self.assertEqual(status["payout_upi_id"], "talpesh100@ybl")
+        self.assertIn("port", status)
+        self.assertEqual(status["port"], 8585)
+        
+        # Test simulated connection event
+        test_url = "https://microcorp-test.trycloudflare.com"
+        public_gateway._on_tunnel_connected(test_url)
+        self.assertEqual(public_gateway.get_public_url(), test_url)
+        self.assertTrue(Path(config.PUBLIC_GATEWAY_FILE).exists())
+        self.assertTrue(Path(config.PUBLIC_QR_FILE).exists())
+        print(f"Public Gateway Verified: Live Store={test_url}/store, QR SVG generated.")
+
+    def test_16_growth_engine_and_distribution(self):
+        """Verifies autonomous self-growth, department founding, pricing escalation, and public distribution."""
+        from core.growth_engine import growth_engine
+        from core.public_distribution import public_distribution
+        
+        # 1. Growth state inspection
+        state = growth_engine.get_growth_state()
+        self.assertIn("corporate_tier", state)
+        self.assertIn("tier_name", state)
+        self.assertGreater(state["base_price_usd"], 0)
+        self.assertGreater(state["base_price_inr"], 0)
+        print(f"Growth Engine Verified: Level={state.get('tier_badge')}, Base Price=${state['base_price_usd']} (₹{state['base_price_inr']})")
+
+        # 2. Dynamic pricing escalation
+        price_usd, price_inr = growth_engine.compute_dynamic_product_price(complexity_score=1.5)
+        self.assertGreater(price_usd, state["base_price_usd"])
+        self.assertGreater(price_inr, state["base_price_inr"])
+
+        # 3. Autonomous department founding check
+        grow_res = growth_engine.evaluate_and_grow()
+        self.assertIn(grow_res["status"], ["EXPANDED", "OPTIMIZED"])
+        print(f"Self-Evolution Result: Status={grow_res['status']}, Evolutions={grow_res.get('evolutions_triggered')}")
+
+        # 4. Public distribution marketing generation
+        promo_file = public_distribution.generate_promotional_copy(
+            title="FastAPI Autonomous Blueprint",
+            description="Production rate-limited REST API kit",
+            price_usd=price_usd,
+            price_inr=price_inr,
+            checkout_url="https://microcorp-test.trycloudflare.com/checkout/fastapi"
+        )
+        self.assertTrue(Path(promo_file).exists())
+        with open(promo_file, "r", encoding="utf-8") as f:
+            promo_text = f.read()
+            self.assertIn("talpesh100@ybl", promo_text)
+            self.assertIn("Reddit Post", promo_text)
+        print(f"Public Marketing Engine Verified: Generated {Path(promo_file).name} with UPI talpesh100@ybl.")
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -66,13 +66,13 @@ COMPANY_TAGLINE = "Autonomous Laptop Enterprise"
 CEO_NAME = "Artemis (Executive Core)"
 
 # Laptop Safety & Resource Guardian Thresholds
-MAX_CPU_PERCENT = 80.0          # Pause / throttle workers if CPU exceeds this
-MAX_MEMORY_PERCENT = 85.0       # Pause / throttle workers if RAM exceeds this
-MIN_BATTERY_PERCENT = 20.0      # Pause non-urgent tasks if on battery below 20%
-LOOP_INTERVAL_SECONDS = 15      # Main CEO orchestrator loop cycle time
+MAX_CPU_PERCENT = 90.0          # Pause / throttle workers if CPU exceeds this
+MAX_MEMORY_PERCENT = 94.0       # Pause / throttle workers if RAM exceeds this
+MIN_BATTERY_PERCENT = 15.0      # Pause non-urgent tasks if on battery below 15%
+LOOP_INTERVAL_SECONDS = 10      # Main CEO orchestrator loop cycle time
 
 # Dynamic Scaling Thresholds
-QUEUE_THRESHOLD_FOR_SUBAGENT = 3 # If domain queue has >= 3 pending tasks, spawn subagent
+QUEUE_THRESHOLD_FOR_SUBAGENT = 2 # If domain queue has >= 2 pending tasks, spawn subagent
 MAX_SUBAGENTS_PER_DEPT = 4       # Max parallel worker subagents per department
 MAX_TOTAL_SUBAGENTS = 12         # Laptop guard limit for simultaneous subagents
 IDLE_TIMEOUT_MINUTES = 5         # Auto-reap subagents after 5 minutes of idle time
@@ -81,8 +81,8 @@ IDLE_TIMEOUT_MINUTES = 5         # Auto-reap subagents after 5 minutes of idle t
 SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 8585
 AUTONOMY_MODE = "autonomous"     # "autonomous" (self-executing) or "supervised"
-AUTO_SPRINT_INTERVAL_MINUTES = 15 # Automatically triggers self-directed income sprints
-MAX_AUTO_SPRINTS_PER_DAY = 48    # Safeguard to prevent uncontrolled API usage
+AUTO_SPRINT_INTERVAL_MINUTES = 5 # Automatically triggers self-directed income sprints every 5 minutes
+MAX_AUTO_SPRINTS_PER_DAY = 96    # Scaled capacity for continuous background production
 ENABLE_AUTO_HARVEST = True       # Continuously discover and execute online opportunities
 
 # Real-World Passive Income & UPI Payout Gateway
@@ -90,5 +90,15 @@ PAYOUT_UPI_ID = os.environ.get("PAYOUT_UPI_ID", "talpesh100@ybl")
 PAYEE_NAME = os.environ.get("PAYEE_NAME", "Alpesh Thakor")
 DEFAULT_CURRENCY = "INR"
 USD_TO_INR_RATE = 86.50          # Benchmark exchange rate for international pricing
+
+# Public Cloudflare Tunnel & Distribution Gateway
+CLOUDFLARED_BIN = Path("/home/alpesh/bin/cloudflared")
+GH_BIN = Path("/home/alpesh/.local/bin/gh")
+ENABLE_PUBLIC_TUNNEL = True
+ENABLE_GITHUB_RELEASES = True
+GITHUB_REPO = "thakoralpesh3/microcorp-agent"
+PUBLIC_GATEWAY_FILE = DATA_DIR / "public_gateway.json"
+PUBLIC_QR_FILE = DATA_DIR / "public_store_qr.svg"
+
 
 
