@@ -155,25 +155,26 @@ async def track_customer_order(req: TrackOrderRequest):
     if not q:
         raise HTTPException(status_code=400, detail="Please enter a UTR number, Order ID, or keyword.")
     
-    from core.database import get_db_connection
-    conn = get_db_connection()
-    row = conn.execute("SELECT * FROM payments WHERE utr_number = ? OR order_id = ? ORDER BY id DESC LIMIT 1", (q, q)).fetchone()
-    conn.close()
+    from core.upi_payment import upi_gateway
+    # 1. Search verified transactions list
+    for tx in upi_gateway.transactions:
+        if tx.get("utr_number", "").lower() == q or tx.get("order_id", "").lower() == q:
+            title = tx.get("asset_title", "Purchased Deliverable")
+            return {
+                "found": True,
+                "status": "PAID_VERIFIED",
+                "asset_id": tx.get("order_id"),
+                "amount_inr": tx.get("amount_inr"),
+                "download_url": "/store",
+                "message": f"Payment verified ({tx.get('utr_number')})! Your order '{title}' is confirmed and active."
+            }
 
+    # 2. Search deliverables directory for keyword matches
     ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
-    if row:
-        asset_id = row["asset_id"]
-        return {
-            "found": True,
-            "status": "PAID_VERIFIED",
-            "asset_id": asset_id,
-            "amount_inr": row["amount_inr"],
-            "download_url": f"/download_purchased/{asset_id}",
-            "preview_url": f"/view_deliverable/ready_to_monetize/{asset_id}.html",
-            "message": "Payment verified! Your turnkey delivery is ready for instant download."
-        }
-    
-    matches = list(ready_dir.glob(f"*{q}*.zip")) or list(DELIVERABLES_DIR.rglob(f"*{q}*.zip"))
+    matches = list(ready_dir.glob(f"*{q}*.zip")) if ready_dir.exists() else []
+    if not matches and DELIVERABLES_DIR.exists():
+        matches = list(DELIVERABLES_DIR.rglob(f"*{q}*.zip"))
+
     if matches:
         zip_p = matches[0]
         slug = zip_p.stem
@@ -181,9 +182,9 @@ async def track_customer_order(req: TrackOrderRequest):
             "found": True,
             "status": "READY_FOR_DELIVERY",
             "asset_id": slug,
-            "download_url": f"/view_deliverable/{slug}.zip?download=true",
+            "download_url": f"/view_deliverable/ready_to_monetize/{zip_p.name}?download=true",
             "preview_url": f"/view_deliverable/ready_to_monetize/{slug}.html",
-            "message": f"Found matching turnkey deliverable package: {slug}"
+            "message": f"Found matching turnkey deliverable package: {slug.replace('_', ' ').title()}"
         }
 
     return {
@@ -1073,6 +1074,14 @@ async def public_storefront():
                           .replace("__PRODUCTS_CARDS__", products_cards_html or empty_msg)
     return HTMLResponse(content=html)
 
+@app.get("/hire", response_class=HTMLResponse)
+@app.get("/order", response_class=HTMLResponse)
+async def hire_page():
+    from core.upi_payment import upi_gateway
+    html = HIRE_TEMPLATE.replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
+                          .replace("__PAYEE_NAME__", upi_gateway.payee_name)
+    return HTMLResponse(content=html)
+
 @app.get("/sitemap.xml")
 async def sitemap_endpoint():
     from core.tunnel_gateway import public_gateway
@@ -1081,6 +1090,7 @@ async def sitemap_endpoint():
     urls = [
         f"<url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>",
         f"<url><loc>{base_url}/store</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>",
+        f"<url><loc>{base_url}/hire</loc><changefreq>daily</changefreq><priority>0.9</priority></url>",
         f"<url><loc>{base_url}/terms</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>"
     ]
     if ready_dir.exists():
@@ -1101,6 +1111,8 @@ async def robots_endpoint():
     txt = f"""User-agent: *
 Allow: /
 Allow: /store
+Allow: /hire
+Allow: /order
 Allow: /checkout/
 Allow: /view_deliverable/
 Sitemap: {base_url}/sitemap.xml
