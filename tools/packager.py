@@ -691,7 +691,8 @@ def extract_or_generate_code(markdown_content: str, title: str, category: str) -
     }
 
     if code_blocks:
-        combined = "\n\n# " + "=" * 60 + "\n# Module Implementation Snippet\n# " + "=" * 60 + "\n\n".join(code_blocks)
+        sep = "\n\n# " + "=" * 60 + "\n# Module Implementation Snippet\n# " + "=" * 60 + "\n\n"
+        combined = sep.join(code_blocks)
         for line in combined.splitlines():
             s = line.strip()
             if s.startswith("import ") or s.startswith("from "):
