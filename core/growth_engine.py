@@ -201,10 +201,12 @@ class EnterpriseGrowthEngine:
         from core.pricing_engine import pricing_engine
         pricing = pricing_engine.get_pricing_for_asset(title=title, category=category)
         tier_usd = pricing["price_usd"]
+        state = self.get_growth_state()
+        base_ref = max(tier_usd, state.get("base_price_usd", 19.0))
         
         # Scale if complexity_score > 1.0
-        price_usd = round(tier_usd * max(1.0, complexity_score), 2)
-        price_inr = round(pricing["price_inr"] * max(1.0, complexity_score))
+        price_usd = round(base_ref * max(1.0, complexity_score), 2)
+        price_inr = round(base_ref * USD_TO_INR_RATE * max(1.0, complexity_score))
         return price_usd, price_inr
 
 # Global singleton

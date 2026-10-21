@@ -410,6 +410,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- Interactive Asset Content Viewer Modal -->
+        <div id="assetViewerModal" class="modal-overlay" onclick="closeAssetViewer(event)">
+            <div class="modal-card-large" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                        <div class="agent-avatar" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-file-code"></i></div>
+                        <div style="min-width: 0; flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <h3 id="assetViewerTitle" style="font-size: 17px; margin: 0; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 520px;">Asset Title</h3>
+                                <span id="assetViewerCategory" class="badge-tag">digital_product</span>
+                                <span id="assetViewerPrice" class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700;">₹0</span>
+                            </div>
+                            <small id="assetViewerSubtitle" style="color: var(--text-muted); font-size: 12px;">Full visual preview with architecture blueprints and payment verification</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <a id="assetViewerDownloadBtn" href="#" class="btn-action purple" style="text-decoration: none; padding: 6px 12px; font-size: 12px;" title="Download release ZIP archive">
+                            <i class="fa-solid fa-download"></i> Download ZIP
+                        </a>
+                        <a id="assetViewerNewTabBtn" href="#" target="_blank" class="btn-action" style="text-decoration: none; padding: 6px 12px; font-size: 12px;" title="Open in new browser tab">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> New Tab
+                        </a>
+                        <button class="modal-close" onclick="closeAssetViewer()">&times;</button>
+                    </div>
+                </div>
+
+                <div class="asset-iframe-container">
+                    <iframe id="assetViewerIframe" src="about:blank" title="Deliverable Preview"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Internal Event Log Inspector Modal -->
+        <div id="eventInspectorModal" class="modal-overlay" onclick="closeEventInspector(event)">
+            <div class="modal-card" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="agent-avatar" style="background: linear-gradient(135deg, #64748b, #475569);"><i class="fa-solid fa-code-branch"></i></div>
+                        <div>
+                            <h3 id="eventModalTitle" style="font-size: 18px; margin: 0; color: #f8fafc;">Internal Corporate Event</h3>
+                            <small id="eventModalCategory" style="color: var(--text-muted); font-size: 12px;">Autonomous Operation Log</small>
+                        </div>
+                    </div>
+                    <button class="modal-close" onclick="closeEventInspector()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="inspector-box">
+                        <div class="inspector-label"><i class="fa-solid fa-circle-info"></i> Event Summary</div>
+                        <p id="eventModalSummary" style="color: #cbd5e1; font-size: 13px; line-height: 1.5; margin-top: 6px;">Event details</p>
+                    </div>
+                    <div class="inspector-box" style="margin-top: 12px;">
+                        <div class="inspector-label"><i class="fa-solid fa-clock"></i> Timestamp & Status</div>
+                        <div id="eventModalMeta" style="color: #94a3b8; font-size: 12px; margin-top: 4px;">Recorded in enterprise ledger</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-action" onclick="closeEventInspector()">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/static/js/dashboard.js"></script>

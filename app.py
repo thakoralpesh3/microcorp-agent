@@ -298,17 +298,111 @@ async def view_plan_html(plan_id: str):
     return HTMLResponse(content=html)
 
 @app.get("/view_deliverable/{file_path:path}")
-async def view_deliverable(file_path: str):
+async def view_deliverable(file_path: str, download: bool = False, format: Optional[str] = None):
+    # 1. Resolve path - exact, clean relative, or recursive search
     target = DELIVERABLES_DIR / file_path
     if not target.exists():
+        clean_p = file_path.lstrip("/").replace("deliverables/", "", 1)
+        target = DELIVERABLES_DIR / clean_p
+        
+    if not target.exists():
+        fname = Path(file_path).name
+        matches = list(DELIVERABLES_DIR.rglob(fname))
+        if matches:
+            target = matches[0]
+        else:
+            base_stem = Path(file_path).stem
+            html_matches = list(DELIVERABLES_DIR.rglob(f"{base_stem}.html"))
+            if html_matches:
+                target = html_matches[0]
+            else:
+                zip_matches = list(DELIVERABLES_DIR.rglob(f"{base_stem}.zip"))
+                if zip_matches:
+                    target = zip_matches[0]
+
+    if not target or not target.exists():
         raise HTTPException(status_code=404, detail="Deliverable file not found.")
-    
+
+    # 2. Direct download request
+    if download:
+        media_type = "application/zip" if target.suffix.lower() == ".zip" else "application/octet-stream"
+        return FileResponse(path=str(target), media_type=media_type, filename=target.name)
+
+    # 3. Handle ZIP archives accessed via browser navigation -> Show HTML preview
+    if target.suffix.lower() == ".zip":
+        # Sibling HTML check
+        html_sibling = target.with_suffix(".html")
+        if html_sibling.exists():
+            return FileResponse(path=str(html_sibling), media_type="text/html")
+        
+        # Sibling HTML anywhere in deliverables
+        sibling_matches = list(DELIVERABLES_DIR.rglob(f"{target.stem}.html"))
+        if sibling_matches:
+            return FileResponse(path=str(sibling_matches[0]), media_type="text/html")
+
+        # Inspect inside the ZIP archive for index.html or README.md
+        try:
+            import zipfile
+            with zipfile.ZipFile(target, "r") as zf:
+                html_names = [n for n in zf.namelist() if n.lower().endswith(".html")]
+                if html_names:
+                    content = zf.read(html_names[0]).decode("utf-8", errors="replace")
+                    return HTMLResponse(content=content)
+                md_names = [n for n in zf.namelist() if n.lower().endswith(".md")]
+                if md_names:
+                    md_text = zf.read(md_names[0]).decode("utf-8", errors="replace")
+                    from tools.packager import simple_markdown_to_html
+                    html_body = simple_markdown_to_html(md_text)
+                    rendered = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>{target.stem}</title>
+                    <style>body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 860px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #1e293b; background: #f8fafc; }} .box {{ background: #fff; padding: 36px 44px; border-radius: 12px; border: 1px solid #e2e8f0; }} pre {{ background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; }}</style>
+                    </head><body><div class="box">{html_body}</div></body></html>"""
+                    return HTMLResponse(content=rendered)
+        except Exception:
+            pass
+        return FileResponse(path=str(target), media_type="application/zip", filename=target.name)
+
+    # 4. Handle HTML previews
     if target.suffix.lower() == ".html":
         return FileResponse(path=str(target), media_type="text/html")
-    elif target.suffix.lower() in [".md", ".txt"]:
-        return FileResponse(path=str(target), media_type="text/markdown")
-    elif target.suffix.lower() == ".zip":
-        return FileResponse(path=str(target), media_type="application/zip", filename=target.name)
+
+    # 5. Handle Markdown & text files: render formatted HTML in browser
+    if target.suffix.lower() in [".md", ".txt"]:
+        if format == "raw":
+            return FileResponse(path=str(target), media_type="text/markdown")
+        try:
+            from tools.packager import simple_markdown_to_html
+            text_content = target.read_text(encoding="utf-8", errors="replace")
+            html_body = simple_markdown_to_html(text_content)
+            rendered = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{target.name}</title>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 860px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #1e293b; background: #f8fafc; }}
+        .box {{ background: #ffffff; padding: 36px 44px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }}
+        pre {{ background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; }}
+        code {{ background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; }}
+        pre code {{ background: transparent; color: inherit; }}
+        h1, h2, h3 {{ color: #0f172a; }}
+        hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0; }}
+        a {{ color: #2563eb; text-decoration: none; }}
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <a href="/" style="color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 600;">← Back to Console</a>
+        <a href="/view_deliverable/{file_path}?download=true" style="background: #2563eb; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">Download Source</a>
+    </div>
+    <div class="box">
+        {html_body}
+    </div>
+</body>
+</html>"""
+            return HTMLResponse(content=rendered)
+        except Exception:
+            return FileResponse(path=str(target), media_type="text/markdown")
+
     return FileResponse(path=str(target))
 
 # ==========================================
@@ -568,7 +662,10 @@ async def public_storefront():
                     <span style="font-size: 20px; font-weight: 800; color: #34d399;">₹{p['price_inr']}</span>
                     <small style="color: #94a3b8; font-size: 12px; display: block;">(~${p['price_usd']:.2f} USD)</small>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <a href="/view_deliverable/ready_to_monetize/{p['slug']}.html" target="_blank" style="background: rgba(96, 165, 250, 0.12); border: 1px solid rgba(96, 165, 250, 0.3); color: #93c5fd; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;" title="Preview full technical guide & blueprints">
+                        <i class="fa-solid fa-eye"></i> Preview
+                    </a>
                     <a href="/api/ecommerce/syndicate/{p['slug']}" target="_blank" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;" title="View Amazon, Flipkart, Meesho, and Gumroad Seller Pack">
                         <i class="fa-solid fa-cart-shopping"></i> Marketplace Pack
                     </a>

@@ -222,25 +222,53 @@ function renderDashboard(data) {
         tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">No deliverables generated yet. Click any button above to launch an autonomous sprint!</td></tr>`;
     } else {
         tableBody.innerHTML = deliverables.map(item => {
-            let viewLink = "#";
-            if (item.deliverable_path) {
+            const hasDeliverable = Boolean(item.deliverable_path && item.deliverable_path.trim());
+            let htmlPreviewUrl = "#";
+            let zipDownloadUrl = "#";
+            const safeTitle = (item.title || "Deliverable").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            const priceInr = Math.round((Number(item.amount_est_usd) || 19.0) * 86.5);
+            
+            if (hasDeliverable) {
                 const parts = item.deliverable_path.split("deliverables/");
-                if (parts.length > 1) {
-                    viewLink = `/view_deliverable/${parts[1]}`;
-                }
+                const relPath = parts.length > 1 ? parts[1] : item.deliverable_path;
+                const htmlRel = relPath.replace(/\.zip$/i, ".html");
+                htmlPreviewUrl = `/view_deliverable/${htmlRel}`;
+                zipDownloadUrl = `/view_deliverable/${relPath}${relPath.endsWith('.zip') ? '?download=true' : ''}`;
             }
+
+            const titleHtml = hasDeliverable 
+                ? `<a href="javascript:void(0)" onclick="openAssetViewer('${htmlPreviewUrl}', '${safeTitle}', '${zipDownloadUrl}', '${item.category}', '${priceInr}')" class="asset-title-link" title="Click to preview asset content in viewer"><strong style="color: #60a5fa;"><i class="fa-solid fa-file-lines" style="margin-right: 4px; font-size: 11px;"></i>${item.title}</strong></a>`
+                : `<strong style="color: #cbd5e1;">${item.title}</strong>`;
+
+            const actionHtml = hasDeliverable
+                ? `
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button onclick="openAssetViewer('${htmlPreviewUrl}', '${safeTitle}', '${zipDownloadUrl}', '${item.category}', '${priceInr}')" class="link-btn" style="padding: 5px 10px; font-size: 11px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); cursor: pointer;" title="Preview formatted document, code & payment in browser">
+                            <i class="fa-solid fa-eye"></i> View Content
+                        </button>
+                        <a href="${zipDownloadUrl}" class="link-btn purple" style="padding: 5px 10px; font-size: 11px; text-decoration: none;" title="Download release ZIP archive">
+                            <i class="fa-solid fa-download"></i> ZIP
+                        </a>
+                    </div>
+                `
+                : `
+                    <button onclick="openEventInspector('${safeTitle}', '${item.category}', '${safeTitle}', '${item.created_at || ''}', '${item.status}')" class="link-btn" style="padding: 5px 10px; font-size: 11px; background: rgba(148, 163, 184, 0.12); color: #94a3b8; border-color: rgba(148, 163, 184, 0.25); cursor: pointer;" title="View event details">
+                        <i class="fa-solid fa-circle-info"></i> Event Info
+                    </button>
+                `;
+
             return `
                 <tr>
                     <td>
-                        <strong style="color: #f8fafc;">${item.title}</strong>
-                        <div style="font-size: 11px; color: var(--text-muted);">${item.created_at || ''}</div>
+                        ${titleHtml}
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${item.created_at || ''}</div>
                     </td>
                     <td><span class="badge-tag">${item.category.replace('_', ' ')}</span></td>
                     <td style="color: #34d399; font-weight: 600;">$${Number(item.amount_est_usd).toFixed(2)}</td>
                     <td style="color: #94a3b8; font-size: 12px;">$${Number(item.token_cost_usd).toFixed(4)}</td>
                     <td><span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">${item.status}</span></td>
                     <td>
-                        <a href="${viewLink}" target="_blank" class="link-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Asset</a>
+                        ${actionHtml}
                     </td>
                 </tr>
             `;
@@ -369,7 +397,15 @@ async function refreshInspectorData(subagentId) {
         if (sub.result_deliverable_path) {
             const parts = sub.result_deliverable_path.split("deliverables/");
             if (parts.length > 1) {
-                delivLink.href = `/view_deliverable/${parts[1]}`;
+                const relPath = parts[1];
+                const htmlRel = relPath.replace(/\.zip$/i, ".html");
+                const safeTaskTitle = (sub.current_task_title || sub.name || "Deliverable").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                delivLink.onclick = (e) => {
+                    e.preventDefault();
+                    closeInspector();
+                    openAssetViewer(`/view_deliverable/${htmlRel}`, safeTaskTitle, `/view_deliverable/${relPath}?download=true`, sub.task_domain || "deliverable", "1499");
+                };
+                delivLink.innerHTML = `<i class="fa-solid fa-eye"></i> View Deliverable Preview`;
                 delivLink.style.display = "inline-flex";
             } else {
                 delivLink.style.display = "none";
@@ -425,8 +461,84 @@ function closeInspector(event) {
         return;
     }
     const modal = document.getElementById("inspectorModal");
-    modal.classList.remove("active");
+    if (modal) modal.classList.remove("active");
     currentInspectSubagentId = null;
+}
+
+// ==========================================
+// Asset Content Viewer & Preview Modal Handlers
+// ==========================================
+function openAssetViewer(previewUrl, title, zipUrl, category, amountInr) {
+    const modal = document.getElementById("assetViewerModal");
+    if (!modal) return;
+    
+    const titleEl = document.getElementById("assetViewerTitle");
+    if (titleEl) titleEl.textContent = title || "Deliverable Asset";
+    
+    const catEl = document.getElementById("assetViewerCategory");
+    if (catEl) catEl.textContent = (category || "digital_product").replace("_", " ");
+    
+    const priceEl = document.getElementById("assetViewerPrice");
+    if (priceEl) priceEl.textContent = `₹${amountInr || "399"}`;
+    
+    const dlBtn = document.getElementById("assetViewerDownloadBtn");
+    if (dlBtn) {
+        dlBtn.href = zipUrl || previewUrl;
+    }
+    
+    const newTabBtn = document.getElementById("assetViewerNewTabBtn");
+    if (newTabBtn) {
+        newTabBtn.href = previewUrl;
+    }
+    
+    const iframe = document.getElementById("assetViewerIframe");
+    if (iframe) {
+        iframe.src = previewUrl;
+    }
+    
+    modal.classList.add("active");
+}
+
+function closeAssetViewer(event) {
+    if (event && event.target && event.target.id !== "assetViewerModal" && !event.target.classList.contains("modal-close")) {
+        return;
+    }
+    const modal = document.getElementById("assetViewerModal");
+    if (modal) {
+        modal.classList.remove("active");
+        const iframe = document.getElementById("assetViewerIframe");
+        if (iframe) iframe.src = "about:blank";
+    }
+}
+
+// ==========================================
+// Internal Corporate Event Inspector Modal Handlers
+// ==========================================
+function openEventInspector(title, category, summary, timestamp, status) {
+    const modal = document.getElementById("eventInspectorModal");
+    if (!modal) return;
+    
+    const titleEl = document.getElementById("eventModalTitle");
+    if (titleEl) titleEl.textContent = title || "Internal Corporate Event";
+    
+    const catEl = document.getElementById("eventModalCategory");
+    if (catEl) catEl.textContent = (category || "r_and_d").replace("_", " ").toUpperCase();
+    
+    const summaryEl = document.getElementById("eventModalSummary");
+    if (summaryEl) summaryEl.textContent = summary || "Internal corporate governance event executed autonomously.";
+    
+    const metaEl = document.getElementById("eventModalMeta");
+    if (metaEl) metaEl.textContent = `Timestamp: ${timestamp || 'Recent'} • Status: ${status || 'VERIFIED'}`;
+    
+    modal.classList.add("active");
+}
+
+function closeEventInspector(event) {
+    if (event && event.target && event.target.id !== "eventInspectorModal" && !event.target.classList.contains("modal-close")) {
+        return;
+    }
+    const modal = document.getElementById("eventInspectorModal");
+    if (modal) modal.classList.remove("active");
 }
 
 async function triggerSprint(domain, title) {

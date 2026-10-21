@@ -398,11 +398,14 @@ and practical implementation guides designed for modern engineers and builders.
 
             zip_path_str = str(zip_file)
             
-            # Copy zip to ready_to_monetize for instant access
+            # Copy zip and html preview to ready_to_monetize for instant access and previews
             try:
                 import shutil
                 ready_zip = ready_dir / f"{base_filename}.zip"
                 shutil.copy2(zip_file, ready_zip)
+                ready_html = ready_dir / f"{base_filename}.html"
+                if html_file.exists():
+                    shutil.copy2(html_file, ready_html)
             except Exception:
                 pass
             
