@@ -88,6 +88,8 @@ ENABLE_AUTO_HARVEST = True       # Continuously discover and execute online oppo
 # Real-World Passive Income & UPI Payout Gateway
 PAYOUT_UPI_ID = os.environ.get("PAYOUT_UPI_ID", "talpesh100@ybl")
 PAYEE_NAME = os.environ.get("PAYEE_NAME", "Alpesh Thakor")
+WHATSAPP_NUMBER = os.environ.get("WHATSAPP_NUMBER", "919999999999")
+CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "talpesh100@ybl")
 DEFAULT_CURRENCY = "INR"
 USD_TO_INR_RATE = 86.50          # Benchmark exchange rate for international pricing
 
