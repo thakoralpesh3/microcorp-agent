@@ -16,13 +16,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 # Ensure import paths are clean
 BASE_DIR = Path(__file__).parent.resolve()
 sys.path.insert(0, str(BASE_DIR))
 
-from config import SERVER_HOST, SERVER_PORT, DELIVERABLES_DIR, STATIC_DIR, COMPANY_NAME, CEO_NAME
+from config import (
+    SERVER_HOST, SERVER_PORT, DELIVERABLES_DIR, STATIC_DIR, COMPANY_NAME, CEO_NAME,
+    WHATSAPP_NUMBER, CONTACT_EMAIL, PAYOUT_UPI_ID, PAYEE_NAME
+)
 from core.ceo_orchestrator import ceo
 from tools.gemini_client import llm_client
 
@@ -60,6 +63,10 @@ class CustomerOrderRequest(BaseModel):
 
 class TrackOrderRequest(BaseModel):
     query: str
+
+class ChatAssistantRequest(BaseModel):
+    message: str
+    history: Optional[List[Dict[str, str]]] = None
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
@@ -191,6 +198,61 @@ async def track_customer_order(req: TrackOrderRequest):
         "found": False,
         "message": "No matching order or verified UTR found. If you just made a UPI payment, please allow 1-2 minutes or contact Alpesh Thakor at talpesh100@ybl."
     }
+
+@app.post("/api/chat/assistant")
+async def chat_assistant_endpoint(req: ChatAssistantRequest):
+    user_msg = req.message.strip()
+    if not user_msg:
+        raise HTTPException(status_code=400, detail="Message cannot be empty.")
+    
+    from core.pricing_engine import pricing_engine
+    from core.upi_payment import upi_gateway
+    
+    catalog = pricing_engine.get_catalog()
+    catalog_summary = "\n".join([f"- {t['tier_name']}: ${t['base_price_usd']} (₹{t['base_price_inr']}) - {t['description']}" for t in catalog.get("tiers", [])])
+
+    system_prompt = f"""You are the official AI Solution Architect and Technical Pre-Sales Consultant for MicroCorp AI (an autonomous AI software engineering enterprise operated by Alpesh Thakor).
+Official Payee UPI ID: {upi_gateway.upi_id} ({upi_gateway.payee_name}).
+WhatsApp Direct Support: https://wa.me/{WHATSAPP_NUMBER}
+
+YOUR ROLE:
+1. Help prospective clients and developers understand our products, architecture, and custom engineering services.
+2. Recommend relevant toolkits and cheatsheets based on what the client needs.
+3. Explain how to buy with zero fees using PhonePe/GooglePay/Paytm via UPI to {upi_gateway.upi_id}, and how entering a 12-digit bank UTR unlocks instant ZIP download.
+4. Explain how clients can commission custom software from the AI fleet at /hire.
+5. All deliverables include standalone modular Python code (main.py), 1-click launchers (START_HERE.html & RUN_WINDOWS.bat), and full commercial ownership rights.
+6. Keep responses friendly, concise, technically sharp, and formatted in clean markdown.
+
+AVAILABLE TIERS:
+{catalog_summary}
+"""
+    try:
+        reply_text, _, _ = llm_client.generate(
+            prompt=f"Client Question: {user_msg}\nProvide a helpful, professional, concise response guiding the client.",
+            system_instruction=system_prompt
+        )
+        return {
+            "reply": reply_text.strip(),
+            "payout_upi_id": upi_gateway.upi_id,
+            "payee_name": upi_gateway.payee_name,
+            "whatsapp_url": f"https://wa.me/{WHATSAPP_NUMBER}?text=Hi%20Alpesh,%20I%20have%20an%20inquiry%20about%20MicroCorp%20AI"
+        }
+    except Exception as e:
+        lower = user_msg.lower()
+        if "hire" in lower or "custom" in lower or "project" in lower:
+            fallback = f"You can commission custom software from our 24/7 autonomous engineering fleet at [/hire](/hire). Every project includes clean modular architecture, automated tests, Docker setup, and 1-click launchers. Payments settle directly to UPI ID `{upi_gateway.upi_id}`."
+        elif "pay" in lower or "upi" in lower or "phonepe" in lower or "gpay" in lower or "price" in lower:
+            fallback = f"We support zero-fee direct UPI settlements to `{upi_gateway.upi_id}` ({upi_gateway.payee_name}) using PhonePe, Google Pay, Paytm, or BHIM. After paying, entering your 12-digit bank UTR instantly unlocks your download!"
+        elif "fastapi" in lower or "backend" in lower or "microservice" in lower:
+            fallback = f"Our Full-Stack FastAPI Async Microservice toolkit is our most popular package! It includes JWT authentication, Docker configs, background workers, and an interactive `START_HERE.html` dashboard. Check it out on the [/store](/store)."
+        else:
+            fallback = f"Hello! I am the MicroCorp AI Assistant. You can browse our production-ready developer toolkits on the [/store](/store), or commission a custom project tailored to your specifications at [/hire](/hire). All deliverables settle securely to UPI `{upi_gateway.upi_id}`."
+        return {
+            "reply": fallback,
+            "payout_upi_id": upi_gateway.upi_id,
+            "payee_name": upi_gateway.payee_name,
+            "whatsapp_url": f"https://wa.me/{WHATSAPP_NUMBER}?text=Hi%20Alpesh,%20I%20have%20an%20inquiry%20about%20MicroCorp%20AI"
+        }
 
 @app.post("/api/toggle_pause")
 async def toggle_pause():
@@ -545,6 +607,111 @@ async def get_growth_metrics():
     from core.growth_engine import growth_engine
     return growth_engine.get_growth_state()
 
+AI_CHAT_WIDGET_HTML = """
+<!-- Floating AI Sales & Technical Solution Architect Widget -->
+<div id="aiChatDrawer" style="display: none; position: fixed; bottom: 84px; right: 24px; width: 380px; max-width: calc(100vw - 48px); height: 520px; max-height: calc(100vh - 120px); background: rgba(18, 24, 38, 0.98); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); z-index: 99998; flex-direction: column; overflow: hidden; backdrop-filter: blur(12px);">
+    <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px;">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+                <div style="color: #f8fafc; font-weight: 700; font-size: 14px;">MicroCorp AI Assistant</div>
+                <div style="color: #34d399; font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span> 24/7 Solutions Architect
+                </div>
+            </div>
+        </div>
+        <button onclick="toggleAiChat()" style="background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">&times;</button>
+    </div>
+
+    <!-- Message Area -->
+    <div id="aiChatMessages" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 13px; line-height: 1.5;">
+        <div style="align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px 12px 12px 2px; padding: 12px 14px; color: #cbd5e1; max-width: 90%;">
+            👋 Hi! I am your MicroCorp AI Solution Architect. Ask me about our production toolkits, custom software commissions, or how to buy with zero-fee direct UPI!
+        </div>
+    </div>
+
+    <!-- Quick Chips -->
+    <div style="padding: 6px 12px; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+        <button onclick="sendQuickPrompt('How do I buy with PhonePe / Google Pay?')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">💳 How to Pay</button>
+        <button onclick="sendQuickPrompt('How does custom software hiring work?')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">💼 Custom Hire</button>
+        <button onclick="sendQuickPrompt('What is included in the deliverable ZIP?')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">📦 Deliverables</button>
+    </div>
+
+    <!-- Input Box -->
+    <div style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.95); display: flex; gap: 8px;">
+        <input type="text" id="aiChatInput" placeholder="Ask about tools, code, pricing..." onkeydown="if(event.key==='Enter') sendAiChatMessage()" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px; outline: none;">
+        <button onclick="sendAiChatMessage()" id="aiChatSendBtn" class="btn-action purple" style="padding: 10px 14px; font-weight: 700;">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Floating Action Button -->
+<button onclick="toggleAiChat()" id="aiChatFloatBtn" style="position: fixed; bottom: 24px; right: 24px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #ffffff; border: 2px solid rgba(255,255,255,0.2); border-radius: 999px; padding: 12px 20px; font-weight: 700; font-size: 13px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.45); cursor: pointer; display: flex; align-items: center; gap: 8px; z-index: 99999; transition: transform 0.2s;">
+    <i class="fa-solid fa-robot"></i> <span>Ask AI Architect</span>
+</button>
+
+<script>
+    function toggleAiChat() {
+        var drawer = document.getElementById('aiChatDrawer');
+        var isHidden = drawer.style.display === 'none' || drawer.style.display === '';
+        drawer.style.display = isHidden ? 'flex' : 'none';
+        if (isHidden) {
+            document.getElementById('aiChatInput').focus();
+        }
+    }
+
+    function sendQuickPrompt(text) {
+        document.getElementById('aiChatInput').value = text;
+        sendAiChatMessage();
+    }
+
+    async function sendAiChatMessage() {
+        var inp = document.getElementById('aiChatInput');
+        var msg = inp.value.trim();
+        if (!msg) return;
+
+        var box = document.getElementById('aiChatMessages');
+        var btn = document.getElementById('aiChatSendBtn');
+
+        var userBubble = document.createElement('div');
+        userBubble.style.cssText = 'align-self: flex-end; background: #3b82f6; color: #fff; border-radius: 12px 12px 2px 12px; padding: 10px 14px; max-width: 85%;';
+        userBubble.innerText = msg;
+        box.appendChild(userBubble);
+        inp.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        var botBubble = document.createElement('div');
+        botBubble.style.cssText = 'align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px 12px 12px 2px; padding: 10px 14px; color: #cbd5e1; max-width: 90%;';
+        botBubble.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color: #60a5fa;"></i> Consulting architecture knowledge base...';
+        box.appendChild(botBubble);
+        box.scrollTop = box.scrollHeight;
+
+        btn.disabled = true;
+
+        try {
+            var res = await fetch('/api/chat/assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            var data = await res.json();
+            var reply = data.reply || 'I am ready to assist you. Please browse our store or commission custom work!';
+            var formatted = reply.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
+                                 .replace(/\\[(.*?)\\]\\((.*?)\\)/g, '<a href="$2" target="_blank" style="color: #60a5fa; text-decoration: underline;">$1</a>');
+            botBubble.innerHTML = formatted;
+        } catch (e) {
+            botBubble.innerHTML = '<span style="color: #f87171;">Assistant temporarily busy. You can also reach Alpesh Thakor directly on WhatsApp!</span>';
+        } finally {
+            btn.disabled = false;
+            box.scrollTop = box.scrollHeight;
+        }
+    }
+</script>
+"""
+
 STORE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -596,10 +763,16 @@ STORE_TEMPLATE = """<!DOCTYPE html>
             <a href="/hire" class="btn-action purple" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 700;">
                 <i class="fa-solid fa-briefcase"></i> Hire AI Agent (Custom Work)
             </a>
+            <a href="/broadcast" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; font-weight: 600;">
+                <i class="fa-solid fa-bullhorn"></i> Broadcast Hub
+            </a>
+            <a href="/feed.xml" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-weight: 600;">
+                <i class="fa-solid fa-rss"></i> RSS
+            </a>
             <button onclick="openTrackModal()" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #cbd5e1;">
                 <i class="fa-solid fa-magnifying-glass"></i> Track by UTR
             </button>
-            <a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20am%20interested%20in%20MicroCorp%20AI%20custom%20projects" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">
+            <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20Alpesh,%20I%20am%20interested%20in%20MicroCorp%20AI%20custom%20projects" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">
                 <i class="fa-brands fa-whatsapp"></i> WhatsApp Reach
             </a>
         </div>
@@ -743,13 +916,16 @@ STORE_TEMPLATE = """<!DOCTYPE html>
     <footer style="margin-top: 50px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 13px; color: #64748b;">
         <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 8px;">
             <a href="/terms" target="_blank" style="color: #94a3b8; text-decoration: none;"><i class="fa-solid fa-scale-balanced"></i> Master Terms of Service & AI Disclaimers</a>
+            <a href="/broadcast" style="color: #60a5fa; text-decoration: none;"><i class="fa-solid fa-bullhorn"></i> Broadcast Hub</a>
+            <a href="/feed.xml" target="_blank" style="color: #fbbf24; text-decoration: none;"><i class="fa-solid fa-rss"></i> Developer RSS Feed</a>
             <a href="/hire" style="color: #94a3b8; text-decoration: none;"><i class="fa-solid fa-briefcase"></i> Commission Custom Work</a>
-            <a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20have%20an%20inquiry" target="_blank" style="color: #4ade80; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Reach</a>
+            <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20Alpesh,%20I%20have%20an%20inquiry" target="_blank" style="color: #4ade80; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Reach</a>
         </div>
         <p style="margin: 0; font-size: 12px; color: #475569;">
             MicroCorp AI is an autonomous AI software engineering fleet operated by Alpesh Thakor (UPI: <strong>talpesh100@ybl</strong>). All deliverables are provided strictly on an <strong>AS-IS</strong> basis with all faults and without warranty. Exclusive jurisdiction: Ahmedabad, Gujarat, India.
         </p>
     </footer>
+    __AI_CHAT_WIDGET__
 </body>
 </html>"""
 
@@ -780,7 +956,7 @@ HIRE_TEMPLATE = """<!DOCTYPE html>
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
             <a href="/store" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Digital Store</a>
             <a href="/" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-gauge"></i> Console</a>
-            <a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20want%20to%20discuss%20a%20custom%20software%20project" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">
+            <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20Alpesh,%20I%20want%20to%20discuss%20a%20custom%20software%20project" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">
                 <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
             </a>
         </div>
@@ -905,7 +1081,7 @@ HIRE_TEMPLATE = """<!DOCTYPE html>
                         '<div style="display: flex; gap: 10px; flex-wrap: wrap;">' +
                             '<a href="' + (d.upi_uri || 'upi://pay?pa=talpesh100@ybl') + '" class="btn-action purple" style="text-decoration: none; padding: 10px 18px; font-weight: 700;">' +
                             '<i class="fa-solid fa-bolt"></i> Lock-In Order via UPI App</a>' +
-                            '<a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20just%20submitted%20project%20order%20' + d.task_id + ':%20' + encodeURIComponent(title) + '" target="_blank" class="btn-action" style="text-decoration: none; padding: 10px 18px; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">' +
+                            '<a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20Alpesh,%20I%20just%20submitted%20project%20order%20' + d.task_id + ':%20' + encodeURIComponent(title) + '" target="_blank" class="btn-action" style="text-decoration: none; padding: 10px 18px; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #4ade80;">' +
                             '<i class="fa-brands fa-whatsapp"></i> Confirm on WhatsApp</a>' +
                         '</div>';
                 } else {
@@ -924,6 +1100,7 @@ HIRE_TEMPLATE = """<!DOCTYPE html>
             }
         }
     </script>
+    __AI_CHAT_WIDGET__
 </body>
 </html>"""
 
@@ -1062,10 +1239,198 @@ CHECKOUT_TEMPLATE = """<!DOCTYPE html>
 </body>
 </html>"""
 
+BROADCAST_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroCorp AI — Autonomous Marketing & Syndication Network</title>
+    <meta name="description" content="Autonomous multi-channel broadcast, social launches, and developer syndication hub for MicroCorp AI products.">
+    <!-- OpenGraph & Twitter Cards -->
+    <meta property="og:title" content="MicroCorp AI — Broadcast & Developer Syndication Hub">
+    <meta property="og:description" content="Explore and share production-grade developer toolkits, cheatsheets, and architecture blueprints. Instant 1-click broadcasts on 𝕏, LinkedIn, WhatsApp & Reddit.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/broadcast">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { max-width: 1100px; margin: 30px auto; padding: 20px; }
+        .hero { background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1px solid var(--card-border); padding: 36px; border-radius: 16px; margin-bottom: 24px; }
+        .broadcast-card { background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; margin-bottom: 20px; transition: transform 0.2s, border-color 0.2s; }
+        .broadcast-card:hover { border-color: rgba(59, 130, 246, 0.4); }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+        .share-btn:hover { opacity: 0.85; }
+        .btn-twitter { background: #1d9bf0; color: #fff; }
+        .btn-linkedin { background: #0a66c2; color: #fff; }
+        .btn-whatsapp { background: #25d366; color: #fff; }
+        .btn-reddit { background: #ff4500; color: #fff; }
+        .btn-copy { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <a href="/store" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-store"></i> Digital Store</a>
+            <a href="/hire" class="btn-action purple" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 700;"><i class="fa-solid fa-briefcase"></i> Custom Work</a>
+            <a href="/feed.xml" target="_blank" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24;"><i class="fa-solid fa-rss"></i> RSS 2.0 Feed</a>
+            <a href="/" class="btn-action" style="display: inline-flex; text-decoration: none;"><i class="fa-solid fa-gauge"></i> Console</a>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-satellite-dish"></i> Continuous Syndication: <strong>ACTIVE</strong>
+        </div>
+    </div>
+
+    <div class="hero">
+        <span class="badge-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; margin-bottom: 12px; display: inline-block;">GLOBAL MARKETING & BROADCAST PORTAL</span>
+        <h1 style="color: #f8fafc; font-size: 30px; margin: 6px 0 12px 0;">Autonomous Developer Marketing & Syndication Network</h1>
+        <p style="color: #94a3b8; font-size: 15px; max-width: 820px; line-height: 1.6;">
+            MicroCorp AI continuously manufactures production toolkits and syndicates releases across social media, developer channels, RSS aggregators, and public marketplaces.
+            Use the 1-click broadcast triggers below to share releases directly to 𝕏 (Twitter), LinkedIn, WhatsApp, and Reddit with pre-written high-converting copy!
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px;">
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 8px;">
+                <span style="font-size: 12px; color: var(--text-muted); display: block;">Published Deliverables</span>
+                <strong style="color: #60a5fa; font-size: 20px;">__TOTAL_COUNT__</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 8px;">
+                <span style="font-size: 12px; color: var(--text-muted); display: block;">Official UPI Settlement</span>
+                <strong style="color: #34d399; font-size: 16px; font-family: monospace;">__PAYOUT_UPI_ID__</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 8px;">
+                <span style="font-size: 12px; color: var(--text-muted); display: block;">Syndication Reach</span>
+                <strong style="color: #c084fc; font-size: 16px;">X • LinkedIn • Reddit • WhatsApp • RSS</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Broadcast Feeds Section -->
+    <h2 style="color: #f1f5f9; font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-bullhorn" style="color: #3b82f6;"></i> Latest Manufactured Products & 1-Click Broadcast Channels
+    </h2>
+
+    <div id="broadcastList">
+        __BROADCAST_CARDS__
+    </div>
+
+    <footer style="margin-top: 50px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 13px; color: #64748b;">
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 8px;">
+            <a href="/terms" target="_blank" style="color: #94a3b8; text-decoration: none;"><i class="fa-solid fa-scale-balanced"></i> Master Terms of Service & AI Disclaimers</a>
+            <a href="/feed.xml" target="_blank" style="color: #fbbf24; text-decoration: none;"><i class="fa-solid fa-rss"></i> Developer RSS Feed</a>
+            <a href="/store" style="color: #94a3b8; text-decoration: none;"><i class="fa-solid fa-store"></i> Full Storefront</a>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: #475569;">
+            All marketing copy and deliverables generated autonomously by MicroCorp AI (Beneficiary: <strong>talpesh100@ybl</strong>). Exclusive jurisdiction: Ahmedabad, Gujarat, India.
+        </p>
+    </footer>
+
+    __AI_CHAT_WIDGET__
+</body>
+</html>"""
+
+RECEIPT_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercial Tax Invoice / Receipt - __INVOICE_NUMBER__</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px 20px; margin: 0; }
+        .receipt-container { max-width: 720px; margin: 0 auto; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 36px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 24px; }
+        .table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+        .table th { text-align: left; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); color: #94a3b8; font-size: 13px; text-transform: uppercase; }
+        .table td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .receipt-container { border: 1px solid #ccc; box-shadow: none; background: #fff; color: #000; }
+            .no-print { display: none !important; }
+            .table th { color: #555; border-bottom: 1px solid #ccc; }
+            .table td { border-bottom: 1px solid #eee; }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="no-print" style="margin-bottom: 20px; display: flex; justify-content: space-between;">
+            <a href="/store" style="color: #60a5fa; text-decoration: none; font-size: 13px;"><i class="fa-solid fa-arrow-left"></i> Back to Store</a>
+            <button onclick="window.print()" style="background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                <i class="fa-solid fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+
+        <div class="header">
+            <div>
+                <h2 style="margin: 0; font-size: 22px; color: #f8fafc;">TAX INVOICE & COMMERCIAL RECEIPT</h2>
+                <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">MicroCorp AI Autonomous Software Enterprise</div>
+                <div style="font-size: 12px; color: #94a3b8;">Ahmedabad, Gujarat, Republic of India</div>
+            </div>
+            <div style="text-align: right;">
+                <span class="badge"><i class="fa-solid fa-circle-check"></i> PAID & SETTLED</span>
+                <div style="font-size: 13px; font-weight: 700; margin-top: 8px; color: #f8fafc;">Invoice #: __INVOICE_NUMBER__</div>
+                <div style="font-size: 12px; color: #94a3b8;">Date: __DATE__</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; margin-bottom: 20px;">
+            <div>
+                <strong style="color: #cbd5e1;">Service Provider / Payee:</strong><br>
+                Name: __PAYEE_NAME__<br>
+                Official UPI ID: <code style="color: #34d399;">__PAYOUT_UPI_ID__</code><br>
+                Operating Jurisdiction: Ahmedabad, Gujarat, India<br>
+                HSN / SAC Code: 998313 (Information Technology Software Services)
+            </div>
+            <div>
+                <strong style="color: #cbd5e1;">Customer / Order Reference:</strong><br>
+                Order / Ref ID: <code>__ORDER_REF__</code><br>
+                UPI UTR / Trans ID: <code>__UTR_NUMBER__</code><br>
+                Payment Method: Unified Payments Interface (UPI Instant Bank Settlement)
+            </div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th style="text-align: right;">Amount (INR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>__ITEM_TITLE__</strong><br>
+                        <small style="color: #94a3b8;">Full source code, automated test suite, 1-click launcher, and perpetual commercial production license.</small>
+                    </td>
+                    <td>Commercial License</td>
+                    <td style="text-align: right; font-weight: 700; color: #34d399;">₹__AMOUNT_INR__</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right; color: #94a3b8;">GST (0% - Digital Export / Below Composition Threshold):</td>
+                    <td style="text-align: right; color: #94a3b8;">₹0.00</td>
+                </tr>
+                <tr style="font-weight: 800; font-size: 16px;">
+                    <td colspan="2" style="text-align: right; color: #f8fafc;">Total Paid:</td>
+                    <td style="text-align: right; color: #34d399;">₹__AMOUNT_INR__</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px; font-size: 11px; color: #94a3b8; line-height: 1.5; margin-top: 24px;">
+            <strong>Governance & Legal Terms:</strong> Deliverables are engineered autonomously by AI and licensed strictly on an <strong>AS-IS</strong> basis pursuant to the MicroCorp AI Master Terms of Service. Total financial liability capped at the lesser of the fee paid or ₹1,000 INR. Exclusive dispute resolution and arbitration jurisdiction: Ahmedabad, Gujarat, India.
+        </div>
+    </div>
+</body>
+</html>"""
+
 @app.get("/store", response_class=HTMLResponse)
 async def public_storefront():
     from core.upi_payment import upi_gateway
     from core.pricing_engine import pricing_engine
+    from core.public_distribution import public_distribution
+    from core.tunnel_gateway import public_gateway
+    base_url = public_gateway.get_public_url() or "http://127.0.0.1:8585"
     ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
     products = []
     if ready_dir.exists():
@@ -1091,10 +1456,20 @@ async def public_storefront():
     for p in products[:60]:
         cat_tag = "cheatsheet" if "cheatsheet" in p['tier_name'].lower() else ("research" if "research" in p['tier_name'].lower() else ("enterprise" if "enterprise" in p['tier_name'].lower() else "toolkit"))
         search_blob = f"{p['title']} {p['description']} {p['slug']} {p['tier_name']}".lower().replace('"', '&quot;')
+        checkout_link = f"{base_url}/checkout/{p['slug']}"
+        share_links = public_distribution.get_share_links(p['title'], checkout_link, p['price_inr'])
+
         products_cards_html += f"""
         <div class="product-card" data-category="{cat_tag}" data-search="{search_blob}" style="background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-                <span style="{p['badge_style']} font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">{p['badge']}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="{p['badge_style']} font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">{p['badge']}</span>
+                    <div style="display: flex; gap: 6px;">
+                        <a href="{share_links['twitter']}" target="_blank" style="color: #38bdf8; font-size: 13px; text-decoration: none;" title="Share on 𝕏 (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="{share_links['whatsapp']}" target="_blank" style="color: #4ade80; font-size: 13px; text-decoration: none;" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="{share_links['linkedin']}" target="_blank" style="color: #60a5fa; font-size: 13px; text-decoration: none;" title="Share on LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
                 <h3 style="color: #f1f5f9; font-size: 17px; margin: 10px 0 6px 0; line-height: 1.4;">{p['title']}</h3>
                 <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">{p['description']}</p>
                 <div style="color: #64748b; font-size: 12px; margin-top: 8px;"><i class="fa-solid fa-file-zipper"></i> Packaged ZIP ({p['size_kb']} KB)</div>
@@ -1123,7 +1498,9 @@ async def public_storefront():
     html = STORE_TEMPLATE.replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
                           .replace("__PAYEE_NAME__", upi_gateway.payee_name) \
                           .replace("__TOTAL_COUNT__", str(len(products))) \
-                          .replace("__PRODUCTS_CARDS__", products_cards_html or empty_msg)
+                          .replace("__PRODUCTS_CARDS__", products_cards_html or empty_msg) \
+                          .replace("__WHATSAPP_NUMBER__", WHATSAPP_NUMBER) \
+                          .replace("__AI_CHAT_WIDGET__", AI_CHAT_WIDGET_HTML)
     return HTMLResponse(content=html)
 
 @app.get("/hire", response_class=HTMLResponse)
@@ -1131,7 +1508,150 @@ async def public_storefront():
 async def hire_page():
     from core.upi_payment import upi_gateway
     html = HIRE_TEMPLATE.replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
-                          .replace("__PAYEE_NAME__", upi_gateway.payee_name)
+                          .replace("__PAYEE_NAME__", upi_gateway.payee_name) \
+                          .replace("__WHATSAPP_NUMBER__", WHATSAPP_NUMBER) \
+                          .replace("__AI_CHAT_WIDGET__", AI_CHAT_WIDGET_HTML)
+    return HTMLResponse(content=html)
+
+@app.get("/broadcast", response_class=HTMLResponse)
+@app.get("/announcements", response_class=HTMLResponse)
+async def broadcast_page():
+    from core.upi_payment import upi_gateway
+    from core.pricing_engine import pricing_engine
+    from core.public_distribution import public_distribution
+    from core.tunnel_gateway import public_gateway
+    base_url = public_gateway.get_public_url() or "http://127.0.0.1:8585"
+    ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
+
+    products = []
+    if ready_dir.exists():
+        for zip_p in sorted(ready_dir.glob("*.zip"), reverse=True):
+            clean_name = zip_p.stem
+            size_kb = round(zip_p.stat().st_size / 1024, 1)
+            title_guess = re.sub(r'^\d+_\d+_', '', clean_name).replace("_", " ").title()
+            pricing = pricing_engine.get_pricing_for_asset(title=title_guess)
+            products.append({
+                "slug": clean_name,
+                "title": title_guess,
+                "size_kb": size_kb,
+                "price_usd": pricing["price_usd"],
+                "price_inr": pricing["price_inr"],
+                "badge": pricing["badge"],
+                "badge_style": pricing["badge_style"],
+                "tier_name": pricing["tier_name"],
+                "description": pricing["description"]
+            })
+
+    cards_html = ""
+    for p in products[:25]:
+        checkout_link = f"{base_url}/checkout/{p['slug']}"
+        preview_link = f"{base_url}/view_deliverable/ready_to_monetize/{p['slug']}.html"
+        share_links = public_distribution.get_share_links(p['title'], checkout_link, p['price_inr'])
+
+        cards_html += f"""
+        <div class="broadcast-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <span style="{p['badge_style']} font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;">{p['badge']}</span>
+                    <h3 style="color: #f8fafc; font-size: 18px; margin: 8px 0 4px 0;">{p['title']}</h3>
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0 0 10px 0;">{p['description']}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 20px; font-weight: 800; color: #34d399;">₹{p['price_inr']}</span>
+                    <span style="display: block; font-size: 12px; color: #94a3b8;">(~${p['price_usd']:.2f} USD)</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px;">
+                <span style="font-size: 12px; font-weight: 700; color: #cbd5e1; margin-right: 4px;">⚡ 1-Click Broadcast:</span>
+                <a href="{share_links['twitter']}" target="_blank" class="share-btn btn-twitter"><i class="fa-brands fa-x-twitter"></i> Tweet on 𝕏</a>
+                <a href="{share_links['linkedin']}" target="_blank" class="share-btn btn-linkedin"><i class="fa-brands fa-linkedin"></i> Share on LinkedIn</a>
+                <a href="{share_links['whatsapp']}" target="_blank" class="share-btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Broadcast on WhatsApp</a>
+                <a href="{share_links['reddit']}" target="_blank" class="share-btn btn-reddit"><i class="fa-brands fa-reddit-alien"></i> Post to Reddit</a>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); align-items: center; flex-wrap: wrap;">
+                <a href="{checkout_link}" class="btn-action purple" style="text-decoration: none; padding: 6px 14px; font-size: 12px; font-weight: 700;"><i class="fa-solid fa-bolt"></i> Instant Checkout</a>
+                <a href="{preview_link}" target="_blank" class="btn-action" style="text-decoration: none; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-eye"></i> Technical Preview</a>
+                <a href="/receipt/{p['slug']}" target="_blank" class="btn-action" style="text-decoration: none; padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-receipt"></i> Sample Tax Receipt</a>
+                <button onclick="navigator.clipboard.writeText('{checkout_link}'); alert('Copied checkout link: {checkout_link}');" class="btn-action" style="padding: 6px 12px; font-size: 12px; cursor: pointer;"><i class="fa-solid fa-link"></i> Copy Link</button>
+            </div>
+        </div>
+        """
+
+    empty_html = '<div style="color: var(--text-muted); padding: 40px; text-align: center;">No broadcast items manufactured yet.</div>'
+    html = BROADCAST_TEMPLATE.replace("__TOTAL_COUNT__", str(len(products))) \
+                             .replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
+                             .replace("__PAYEE_NAME__", upi_gateway.payee_name) \
+                             .replace("__BROADCAST_CARDS__", cards_html or empty_html) \
+                             .replace("__AI_CHAT_WIDGET__", AI_CHAT_WIDGET_HTML)
+    return HTMLResponse(content=html)
+
+@app.get("/feed.xml")
+@app.get("/api/store/feed")
+async def rss_feed_endpoint():
+    import email.utils
+    import time
+    from core.pricing_engine import pricing_engine
+    from core.tunnel_gateway import public_gateway
+    base_url = public_gateway.get_public_url() or "http://127.0.0.1:8585"
+    ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
+
+    items_xml = []
+    if ready_dir.exists():
+        for zip_p in sorted(ready_dir.glob("*.zip"), key=os.path.getmtime, reverse=True)[:50]:
+            clean_name = zip_p.stem
+            title = re.sub(r'^\d+_\d+_', '', clean_name).replace("_", " ").title()
+            pricing = pricing_engine.get_pricing_for_asset(title=title)
+            checkout_url = f"{base_url}/checkout/{clean_name}"
+            mtime = zip_p.stat().st_mtime
+            pub_date = email.utils.formatdate(mtime, usegmt=True)
+
+            items_xml.append(f"""
+    <item>
+        <title>{title} (₹{pricing['price_inr']} / ${pricing['price_usd']:.2f})</title>
+        <link>{checkout_url}</link>
+        <guid isPermaLink="false">{clean_name}</guid>
+        <pubDate>{pub_date}</pubDate>
+        <description><![CDATA[{pricing['description']} - Production toolkit with full source code, automated tests, and 1-click launcher. Instant UPI settlement to {PAYOUT_UPI_ID}.]]></description>
+        <author>{CONTACT_EMAIL} (MicroCorp AI / {PAYEE_NAME})</author>
+    </item>""")
+
+    now_rfc = email.utils.formatdate(time.time(), usegmt=True)
+    xml_content = f"""<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+    <title>MicroCorp AI — Developer Toolkits & Production Blueprints</title>
+    <link>{base_url}/store</link>
+    <description>Battle-tested production developer toolkits, cheatsheets, and architecture blueprints with instant zero-fee UPI settlement.</description>
+    <language>en-us</language>
+    <pubDate>{now_rfc}</pubDate>
+    <atom:link href="{base_url}/feed.xml" rel="self" type="application/rss+xml" />
+    {''.join(items_xml)}
+</channel>
+</rss>"""
+    return Response(content=xml_content, media_type="application/xml")
+
+@app.get("/receipt/{query}", response_class=HTMLResponse)
+async def generate_receipt_page(query: str):
+    from core.upi_payment import upi_gateway
+    from core.pricing_engine import pricing_engine
+    
+    clean_query = re.sub(r'[^a-zA-Z0-9_\-]+', '', query)
+    title = re.sub(r'^\d+_\d+_', '', clean_query).replace("_", " ").title() or "Custom Software Engineering Service"
+    pricing = pricing_engine.get_pricing_for_asset(title=title)
+    
+    inv_num = f"INV-{datetime.now().strftime('%Y%m%d')}-{clean_query[:8].upper() or 'DIRECT'}"
+    date_str = datetime.now().strftime("%B %d, %Y")
+    
+    html = RECEIPT_TEMPLATE.replace("__INVOICE_NUMBER__", inv_num) \
+                           .replace("__DATE__", date_str) \
+                           .replace("__PAYEE_NAME__", upi_gateway.payee_name) \
+                           .replace("__PAYOUT_UPI_ID__", upi_gateway.upi_id) \
+                           .replace("__ORDER_REF__", clean_query) \
+                           .replace("__UTR_NUMBER__", f"UPI-UTR-{uuid.uuid4().hex[:12].upper()}") \
+                           .replace("__ITEM_TITLE__", title) \
+                           .replace("__AMOUNT_INR__", str(pricing["price_inr"]))
     return HTMLResponse(content=html)
 
 @app.get("/sitemap.xml")
@@ -1143,6 +1663,9 @@ async def sitemap_endpoint():
         f"<url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>",
         f"<url><loc>{base_url}/store</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>",
         f"<url><loc>{base_url}/hire</loc><changefreq>daily</changefreq><priority>0.9</priority></url>",
+        f"<url><loc>{base_url}/broadcast</loc><changefreq>daily</changefreq><priority>0.9</priority></url>",
+        f"<url><loc>{base_url}/announcements</loc><changefreq>daily</changefreq><priority>0.8</priority></url>",
+        f"<url><loc>{base_url}/feed.xml</loc><changefreq>hourly</changefreq><priority>0.8</priority></url>",
         f"<url><loc>{base_url}/terms</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>"
     ]
     if ready_dir.exists():
@@ -1165,6 +1688,10 @@ Allow: /
 Allow: /store
 Allow: /hire
 Allow: /order
+Allow: /broadcast
+Allow: /announcements
+Allow: /feed.xml
+Allow: /receipt/
 Allow: /checkout/
 Allow: /view_deliverable/
 Sitemap: {base_url}/sitemap.xml

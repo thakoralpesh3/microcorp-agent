@@ -165,6 +165,16 @@ You can directly support the creator and unlock commercial licensing via any Ind
         slug = re.sub(r'[^a-zA-Z0-9]+', '_', title.lower())[:30]
         promo_path = PROMOTIONS_DIR / f"{timestamp}_{slug}_promo.md"
 
+        import urllib.parse
+        tweet_text = f"🚀 Just released: {title}! Production code, automated tests & 1-click launcher. Instant UPI (₹{price_inr}): {checkout_url}"
+        wa_text = f"Check out {title} on MicroCorp AI (₹{price_inr} instant UPI download): {checkout_url}"
+        reddit_title = f"Show Python: {title} - Production developer toolkit with 1-click launcher"
+        
+        tw_share = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}"
+        li_share = f"https://www.linkedin.com/sharing/share-offsite/?url={urllib.parse.quote(checkout_url)}"
+        wa_share = f"https://api.whatsapp.com/send?text={urllib.parse.quote(wa_text)}"
+        rd_share = f"https://reddit.com/submit?url={urllib.parse.quote(checkout_url)}&title={urllib.parse.quote(reddit_title)}"
+
         content = f"""# Social & Marketplace Promotional Pack: {title}
 **Date:** {time.strftime('%B %d, %Y')}  
 **Asset:** {title}  
@@ -174,7 +184,44 @@ You can directly support the creator and unlock commercial licensing via any Ind
 
 ---
 
-## 1. Reddit Post (`r/Python`, `r/FastAPI`, `r/webdev`)
+### ⚡ 1-Click Broadcast Links:
+- [Share on 𝕏 (Twitter)]({tw_share})
+- [Share on LinkedIn]({li_share})
+- [Share on WhatsApp]({wa_share})
+- [Submit to Reddit]({rd_share})
+
+---
+
+## 1. 𝕏 (Twitter) Launch Post / Thread
+**Post 1:**
+🚀 Just dropped: **{title}**!
+A turnkey, production-grade developer toolkit with full modular source code, unit tests, Docker scaffolding, and 1-click launchers (`START_HERE.html`).
+
+Get it here with zero-fee instant UPI (₹{price_inr} / ${price_usd:.2f}):
+👉 {checkout_url}
+
+#Python #DevOps #MicroSaaS #WebDev #BuildInPublic
+
+---
+
+## 2. LinkedIn Professional Update
+**Hook:**
+Excited to announce the release of **{title}**, engineered autonomously by MicroCorp AI!
+
+Modern software development requires handling edge cases, rigorous error boundaries, and production-tested patterns. This toolkit provides:
+✅ Full typed source code (`main.py`)
+✅ Automated verification tests
+✅ Interactive customer dashboard & 1-click launchers
+✅ Full commercial ownership rights
+
+Direct download with instant bank UPI settlement to `{PAYOUT_UPI_ID}`:
+🔗 {checkout_url}
+
+#SoftwareEngineering #TechStartup #Automation #AI
+
+---
+
+## 3. Reddit Post (`r/Python`, `r/FastAPI`, `r/webdev`)
 **Title:** Show Python: {title} (Complete architecture guide & production boilerplate)
 
 **Body:**
@@ -199,7 +246,15 @@ Let me know what you think in the comments!
 
 ---
 
-## 2. Dev.to / Medium Article Draft
+## 4. WhatsApp Broadcast Message
+🔥 *New Release from MicroCorp AI:* **{title}**
+Instant production toolkit with complete source code, tests, and 1-click launcher!
+💰 Price: ₹{price_inr} INR (Zero fee direct UPI)
+🔗 Download now: {checkout_url}
+
+---
+
+## 5. Dev.to / Medium Article Draft
 **Title:** Architecture Deep-Dive: Building {title} in Production
 
 **Hook:**
@@ -216,6 +271,20 @@ Get it here with instant UPI checkout: [{checkout_url}]({checkout_url})
         with open(promo_path, "w", encoding="utf-8") as f:
             f.write(content)
         return str(promo_path)
+
+    def get_share_links(self, title: str, checkout_url: str, price_inr: int) -> Dict[str, str]:
+        """Returns direct 1-click social sharing links for a given asset."""
+        import urllib.parse
+        tweet_text = f"🚀 Just released: {title}! Production code & 1-click launcher. Instant UPI (₹{price_inr}): {checkout_url}"
+        wa_text = f"Check out {title} on MicroCorp AI (₹{price_inr} instant UPI download): {checkout_url}"
+        reddit_title = f"Show Python: {title} - Production developer toolkit with 1-click launcher"
+        
+        return {
+            "twitter": f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}",
+            "linkedin": f"https://www.linkedin.com/sharing/share-offsite/?url={urllib.parse.quote(checkout_url)}",
+            "whatsapp": f"https://api.whatsapp.com/send?text={urllib.parse.quote(wa_text)}",
+            "reddit": f"https://reddit.com/submit?url={urllib.parse.quote(checkout_url)}&title={urllib.parse.quote(reddit_title)}"
+        }
 
 import re
 
