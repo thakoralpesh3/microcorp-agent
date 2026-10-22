@@ -1096,8 +1096,24 @@ and practical implementation guides designed for modern engineers and builders.
                 zf.write(qr_file, arcname=f"{safe_slug}/PAYMENT_QR.svg")
                 zf.write(payment_file, arcname=f"{safe_slug}/PAYMENT_INSTRUCTIONS.md")
                 
-                # License text
-                license_text = f"COMMERCIAL PRODUCT LICENSE\nProduct: {title}\nProduced By: MicroCorp AI\nCommercial and Personal Use Permitted.\nPayee UPI ID: {PAYOUT_UPI_ID} ({PAYEE_NAME})\nHost Owner retains 100% distribution rights."
+                # License text with explicit AI disclaimer and liability shield
+                license_text = f"""COMMERCIAL PRODUCT LICENSE & LIABILITY DISCLAIMER
+Product: {title}
+Produced Autonomously By: MicroCorp AI (Autonomous AI Multi-Agent Fleet)
+Platform Operator & Payee: {PAYEE_NAME} (UPI: {PAYOUT_UPI_ID})
+Jurisdiction: Ahmedabad, Gujarat, India
+
+1. COMMERCIAL GRANT:
+Customer is granted a non-exclusive, perpetual, commercial license to use, adapt, and deploy this software deliverable.
+
+2. STRICT AS-IS DISCLAIMER (NO WARRANTIES):
+THIS DELIVERABLE AND ALL ACCOMPANYING CODE, SCRIPTS, AND BLUEPRINTS ARE PROVIDED ON AN "AS-IS", "WHERE-IS", AND "WITH ALL FAULTS" BASIS WITHOUT WARRANTY OF ANY KIND, EXPRESS, STATUTORY, OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, ACCURACY, OR NON-INFRINGEMENT.
+
+3. ZERO LIABILITY & HARD MONETARY CAP:
+ALL CODE WAS GENERATED AUTONOMOUSLY BY ARTIFICIAL INTELLIGENCE. THE CUSTOMER ASSUMES 100% SOLE RESPONSIBILITY FOR AUDITING, SANDBOXING, AND TESTING ALL CODE PRIOR TO EXECUTION OR PRODUCTION DEPLOYMENT. UNDER NO CIRCUMSTANCES SHALL ALPESH THAKOR OR MICROCORP AI BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, LOST PROFITS, OR DATA LOSS. TOTAL AGGREGATE LIABILITY IS HARD-CAPPED AT THE LESSER OF THE PURCHASE PRICE OR ₹1,000 INR ($10 USD).
+
+4. COMPLETE TERMS:
+See accompanying 'TERMS_AND_CONDITIONS.txt' for the complete, legally binding Master Terms of Service, Indemnification, and Exclusive Jurisdiction in Ahmedabad, Gujarat, India."""
                 zf.writestr(f"{safe_slug}/LICENSE.txt", license_text)
                 
                 # Terms and Conditions
