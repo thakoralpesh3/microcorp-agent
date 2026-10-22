@@ -220,19 +220,35 @@ async def get_terms_html():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MicroCorp AI - Terms and Conditions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroCorp AI - Master Terms of Service & Legal Disclaimer</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body {{ max-width: 900px; margin: 40px auto; line-height: 1.7; padding: 20px; }}
-        .terms-box {{ background: rgba(18, 24, 38, 0.9); padding: 40px; border-radius: 12px; border: 1px solid var(--card-border); }}
-        h1, h2, h3 {{ color: #60a5fa; margin-top: 24px; }}
-        hr {{ border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0; }}
+        body {{ max-width: 960px; margin: 30px auto; line-height: 1.8; padding: 20px; color: #cbd5e1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
+        .terms-box {{ background: rgba(18, 24, 38, 0.95); padding: 42px; border-radius: 14px; border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
+        h1 {{ color: #f8fafc; font-size: 26px; border-bottom: 2px solid rgba(59, 130, 246, 0.4); padding-bottom: 12px; margin-top: 0; }}
+        h2 {{ color: #60a5fa; font-size: 19px; margin-top: 32px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }}
+        h3 {{ color: #93c5fd; font-size: 16px; margin-top: 20px; }}
+        blockquote {{ background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 16px 20px; border-radius: 6px; margin: 20px 0; color: #fca5a5; }}
+        hr {{ border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 26px 0; }}
         a {{ color: #60a5fa; text-decoration: none; }}
+        a:hover {{ text-decoration: underline; }}
+        code {{ background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #34d399; font-size: 13px; }}
+        ul, ol {{ padding-left: 24px; }}
+        li {{ margin-bottom: 8px; }}
+        strong {{ color: #f1f5f9; }}
     </style>
 </head>
 <body>
-    <div style="margin-bottom: 20px;">
-        <a href="/" class="btn-action" style="display: inline-flex;"><i class="fa-solid fa-arrow-left"></i> Back to Console</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 10px;">
+            <a href="/store" class="btn-action" style="display: inline-flex;"><i class="fa-solid fa-arrow-left"></i> Digital Store</a>
+            <a href="/" class="btn-action" style="display: inline-flex;"><i class="fa-solid fa-gauge"></i> Console</a>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">
+            <i class="fa-solid fa-shield-halved"></i> Governing Law: Republic of India (Ahmedabad)
+        </div>
     </div>
     <div class="terms-box">
         {html_body}
@@ -723,6 +739,17 @@ STORE_TEMPLATE = """<!DOCTYPE html>
             <div id="trackResult" style="margin-top: 14px; display: none; padding: 14px; border-radius: 8px; font-size: 13px;"></div>
         </div>
     </div>
+
+    <footer style="margin-top: 50px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 13px; color: #64748b;">
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 8px;">
+            <a href="/terms" target="_blank" style="color: #94a3b8; text-decoration: none;"><i class="fa-solid fa-scale-balanced"></i> Master Terms of Service & AI Disclaimers</a>
+            <a href="/hire" style="color: #94a3b8; text-decoration: none;"><i class="fa-solid fa-briefcase"></i> Commission Custom Work</a>
+            <a href="https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20have%20an%20inquiry" target="_blank" style="color: #4ade80; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp Reach</a>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: #475569;">
+            MicroCorp AI is an autonomous AI software engineering fleet operated by Alpesh Thakor (UPI: <strong>talpesh100@ybl</strong>). All deliverables are provided strictly on an <strong>AS-IS</strong> basis with all faults and without warranty. Exclusive jurisdiction: Ahmedabad, Gujarat, India.
+        </p>
+    </footer>
 </body>
 </html>"""
 
@@ -814,6 +841,13 @@ HIRE_TEMPLATE = """<!DOCTYPE html>
             </div>
         </div>
 
+        <div class="form-group" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 12px 14px; border-radius: 8px; font-size: 12px; color: #94a3b8; line-height: 1.5; margin-top: 14px;">
+            <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="termsCheckHire" checked style="margin-top: 3px;">
+                <span>I confirm I am 18+, acknowledge all software is engineered autonomously by AI on a strict <strong>AS-IS</strong> basis with 100% client assumption of risk, and unconditionally agree to the <a href="/terms" target="_blank" style="color: #60a5fa; text-decoration: underline;">Master Terms of Service, Limitation of Liability & AI Disclaimers</a> (Jurisdiction: Ahmedabad, India).</span>
+            </label>
+        </div>
+
         <div id="hireResultBox" style="display: none; margin-top: 20px; padding: 20px; border-radius: 10px;"></div>
     </div>
 
@@ -826,6 +860,12 @@ HIRE_TEMPLATE = """<!DOCTYPE html>
             var budget = parseFloat(document.getElementById('orderBudget').value) || 50.0;
             var btn = document.getElementById('orderSubmitBtn');
             var resBox = document.getElementById('hireResultBox');
+
+            var termsCheck = document.getElementById('termsCheckHire');
+            if (termsCheck && !termsCheck.checked) {
+                alert('You must accept the Master Terms of Service and AI Liability Disclaimer to submit a project.');
+                return;
+            }
 
             if (!title || !reqs) {
                 alert('Please enter a project title and technical requirements.');
@@ -944,6 +984,13 @@ CHECKOUT_TEMPLATE = """<!DOCTYPE html>
             <h4 style="color: #f1f5f9; font-size: 15px;"><i class="fa-solid fa-key"></i> Step 2: Confirm Payment & Unlock Download</h4>
             <p style="color: var(--text-muted); font-size: 13px; margin: 4px 0 16px 0;">After sending ₹__AMOUNT_INR__ to <code>__UPI_ID__</code>, enter your 12-digit UPI UTR / Transaction Reference Number below to immediately unlock your product.</p>
 
+            <div style="margin-bottom: 14px; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-size: 12px; color: #94a3b8; line-height: 1.5;">
+                <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="termsCheckCheckout" checked style="margin-top: 2px;">
+                    <span>I confirm I am 18+, acknowledge all deliverables are generated autonomously by AI on a strict <strong>AS-IS</strong> basis, assume 100% deployment and auditing responsibility, and agree to the <a href="/terms" target="_blank" style="color: #60a5fa; text-decoration: underline;">Master Terms of Service & AI Disclaimers</a> (Jurisdiction: Ahmedabad, India).</span>
+                </label>
+            </div>
+
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
                 <input type="text" id="utrNumber" placeholder="Enter 12-digit UPI UTR / Transaction ID (e.g. 429182749102)" style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px;">
                 <button class="btn-action" onclick="verifyUTR()" id="verifyBtn" style="background: #10b981; color: #fff; border: none; font-weight: 700; padding: 12px;">
@@ -956,6 +1003,11 @@ CHECKOUT_TEMPLATE = """<!DOCTYPE html>
 
     <script>
         async function verifyUTR() {
+            var termsCheck = document.getElementById("termsCheckCheckout");
+            if (termsCheck && !termsCheck.checked) {
+                alert("You must agree to the Master Terms of Service and AI Liability Disclaimer to download.");
+                return;
+            }
             var utr = document.getElementById("utrNumber").value.trim();
             var btn = document.getElementById("verifyBtn");
             var resDiv = document.getElementById("utrResult");

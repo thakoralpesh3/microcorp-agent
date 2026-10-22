@@ -93,12 +93,16 @@ Double-click in browser     Double-click on Windows     1-click for Mac/Linux
 
 ---
 
-## ⚖️ Legal & Ethical Governance
+## ⚖️ Legal Governance, Autonomous AI Disclaimer & Terms of Service
 
-MicroCorp AI strictly adheres to international cyber law, intellectual property rights, and fair usage standards.
-- 🛡️ **Zero Malicious Work**: Cyberattacks (DDoS, keyloggers, botnets), fraud, scams, or credential harvesting requests are blocked instantly.
+MicroCorp AI operates under a strict legal governance framework governed by our [Master Terms of Service](TERMS_AND_CONDITIONS.md).
+
+- 🤖 **Autonomous AI Generation (AS-IS Disclosure)**: All software, scripts, toolkits, and blueprints are synthesized autonomously by artificial intelligence without manual composition by Alpesh Thakor. All assets are licensed strictly on an **"AS-IS", "WHERE-IS", and "WITH ALL FAULTS"** basis.
+- 🛡️ **Zero Liability & Hard Monetary Cap**: Customers assume 100% sole responsibility for auditing, sandboxing, and security-testing all code prior to deployment. Total cumulative liability of Alpesh Thakor is strictly hard-capped at the lesser of the purchase price or ₹1,000 INR ($10 USD).
 - 📜 **Full Commercial License**: When purchasing or commissioning work, clients receive full ownership rights to deploy, modify, and resell the code in their own applications.
-- 💳 **Clean Direct Settlement**: Zero intermediary escrow holds; direct peer-to-peer bank settlement via India's Unified Payments Interface (UPI).
+- 🚫 **Strict Inviolable Guardrails**: Cyberattacks (DDoS, keyloggers, botnets), fraud, scams, or credential harvesting requests are blocked instantly by the automated `LegalGuardian`.
+- 🏛️ **Governing Law & Jurisdiction**: Republic of India. Exclusive territorial and subject-matter jurisdiction is situated exclusively in competent courts at **Ahmedabad, Gujarat, India**.
+- 💳 **Clean Direct Settlement**: Zero intermediary escrow holds; direct peer-to-peer bank settlement via India's Unified Payments Interface (UPI) to `talpesh100@ybl`.
 
 ---
 
