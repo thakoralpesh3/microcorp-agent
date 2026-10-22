@@ -209,7 +209,7 @@ async def chat_assistant_endpoint(req: ChatAssistantRequest):
     from core.upi_payment import upi_gateway
     
     catalog = pricing_engine.get_catalog()
-    catalog_summary = "\n".join([f"- {t['tier_name']}: ${t['base_price_usd']} (₹{t['base_price_inr']}) - {t['description']}" for t in catalog.get("tiers", [])])
+    catalog_summary = "\n".join([f"- {t.get('tier_name')}: ${t.get('price_usd')} (₹{t.get('price_inr')}) - {t.get('description')}" for t in catalog.get("tiers", {}).values() if isinstance(t, dict)])
 
     system_prompt = f"""You are the official AI Solution Architect and Technical Pre-Sales Consultant for MicroCorp AI (an autonomous AI software engineering enterprise operated by Alpesh Thakor).
 Official Payee UPI ID: {upi_gateway.upi_id} ({upi_gateway.payee_name}).
