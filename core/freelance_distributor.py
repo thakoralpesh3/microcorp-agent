@@ -61,14 +61,21 @@ class FreelanceWorkDistributor:
 
         plan_id = f"fplan_{uuid.uuid4().hex[:8]}"
 
-        # 3. Multi-Department Work Breakdown
+        # 3. Multi-Department Work Breakdown powered by The Agency Personas
+        from core.agency_agents_manager import agency_agents_manager
+        tech_persona = agency_agents_manager.match_agent_for_task(title=title, domain="engineering", requirements=description)
+        doc_persona = agency_agents_manager.match_agent_for_task(title=f"Documentation: {title}", domain="engineering")
+        qa_persona = agency_agents_manager.match_agent_for_task(title=f"QA and Verification: {title}", domain="testing")
+
         milestones = [
             {
                 "step": 1,
                 "title": "Core Technical Architecture & Implementation",
                 "dept_id": "dept_digital_products",
                 "department_name": "Digital Asset & Product Lab",
-                "subagent_role": "Lead Full-Stack Systems Engineer",
+                "subagent_role": tech_persona.get("name", "Lead Full-Stack Systems Engineer") if tech_persona else "Lead Full-Stack Systems Engineer",
+                "agency_persona": tech_persona.get("name") if tech_persona else None,
+                "agency_division": tech_persona.get("division") if tech_persona else "engineering",
                 "deliverable": "Production Source Code, Architecture & Configs",
                 "estimated_minutes": 20
             },
@@ -77,7 +84,9 @@ class FreelanceWorkDistributor:
                 "title": "Developer Documentation & Technical Reference",
                 "dept_id": "dept_content_newsletter",
                 "department_name": "Editorial & Documentation Bureau",
-                "subagent_role": "Senior Technical Writer & Documentation Specialist",
+                "subagent_role": doc_persona.get("name", "Senior Technical Writer & Documentation Specialist") if doc_persona else "Senior Technical Writer & Documentation Specialist",
+                "agency_persona": doc_persona.get("name") if doc_persona else None,
+                "agency_division": doc_persona.get("division") if doc_persona else "engineering",
                 "deliverable": "Complete Setup Guide, API Reference & Walkthrough",
                 "estimated_minutes": 15
             },
@@ -86,7 +95,9 @@ class FreelanceWorkDistributor:
                 "title": "Turnkey Verification, Delivery Certificate & Client Handover",
                 "dept_id": "dept_gig_proposal",
                 "department_name": "Client Acquisition & Proposal Desk",
-                "subagent_role": "Client Delivery Specialist & QA Auditor",
+                "subagent_role": qa_persona.get("name", "Client Delivery Specialist & QA Auditor") if qa_persona else "Client Delivery Specialist & QA Auditor",
+                "agency_persona": qa_persona.get("name") if qa_persona else None,
+                "agency_division": qa_persona.get("division") if qa_persona else "testing",
                 "deliverable": "Client Handover Certificate & Licensing Compliance",
                 "estimated_minutes": 10
             }

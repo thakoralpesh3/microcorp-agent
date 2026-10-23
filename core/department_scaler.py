@@ -46,6 +46,11 @@ class DynamicDepartment(BaseDepartment):
         payload = task.get("payload", {})
         task_title = task.get("title", f"Specialized {self.domain} Task")
         
+        # Match specialized Agency Persona from the 268+ fleet
+        from core.agency_agents_manager import agency_agents_manager
+        persona = agency_agents_manager.match_agent_for_task(title=task_title, domain=self.domain)
+        effective_prompt = agency_agents_manager.build_persona_system_prompt(persona, self.custom_prompt) if persona else self.custom_prompt
+
         prompt = f"""You are executing a specialized enterprise task for Department '{self.name}'.
 Task: {task_title}
 Input Context & Payload:
@@ -56,23 +61,27 @@ Ensure high structure, actionable depth, and comprehensive execution.
 """
         generated_md, prompt_tokens, candidate_tokens = llm_client.generate(
             prompt=prompt,
-            system_instruction=self.custom_prompt
+            system_instruction=effective_prompt
         )
 
         pkg = packager.save_deliverable(
             category=self.domain,
             title=task_title,
             markdown_content=generated_md,
-            create_zip=False
+            create_zip=False,
+            agency_persona=persona
         )
 
+        persona_name = persona.get("name") if persona else subagent_id
         return {
             "title": task_title,
             "category": self.domain,
             "deliverable_path": pkg["primary_path"],
-            "summary": f"Completed by dynamic department '{self.name}' ({subagent_id}).",
+            "summary": f"Completed by dynamic department '{self.name}' ({persona_name}).",
             "prompt_tokens": prompt_tokens,
-            "completion_tokens": candidate_tokens
+            "completion_tokens": candidate_tokens,
+            "agency_persona": persona.get("name") if persona else None,
+            "agency_division": persona.get("division") if persona else None
         }
 
 class DepartmentScaler:
@@ -113,12 +122,22 @@ class DepartmentScaler:
         if dept_id in self.departments:
             return self.departments[dept_id]
 
-        clean_name = name_hint or f"{domain.replace('_', ' ').title()} Operations"
-        head_title = f"{domain.replace('_', ' ').title()} Commander"
-        description = f"Autonomous on-demand department dynamically generated to handle high-volume {domain} tasks."
-        icon = "fa-cubes-stacked text-purple"
-        
-        system_prompt = f"""You are the head of the {clean_name} department at MicroCorp AI.
+        from core.agency_agents_manager import agency_agents_manager
+        agency_div = agency_agents_manager.get_divisions().get(domain.lower().replace("_", "-"))
+        if agency_div:
+            clean_name = name_hint or f"{agency_div['name']} Division"
+            head_title = f"{agency_div['name']} Principal Lead"
+            description = f"Autonomous enterprise division powered by The Agency ({agency_div['agent_count']} specialized agents). {agency_div['description']}"
+            icon = "fa-robot text-primary"
+            system_prompt = f"""You are the Lead Coordinator for the {clean_name} at MicroCorp AI.
+Powered by The Agency's specialized personas.
+Domain focus: {domain}. Execute autonomous tasks with rigorous quality and production standards."""
+        else:
+            clean_name = name_hint or f"{domain.replace('_', ' ').title()} Operations"
+            head_title = f"{domain.replace('_', ' ').title()} Commander"
+            description = f"Autonomous on-demand department dynamically generated to handle high-volume {domain} tasks."
+            icon = "fa-cubes-stacked text-purple"
+            system_prompt = f"""You are the head of the {clean_name} department at MicroCorp AI.
 Your focus is autonomous execution of {domain} deliverables with extreme attention to detail,
 commercial value, and rapid turnaround."""
 

@@ -68,6 +68,11 @@ class ChatAssistantRequest(BaseModel):
     message: str
     history: Optional[List[Dict[str, str]]] = None
 
+class AgencyMatchRequest(BaseModel):
+    title: str
+    domain: Optional[str] = "engineering"
+    requirements: Optional[str] = ""
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     index_file = STATIC_DIR / "index.html"
@@ -221,7 +226,8 @@ YOUR ROLE:
 3. Explain how to buy with zero fees using PhonePe/GooglePay/Paytm via UPI to {upi_gateway.upi_id}, and how entering a 12-digit bank UTR unlocks instant ZIP download.
 4. Explain how clients can commission custom software from the AI fleet at /hire.
 5. All deliverables include standalone modular Python code (main.py), 1-click launchers (START_HERE.html & RUN_WINDOWS.bat), and full commercial ownership rights.
-6. Keep responses friendly, concise, technically sharp, and formatted in clean markdown.
+6. Powered by The Agency: MicroCorp AI integrates 268+ specialized autonomous agent personas across 18 divisions (Engineering, Security, Design, Testing, Finance, DevOps, Product, Spatial Computing, etc.). Every project is matched to its exact expert persona with its AGENT_PERSONA.md blueprint bundled in delivery.
+7. Keep responses friendly, concise, technically sharp, and formatted in clean markdown.
 
 AVAILABLE TIERS:
 {catalog_summary}
@@ -239,14 +245,16 @@ AVAILABLE TIERS:
         }
     except Exception as e:
         lower = user_msg.lower()
-        if "hire" in lower or "custom" in lower or "project" in lower:
-            fallback = f"You can commission custom software from our 24/7 autonomous engineering fleet at [/hire](/hire). Every project includes clean modular architecture, automated tests, Docker setup, and 1-click launchers. Payments settle directly to UPI ID `{upi_gateway.upi_id}`."
+        if "agency" in lower or "specialist" in lower or "persona" in lower or "division" in lower:
+            fallback = f"MicroCorp AI integrates **The Agency**—featuring **268+ specialized AI personas across 18 enterprise divisions** (Engineering, Security, Design, DevOps, Testing, Finance, etc.). When you order or commission work at [/hire](/hire), the exact expert persona is automatically matched and executes your task with full persona attribution and an `AGENT_PERSONA.md` blueprint bundled in your download!"
+        elif "hire" in lower or "custom" in lower or "project" in lower:
+            fallback = f"You can commission custom software from our 24/7 autonomous engineering fleet at [/hire](/hire), powered by The Agency's 268+ specialized personas. Every project includes clean modular architecture, automated tests, Docker setup, and 1-click launchers. Payments settle directly to UPI ID `{upi_gateway.upi_id}`."
         elif "pay" in lower or "upi" in lower or "phonepe" in lower or "gpay" in lower or "price" in lower:
             fallback = f"We support zero-fee direct UPI settlements to `{upi_gateway.upi_id}` ({upi_gateway.payee_name}) using PhonePe, Google Pay, Paytm, or BHIM. After paying, entering your 12-digit bank UTR instantly unlocks your download!"
         elif "fastapi" in lower or "backend" in lower or "microservice" in lower:
-            fallback = f"Our Full-Stack FastAPI Async Microservice toolkit is our most popular package! It includes JWT authentication, Docker configs, background workers, and an interactive `START_HERE.html` dashboard. Check it out on the [/store](/store)."
+            fallback = f"Our Full-Stack FastAPI Async Microservice toolkit is our most popular package, engineered by our Backend Architect persona! It includes JWT authentication, Docker configs, background workers, and an interactive `START_HERE.html` dashboard. Check it out on the [/store](/store)."
         else:
-            fallback = f"Hello! I am the MicroCorp AI Assistant. You can browse our production-ready developer toolkits on the [/store](/store), or commission a custom project tailored to your specifications at [/hire](/hire). All deliverables settle securely to UPI `{upi_gateway.upi_id}`."
+            fallback = f"Hello! I am the MicroCorp AI Assistant. Powered by The Agency's 268+ specialized AI personas across 18 divisions, you can browse our production-ready developer toolkits on the [/store](/store), or commission a custom project tailored to your specifications at [/hire](/hire). All deliverables settle securely to UPI `{upi_gateway.upi_id}`."
         return {
             "reply": fallback,
             "payout_upi_id": upi_gateway.upi_id,
@@ -635,6 +643,7 @@ AI_CHAT_WIDGET_HTML = """
     <!-- Quick Chips -->
     <div style="padding: 6px 12px; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
         <button onclick="sendQuickPrompt('How do I buy with PhonePe / Google Pay?')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">💳 How to Pay</button>
+        <button onclick="sendQuickPrompt('Tell me about The Agency: 268+ AI specialists')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">🤖 The Agency (268+ Personas)</button>
         <button onclick="sendQuickPrompt('How does custom software hiring work?')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">💼 Custom Hire</button>
         <button onclick="sendQuickPrompt('What is included in the deliverable ZIP?')" class="cat-btn" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;">📦 Deliverables</button>
     </div>
@@ -793,6 +802,16 @@ STORE_TEMPLATE = """<!DOCTYPE html>
             <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-book-open"></i> Research: ₹799</span>
             <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-cubes"></i> Toolkits: ₹1,799</span>
             <span style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-layer-group"></i> Enterprise: ₹3,999</span>
+        </div>
+        <div style="margin-top: 18px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 10px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">🤖</span>
+                <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #93c5fd;">Powered by The Agency: 268+ Specialized AI Personas across 18 Divisions</div>
+                    <div style="font-size: 12px; color: #94a3b8;">Engineered with dedicated blueprints: Backend, Security, DevOps, Testing, AI & Full-Stack</div>
+                </div>
+            </div>
+            <a href="/hire" class="btn-action purple" style="font-size: 12px; padding: 6px 14px; text-decoration: none; font-weight: 600;">Deploy Persona &rarr;</a>
         </div>
     </div>
 
@@ -976,6 +995,16 @@ HIRE_TEMPLATE = """<!DOCTYPE html>
             <span class="pill"><i class="fa-solid fa-bolt"></i> 0.5s Automated Feasibility Check</span>
             <span class="pill"><i class="fa-solid fa-file-zipper"></i> Turnkey ZIP Delivery</span>
             <span class="pill"><i class="fa-solid fa-credit-card"></i> Direct UPI Settlement (Zero Fees)</span>
+        </div>
+        <div style="margin-top: 18px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 10px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">🤖</span>
+                <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #93c5fd;">Powered by The Agency: 268+ Specialized AI Personas across 18 Divisions</div>
+                    <div style="font-size: 12px; color: #94a3b8;">Automatic persona matching: Backend Architect, Security Auditor, DevOps, QA, & Documentation Specialists</div>
+                </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: uppercase;">268+ Specialists</span>
         </div>
     </div>
 
@@ -1843,6 +1872,51 @@ async def get_ecommerce_syndication(asset_id: str):
         markdown_content=md_content
     )
     return bundle
+
+# -------------------------------------------------------------
+# Agency Agents Endpoints (The Agency: 268+ Personas across 18 Divisions)
+# -------------------------------------------------------------
+@app.get("/api/agency/divisions")
+async def get_agency_divisions_endpoint():
+    from core.agency_agents_manager import agency_agents_manager
+    divs = agency_agents_manager.get_divisions()
+    return {
+        "count": len(divs),
+        "divisions": divs
+    }
+
+@app.get("/api/agency/agents")
+async def get_agency_agents_endpoint(division: Optional[str] = None):
+    from core.agency_agents_manager import agency_agents_manager
+    agents = agency_agents_manager.get_agents(division=division)
+    return {
+        "count": len(agents),
+        "division": division,
+        "agents": agents
+    }
+
+@app.get("/api/agency/agent/{agent_id}")
+async def get_agency_agent_endpoint(agent_id: str):
+    from core.agency_agents_manager import agency_agents_manager
+    agent = agency_agents_manager.get_agent(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agency agent '{agent_id}' not found.")
+    return agent
+
+@app.post("/api/agency/match")
+async def match_agency_agent_endpoint(req: AgencyMatchRequest):
+    from core.agency_agents_manager import agency_agents_manager
+    matched = agency_agents_manager.match_agent_for_task(
+        title=req.title,
+        domain=req.domain,
+        requirements=req.requirements
+    )
+    if not matched:
+        raise HTTPException(status_code=404, detail="No matching agent found.")
+    return {
+        "matched": True,
+        "agent": matched
+    }
 
 def main():
     parser = argparse.ArgumentParser(description="MicroCorp AI Enterprise Launcher")
