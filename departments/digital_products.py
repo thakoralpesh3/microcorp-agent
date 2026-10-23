@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from departments.base_department import BaseDepartment
 from tools.gemini_client import llm_client
 from tools.packager import packager
+from core.agency_agents_manager import agency_agents_manager
 
 SYSTEM_PROMPT = """You are the Senior Product Architect at MicroCorp AI.
 Your mission is to produce ultra-high-quality, commercially viable digital products
@@ -34,6 +35,17 @@ class DigitalProductsDepartment(BaseDepartment):
         topic = payload.get("topic") or task.get("title", "Modern Python Async Architecture")
         product_type = payload.get("product_type", "Developer Cheatsheet & Pattern Kit")
 
+        # Match specialized Agency persona from the 268+ fleet across 18 divisions
+        agent_persona = agency_agents_manager.match_agent_for_task(
+            title=topic,
+            domain="engineering",
+            requirements=product_type
+        )
+        effective_system_prompt = agency_agents_manager.build_persona_system_prompt(
+            agent_persona,
+            SYSTEM_PROMPT
+        )
+
         prompt = f"""Create a commercial digital product on the topic: '{topic}'.
 Product Type: {product_type}
 
@@ -49,7 +61,7 @@ Make it thorough, elegant, and directly useful for engineers.
 """
         generated_md, prompt_tokens, candidate_tokens = llm_client.generate(
             prompt=prompt,
-            system_instruction=SYSTEM_PROMPT
+            system_instruction=effective_system_prompt
         )
 
         title = f"{topic} - {product_type}"
@@ -57,14 +69,19 @@ Make it thorough, elegant, and directly useful for engineers.
             category="digital_product",
             title=title,
             markdown_content=generated_md,
-            create_zip=True
+            create_zip=True,
+            agency_persona=agent_persona
         )
 
+        persona_title = agent_persona.get('name') if agent_persona else 'Chief Product Architect'
         return {
             "title": title,
             "category": "digital_product",
             "deliverable_path": pkg["primary_path"],
-            "summary": f"Manufactured and packaged {product_type} on '{topic}'. Size: {pkg['size_bytes']} bytes.",
+            "summary": f"Manufactured and packaged {product_type} on '{topic}' by {persona_title}. Size: {pkg['size_bytes']} bytes.",
             "prompt_tokens": prompt_tokens,
-            "completion_tokens": candidate_tokens
+            "completion_tokens": candidate_tokens,
+            "agency_persona": agent_persona.get("name") if agent_persona else None,
+            "agency_division": agent_persona.get("division") if agent_persona else None
         }
+

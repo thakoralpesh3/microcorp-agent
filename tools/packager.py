@@ -430,6 +430,7 @@ START_HERE_TEMPLATE = """<!DOCTYPE html>
         <!-- Hero Header -->
         <div class="hero">
             <span class="badge">MicroCorp AI • Customer Quickstart Center</span>
+            __AGENCY_BADGE__
             <h1>__TITLE__</h1>
             <div class="meta">
                 <span>Category: <strong>__CATEGORY__</strong></span> • 
@@ -874,11 +875,19 @@ def generate_start_here_html(
     markdown_content: str,
     amount_inr: float,
     price_usd: float,
-    reqs_content: str
+    reqs_content: str,
+    agency_persona: Optional[Dict[str, Any]] = None
 ) -> str:
     html_body = simple_markdown_to_html(markdown_content)
     safe_code = code_content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     safe_reqs = reqs_content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    agency_badge = ""
+    if agency_persona:
+        p_name = agency_persona.get("name", "Specialist")
+        p_div = agency_persona.get("division", "Agency").replace("-", " ").title()
+        p_emoji = agency_persona.get("emoji", "🤖")
+        agency_badge = f'<span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); margin-left: 6px;">{p_emoji} Crafted by Agency Specialist: {p_name} ({p_div})</span>'
 
     html = START_HERE_TEMPLATE
     html = html.replace("__TITLE__", title)
@@ -891,6 +900,7 @@ def generate_start_here_html(
     html = html.replace("__CODE_DISPLAY__", safe_code)
     html = html.replace("__REQS_DISPLAY__", safe_reqs)
     html = html.replace("__HTML_BODY__", html_body)
+    html = html.replace("__AGENCY_BADGE__", agency_badge)
     return html
 
 class Packager:
@@ -964,13 +974,21 @@ and practical implementation guides designed for modern engineers and builders.
         markdown_content: str,
         create_zip: bool = True,
         custom_price_usd: Optional[float] = None,
-        custom_price_inr: Optional[float] = None
+        custom_price_inr: Optional[float] = None,
+        agency_persona: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Saves a deliverable as Markdown and HTML, archives into a ZIP file with Terms,
         Marketplace listing, instant UPI QR code, and payment instructions.
         Returns paths and metadata.
         """
+        if agency_persona is None:
+            try:
+                from core.agency_agents_manager import agency_agents_manager
+                agency_persona = agency_agents_manager.match_agent_for_task(title=title, domain=category)
+            except Exception:
+                agency_persona = None
+
         category_dir = DELIVERABLES_DIR / category
         ready_dir = DELIVERABLES_DIR / "ready_to_monetize"
         for d in [category_dir, ready_dir]:
@@ -1067,7 +1085,8 @@ and practical implementation guides designed for modern engineers and builders.
             markdown_content=markdown_content,
             amount_inr=amount_inr,
             price_usd=price_usd,
-            reqs_content=reqs_content
+            reqs_content=reqs_content,
+            agency_persona=agency_persona
         )
         start_here_file = category_dir / f"{base_filename}_START_HERE.html"
         try:
@@ -1088,6 +1107,10 @@ and practical implementation guides designed for modern engineers and builders.
                 zf.writestr(f"{safe_slug}/QUICKSTART.txt", quickstart_txt)
                 zf.writestr(f"{safe_slug}/main.py", code_content)
                 zf.writestr(f"{safe_slug}/requirements.txt", reqs_content)
+
+                # Agency Persona Attribution & Master System Blueprint
+                if agency_persona and agency_persona.get("full_content"):
+                    zf.writestr(f"{safe_slug}/AGENT_PERSONA.md", agency_persona["full_content"])
 
                 # Standard Deliverable Artifacts
                 zf.write(md_file, arcname=f"{safe_slug}/README.md")
@@ -1161,7 +1184,9 @@ See accompanying 'TERMS_AND_CONDITIONS.txt' for the complete, legally binding Ma
             "upi_uri": checkout_pkg["upi_uri"],
             "size_bytes": md_file.stat().st_size,
             "start_here_path": str(start_here_file) if 'start_here_file' in locals() and start_here_file.exists() else "",
-            "ecommerce_listings": ecom_files
+            "ecommerce_listings": ecom_files,
+            "agency_persona": agency_persona.get("name") if agency_persona else None,
+            "agency_division": agency_persona.get("division") if agency_persona else None
         }
 
 packager = Packager()
