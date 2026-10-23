@@ -122,19 +122,28 @@ class AgencyAgentsManager:
             "full_content": content
         }
 
-    def get_divisions(self) -> List[Dict[str, Any]]:
-        """Returns metadata for all 18 divisions."""
+    def get_divisions(self) -> Dict[str, Dict[str, Any]]:
+        """Returns metadata dictionary for all 18 divisions keyed by division id."""
         self._ensure_indexed()
-        result = []
+        result = {}
         for div_id, d in sorted(self.divisions.items(), key=lambda x: x[1].get("label", x[0])):
-            result.append({
+            label = d.get("label", div_id.replace("-", " ").title())
+            result[div_id] = {
                 "id": div_id,
-                "label": d.get("label", div_id.title()),
+                "name": label,
+                "label": label,
+                "description": d.get("description", f"Specialized {label} Division"),
                 "icon": d.get("icon", "Folder"),
                 "color": d.get("color", "#3B82F6"),
                 "agent_count": d.get("agent_count", 0)
-            })
+            }
         return result
+
+    def get_division(self, division_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieves a single division by id or slug."""
+        self._ensure_indexed()
+        divs = self.get_divisions()
+        return divs.get(division_id.lower().replace("_", "-"))
 
     def get_agents(self, division: Optional[str] = None, search: Optional[str] = None) -> List[Dict[str, Any]]:
         """Returns a list of agents matching division or search query."""

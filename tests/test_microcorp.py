@@ -680,6 +680,142 @@ print('Hello MicroCorp')
             self.assertTrue(any("ECOMMERCE_LISTINGS/INSTAMOJO_UPI_SPEC.md" in n for n in names))
         print("Deliverable Packager Verified: Automatically bundled ECOMMERCE_LISTINGS into ZIP.")
 
+    def test_19_agency_agents_integration(self):
+        """
+        Verifies The Agency Agents Integration:
+        - All 18 professional divisions loaded from agency_agents/divisions.json
+        - All 268+ specialized personas indexed with YAML metadata and Markdown instructions
+        - Intelligent persona matching for technical engineering, security, and QA tasks
+        - Persona prompt builder injects mission, vibes, and critical rules
+        - Packager bundles AGENT_PERSONA.md inside ZIP deliverables and attributes persona in START_HERE.html
+        - Digital Products department processes tasks adopting Agency personas
+        - REST API endpoints (/api/agency/divisions, /api/agency/agents, /api/agency/agent/{id}, /api/agency/match)
+        """
+        import zipfile
+        from unittest.mock import patch
+        from fastapi.testclient import TestClient
+        from app import app
+        from core.agency_agents_manager import agency_agents_manager
+        from tools.packager import packager
+        from departments.digital_products import DigitalProductsDepartment
+
+        # 1. Verify Divisions
+        divs = agency_agents_manager.get_divisions()
+        self.assertEqual(len(divs), 18)
+        self.assertIn("engineering", divs)
+        self.assertIn("security", divs)
+        self.assertIn("testing", divs)
+        self.assertIn("design", divs)
+        self.assertIn("finance", divs)
+        print(f"The Agency Divisions Verified: 18 active divisions loaded ({', '.join(list(divs.keys())[:5])}...).")
+
+        # 2. Verify Total Agents Index
+        all_agents = agency_agents_manager.get_agents()
+        self.assertGreaterEqual(len(all_agents), 260)
+        eng_agents = agency_agents_manager.get_agents(division="engineering")
+        self.assertGreater(len(eng_agents), 20)
+        print(f"The Agency Agents Index Verified: {len(all_agents)} total specialized personas across 18 divisions.")
+
+        # 3. Verify Specific Persona Details
+        backend_arch = agency_agents_manager.get_agent("engineering-backend-architect")
+        self.assertIsNotNone(backend_arch)
+        self.assertEqual(backend_arch["name"], "Backend Architect")
+        self.assertEqual(backend_arch["division"], "engineering")
+        self.assertTrue(len(backend_arch["full_content"]) > 100)
+        print(f"Agency Agent Persona Verified: {backend_arch['name']} in division '{backend_arch['division']}'.")
+
+        # 4. Verify Intelligent Persona Matching
+        matched_eng = agency_agents_manager.match_agent_for_task(
+            title="FastAPI Async Microservice",
+            domain="engineering",
+            requirements="High-performance backend API with asyncio"
+        )
+        self.assertIsNotNone(matched_eng)
+        self.assertEqual(matched_eng["id"], "engineering-backend-architect")
+
+        matched_sec = agency_agents_manager.match_agent_for_task(
+            title="Smart Contract Security Audit",
+            domain="security",
+            requirements="Auditing EVM bytecode and Solidity vulnerabilities"
+        )
+        self.assertIsNotNone(matched_sec)
+        self.assertIn(matched_sec["id"], ["security-blockchain-security-auditor", "security-appsec-engineer", "security-penetration-tester", "security-security-architect"])
+        print(f"Intelligent Matching Verified: 'FastAPI Async Microservice' -> {matched_eng['name']}, 'Smart Contract Security Audit' -> {matched_sec['name']}.")
+
+        # 5. Verify Persona Prompt Construction
+        system_prompt = agency_agents_manager.build_persona_system_prompt(
+            backend_arch,
+            "You are a MicroCorp engineer."
+        )
+        self.assertIn("Backend Architect", system_prompt)
+        self.assertIn("CRITICAL RULES & OPERATIONAL BOUNDARIES", system_prompt)
+        self.assertIn("You are a MicroCorp engineer.", system_prompt)
+
+        # 6. Verify Packager embeds AGENT_PERSONA.md and attributes persona in START_HERE.html
+        sample_md = "# FastAPI Microservice Architecture\nModular async architecture patterns."
+        pkg = packager.save_deliverable(
+            category="digital_product",
+            title="FastAPI Microservice Toolkit",
+            markdown_content=sample_md,
+            create_zip=True,
+            agency_persona=backend_arch
+        )
+        self.assertEqual(pkg["agency_persona"], "Backend Architect")
+        self.assertEqual(pkg["agency_division"], "engineering")
+
+        with zipfile.ZipFile(pkg["zip_path"], 'r') as zf:
+            names = zf.namelist()
+            self.assertTrue(any("AGENT_PERSONA.md" in n for n in names))
+            persona_doc = zf.read([n for n in names if "AGENT_PERSONA.md" in n][0]).decode("utf-8")
+            self.assertIn("Backend Architect", persona_doc)
+
+            start_here = zf.read([n for n in names if "START_HERE.html" in n][0]).decode("utf-8")
+            self.assertIn("Backend Architect", start_here)
+            self.assertIn("Crafted by Agency Specialist", start_here)
+        print("Packager Verified: AGENT_PERSONA.md bundled in ZIP and attributed in START_HERE.html.")
+
+        # 7. Verify Digital Products Department Adoption
+        dept = DigitalProductsDepartment()
+        with patch("tools.gemini_client.llm_client.generate", return_value=("# Generated Guide\nCode here", 100, 150)):
+            res = dept.process({
+                "title": "FastAPI Async Blueprint",
+                "payload": {"topic": "FastAPI Async Blueprint", "product_type": "Developer Cheatsheet & Pattern Kit"}
+            }, subagent_id="sub_test_agency")
+            self.assertEqual(res["agency_persona"], "Backend Architect")
+            self.assertEqual(res["agency_division"], "engineering")
+            self.assertIn("Backend Architect", res["summary"])
+        print("Digital Products Department Verified: Autonomously adopted matching Agency persona.")
+
+        # 8. Verify REST API Endpoints
+        client = TestClient(app)
+        
+        # GET /api/agency/divisions
+        r_div = client.get("/api/agency/divisions")
+        self.assertEqual(r_div.status_code, 200)
+        self.assertEqual(r_div.json()["count"], 18)
+
+        # GET /api/agency/agents
+        r_agents = client.get("/api/agency/agents?division=engineering")
+        self.assertEqual(r_agents.status_code, 200)
+        self.assertGreater(r_agents.json()["count"], 20)
+
+        # GET /api/agency/agent/{agent_id}
+        r_agent = client.get("/api/agency/agent/engineering-backend-architect")
+        self.assertEqual(r_agent.status_code, 200)
+        self.assertEqual(r_agent.json()["name"], "Backend Architect")
+
+        # POST /api/agency/match
+        r_match = client.post("/api/agency/match", json={
+            "title": "Cloud Infrastructure Terraform Pipeline",
+            "domain": "devops",
+            "requirements": "AWS ECS and Terraform"
+        })
+        self.assertEqual(r_match.status_code, 200)
+        self.assertTrue(r_match.json()["matched"])
+        self.assertEqual(r_match.json()["agent"]["division"], "engineering")
+        self.assertEqual(r_match.json()["agent"]["name"], "Devops Automator")
+        print("REST API Endpoints Verified: /api/agency/divisions, /api/agency/agents, /api/agency/agent/{id}, and /api/agency/match all operational.")
+
 if __name__ == "__main__":
     unittest.main()
 
