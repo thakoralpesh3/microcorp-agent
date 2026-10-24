@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  microcorp-agent:
+    build: .
+    container_name: microcorp-agent
+    restart: unless-stopped
+    ports:
+      - "8585:8585"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8585
+      - PAYOUT_UPI_ID=talpesh100@ybl
+      - PAYEE_NAME=Alpesh Thakor
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./deliverables:/app/deliverables
