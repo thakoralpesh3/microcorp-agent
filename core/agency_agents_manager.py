@@ -194,8 +194,18 @@ class AgencyAgentsManager:
         text = f"{title} {domain} {requirements}".lower()
 
         # Specific high-priority keyword rules
-        if any(w in text for w in ["security", "audit", "threat", "vulnerability", "cve", "auth bypass"]):
-            agent = self.get_agent("security-code-reviewer") or self.get_agent("security-threat-modeler")
+        if any(w in text for w in ["smart contract audit", "blockchain security", "solidity audit", "evm bytecode", "solidity vulnerabilities"]):
+            agent = self.get_agent("security-blockchain-security-auditor")
+            if agent: return agent
+
+        if any(w in text for w in ["security", "audit", "threat", "vulnerability", "cve", "auth bypass", "pentest", "penetration"]):
+            if "blockchain" in text or "smart contract" in text or "solidity" in text:
+                agent = self.get_agent("security-blockchain-security-auditor")
+                if agent: return agent
+            if "cloud" in text:
+                agent = self.get_agent("security-cloud-security-architect")
+                if agent: return agent
+            agent = self.get_agent("security-appsec-engineer") or self.get_agent("security-penetration-tester") or self.get_agent("security-architect")
             if agent: return agent
 
         if any(w in text for w in ["fastapi", "backend", "api", "microservice", "rest api", "endpoint"]):
@@ -210,7 +220,7 @@ class AgencyAgentsManager:
             agent = self.get_agent("engineering-database-optimizer")
             if agent: return agent
 
-        if any(w in text for w in ["docker", "devops", "kubernetes", "ci/cd", "pipeline", "deploy"]):
+        if any(w in text for w in ["docker", "devops", "kubernetes", "ci/cd", "pipeline", "deploy", "terraform"]):
             agent = self.get_agent("engineering-devops-automator")
             if agent: return agent
 
@@ -243,16 +253,20 @@ class AgencyAgentsManager:
             name_words = a["name"].lower().split()
             desc_words = a["description"].lower().split()
 
+            # Heavy boost if domain matches
+            if domain and a["division"].lower() == domain.lower().replace("_", "-"):
+                score += 30
+
             for w in name_words:
                 if len(w) > 3 and w in text:
-                    score += 10
+                    score += 15
 
             for w in desc_words:
                 if len(w) > 4 and w in text:
-                    score += 2
+                    score += 3
 
             if a["division"].lower() in text:
-                score += 5
+                score += 10
 
             if score > best_score:
                 best_score = score

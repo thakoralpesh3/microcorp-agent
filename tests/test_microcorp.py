@@ -748,7 +748,7 @@ print('Hello MicroCorp')
             "You are a MicroCorp engineer."
         )
         self.assertIn("Backend Architect", system_prompt)
-        self.assertIn("CRITICAL RULES & OPERATIONAL BOUNDARIES", system_prompt)
+        self.assertIn("Critical Rules You Must Follow", system_prompt)
         self.assertIn("You are a MicroCorp engineer.", system_prompt)
 
         # 6. Verify Packager embeds AGENT_PERSONA.md and attributes persona in START_HERE.html
@@ -813,7 +813,7 @@ print('Hello MicroCorp')
         self.assertEqual(r_match.status_code, 200)
         self.assertTrue(r_match.json()["matched"])
         self.assertEqual(r_match.json()["agent"]["division"], "engineering")
-        self.assertEqual(r_match.json()["agent"]["name"], "Devops Automator")
+        self.assertEqual(r_match.json()["agent"]["name"], "DevOps Automator")
         print("REST API Endpoints Verified: /api/agency/divisions, /api/agency/agents, /api/agency/agent/{id}, and /api/agency/match all operational.")
 
 if __name__ == "__main__":
