@@ -19,6 +19,8 @@ ENV/
 # Local database and transient runtime state
 data/*.db
 data/*.db-journal
+data/*.db-shm
+data/*.db-wal
 data/*.log
 data/*.pid
 data/*.json

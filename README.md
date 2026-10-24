@@ -63,6 +63,84 @@ Once accepted, our departmental subagent fleet executes the project, creates aut
 
 ---
 
+## 🤖 Powered by The Agency: 268+ Specialized AI Personas Across 18 Divisions
+
+MicroCorp AI embeds the complete [agency-agents](https://github.com/msitarzewski/agency-agents) repository natively into its autonomous architecture. When tasks, digital products, or freelance gigs are dispatched, they are automatically assigned to an ultra-specialized agent persona equipped with dedicated system prompts, execution workflows, and critical rules.
+
+### 🏛️ The 18 Professional Divisions:
+| Division | Count | Core Focus & Specialized Roles |
+| :--- | :---: | :--- |
+| **Engineering** | 65 | Backend Architects, Cloud/DevOps Automators, Full-Stack, AI/LLM, Database Optimizers |
+| **Specialized** | 59 | Legal Document Review, Chief of Staff, Workflow Architects, M&A Managers, Supply Chain |
+| **Marketing** | 37 | Growth Hackers, Content Strategists, SEO Specialists, Technical Copywriters |
+| **GIS & Geo** | 13 | Spatial Data Analysts, GIS Engineers, Cartography & Remote Sensing Specialists |
+| **Security** | 12 | Blockchain Security Auditors, AppSec Engineers, Penetration Testers, Incident Responders |
+| **Design** | 10 | UI/UX Designers, Design System Architects, Interactive Prototype Specialists |
+| **Testing & QA** | 9 | Test Automation Engineers, API Testers, Accessibility Auditors, Performance Benchmark |
+| **Sales** | 9 | Proposal Writers, Technical Sales Engineers, Enterprise Account Architects |
+| **Project Management** | 7 | Agile Scrum Masters, Delivery Managers, Technical Program Coordinators |
+| **Paid Media** | 7 | Ad Optimization Engineers, Multi-Channel Performance Marketers |
+| **Product** | 6 | Technical Product Managers, Product Discovery Architects, Feature Analysts |
+| **Game Development** | 6 | Unity/Unreal Specialists, Game Loop Engineers, Gameplay Mechanics Architects |
+| **Spatial Computing** | 6 | visionOS / macOS Metal Engineers, XR Interface Architects, Immersive Devs |
+| **Academic** | 6 | Academic Paper Synthesizers, Grant Writers, Research Methodology Analysts |
+| **Support** | 6 | Infrastructure Maintainers, Compliance Checkers, Support Responders |
+| **Finance** | 5 | Financial Modelers, Pricing Analysts, Accounts Specialists |
+| **Healthcare** | 3 | Clinical Documentation Analysts, Compliance Specialists |
+| **Research** | 1 | Deep Autonomous Web & Codebase Researcher |
+
+### ⚡ Agency REST API Endpoints:
+MicroCorp exposes native REST APIs to query, inspect, and match Agency personas:
+- **`GET /api/agency/divisions`**: Returns list and agent counts across all 18 divisions.
+- **`GET /api/agency/agents?division=engineering`**: Lists all agents in a specified division.
+- **`GET /api/agency/agent/{agent_id}`**: Retrieves complete persona identity, mission, and rules.
+- **`POST /api/agency/match`**: Intelligently scores and pairs a project title/requirements to the best persona.
+
+### 📦 Persona Attribution in Deliverables:
+Every ZIP deliverable produced by MicroCorp AI bundles:
+- `AGENT_PERSONA.md`: The complete markdown persona blueprint that designed and audited the code.
+- `START_HERE.html`: Features a dedicated **"Crafted by Agency Specialist"** badge attributing the exact persona.
+
+---
+
+## 🛠️ GitHub Developer Setup & "Why It Was Not Working" Solution
+
+If you previously experienced issues running MicroCorp AI from GitHub, here is the technical root cause and the permanent fix applied:
+
+### 🔍 Why It Was Not Working Previously:
+1. **The Submodule Pitfall (Mode 160000)**: In earlier commits, `agency_agents` was cloned as a nested git repository / submodule. When users did a normal `git clone`, git left `agency_agents/` as an empty folder because submodules require `git submodule update --init --recursive`.
+2. **Missing Dependencies**: Packages like `qrcode` and `httpx` were imported in code but omitted from `requirements.txt`.
+3. **Environment Secrets**: Without a `.env` file, the Gemini API key was unset.
+
+### ✅ How We Fixed It:
+1. **100% Native Git Tracking**: We converted `agency_agents/` from a submodule into a native tracked tree inside `microcorp-agent` (over 387 files and 95,000+ lines committed directly). Standard `git clone` now downloads all 268+ agents immediately with zero extra commands!
+2. **Complete `requirements.txt`**: Pinned all runtime libraries including `qrcode` and `httpx`.
+3. **Automated Fallbacks**: The agent includes offline and mock fallbacks if an API key is not yet set.
+
+### 🚀 Step-by-Step Installation:
+```bash
+# 1. Clone the repository (downloads entire fleet & all 268+ agency agents)
+git clone https://github.com/thakoralpesh3/microcorp-agent.git
+cd microcorp-agent
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Create your local environment configuration
+cat << 'EOF' > .env
+GEMINI_API_KEY=your_gemini_api_key_here
+PAYOUT_UPI_ID=talpesh100@ybl
+PAYEE_NAME=Alpesh Thakor
+EOF
+
+# 4. Run automated test suite (verifies all 19 tests pass)
+python3 -m unittest -v tests/test_microcorp.py
+
+# 5. Launch the Enterprise Server & Autonomous CEO
+python3 app.py
+# Server opens at http://127.0.0.1:8585
+```
+
 ## 🚀 60-Second Customer Quickstart Guide
 
 Every product and deliverable downloaded from MicroCorp AI is engineered for zero-friction execution:
