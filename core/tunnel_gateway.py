@@ -154,16 +154,8 @@ class PublicTunnelGateway:
         except Exception as e:
             logger.warning(f"Could not generate public QR code: {e}")
 
-        # 3. Send desktop notification with public link
-        try:
-            subprocess.run([
-                "notify-send",
-                "-u", "normal",
-                "MicroCorp AI Public Store Live!",
-                f"Global Store: {store_url}\nPayouts: {PAYOUT_UPI_ID}"
-            ], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
-            pass
+        # 3. Log public link silently without intrusive desktop notifications
+        logger.info(f"🌐 MicroCorp AI Public Store Live: {store_url} (Payouts: {PAYOUT_UPI_ID})")
 
     def get_public_url(self) -> Optional[str]:
         """Returns the active public URL if online."""
