@@ -41,3 +41,9 @@ Thumbs.db
 # Scratch and test output artifacts
 *.tmp
 *.bak
+
+# Cloudflare Security Auditor Hardening
+*.pyc
+*.key
+*.token
+*.pem
