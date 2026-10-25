@@ -28,13 +28,16 @@ from config import (
 )
 from core.ceo_orchestrator import ceo
 from tools.gemini_client import llm_client
+from core.git_auto_syncer import auto_syncer
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print(f"🚀 Initializing {COMPANY_NAME} under command of {CEO_NAME}...")
     ceo.start()
+    auto_syncer.start()
     yield
     print(f"🛑 Gracefully stopping {COMPANY_NAME}...")
+    auto_syncer.stop()
     ceo.stop()
 
 app = FastAPI(

@@ -126,7 +126,7 @@ class GitSyncEngine:
 
         if raw_status:
             # Stage all changes (excluding ignored files in .gitignore)
-            add_res = self._run_git(["add", "."])
+            add_res = self._run_git(["add", "-A"])
             if add_res.returncode != 0:
                 return {
                     "success": False,
