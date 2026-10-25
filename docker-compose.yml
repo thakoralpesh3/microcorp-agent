@@ -13,7 +13,8 @@ services:
       - PAYOUT_UPI_ID=talpesh100@ybl
       - PAYEE_NAME=Alpesh Thakor
     env_file:
-      - .env
+      - path: .env
+        required: false
     volumes:
       - ./data:/app/data
       - ./deliverables:/app/deliverables
