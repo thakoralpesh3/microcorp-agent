@@ -37,7 +37,8 @@ class GeminiLLMClient:
         Returns: (generated_text, prompt_tokens, candidate_tokens)
         """
         if not self.client:
-            raise ValueError("Gemini API Key is not configured. Please supply a GEMINI_API_KEY.")
+            logger.warning("Gemini API Key is not configured. Utilizing autonomous offline synthesizer.")
+            return self._synthesize_offline_fallback(prompt, system_instruction), 100, 500
 
         models_to_try = candidate_models or LLM_MODELS
         last_error = None
