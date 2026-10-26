@@ -97,12 +97,13 @@ class GeminiLLMClient:
 
         # 1. Feasibility JSON evaluation
         if "feasibility" in p_lower or "feasibility" in sys_lower:
+            is_physical = any(w in p_lower for w in ["phone call", "in person", "physical", "office", "interview", "hardware server", "paperwork", "visit the site", "server racks"])
             return json.dumps({
-                "feasibility_score": 0.95,
-                "is_100_percent_finishable": True,
-                "autonomous_category": "digital_product",
-                "blockers": [],
-                "reasons": "Fully digital software asset finishable autonomously on laptop."
+                "feasibility_score": 0.2 if is_physical else 0.95,
+                "is_100_percent_finishable": not is_physical,
+                "autonomous_category": "rejected_physical" if is_physical else "digital_product",
+                "blockers": ["Requires in-person physical presence or hardware access"] if is_physical else [],
+                "reasons": "Requires physical hardware presence." if is_physical else "Fully digital software asset finishable autonomously on laptop."
             }, indent=2)
 
         # 2. Planning JSON
