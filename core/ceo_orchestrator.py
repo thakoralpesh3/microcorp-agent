@@ -237,6 +237,9 @@ class CEOOrchestrator:
 
         return plan_res
 
+    # Backward compatibility alias
+    run_daily_income_cycle = run_autonomous_income_cycle
+
     def run_freelance_sprint(self, job_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Harvests freelance gigs (Fiverr, Upwork, Freelancer, RemoteOK),
