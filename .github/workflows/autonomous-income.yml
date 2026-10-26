@@ -1,82 +1,116 @@
-name: Autonomous MicroCorp AI Income Engine
+name: MicroCorp AI • 24/7 Cloud Autonomous Enterprise
 
 on:
+  schedule:
+    # Runs continuously every 2 hours (24/7 autonomous fleet operations)
+    - cron: '0 */2 * * *'
   workflow_dispatch:
     inputs:
       domain:
-        description: 'Target Income Domain (digital_products, newsletter, freelance, all)'
+        description: 'Target Domain (all, digital_products, freelance)'
         required: true
         default: 'all'
-  schedule:
-    # Run once daily at 06:00 UTC (11:30 AM IST)
-    - cron: '0 6 * * *'
+        type: choice
+        options:
+          - all
+          - digital_products
+          - freelance
+      topic:
+        description: 'Custom Technical Topic (leave empty for autonomous trending topic)'
+        required: false
+        default: ''
+        type: string
+      create_release:
+        description: 'Publish generated packages to GitHub Releases with direct UPI checkout'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
-  run-autonomous-enterprise:
+  autonomous-cloud-enterprise:
+    name: Autonomous Cloud Cycle Execution
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: Checkout MicroCorp Enterprise Codebase
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Set up Python Environment
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Install System and Python Dependencies
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git curl
+
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Verify Legal Guardian & System Test Suite
+      - name: Verify Legal Compliance & Architecture Test Suite
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PAYOUT_UPI_ID: "talpesh100@ybl"
+          PAYEE_NAME: "Alpesh Thakor"
         run: |
           python -m unittest tests/test_microcorp.py
 
-      - name: Execute Autonomous Passive Income & Freelance Cycle
+      - name: Execute Autonomous Cloud Cycle
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PAYOUT_UPI_ID: "talpesh100@ybl"
+          PAYEE_NAME: "Alpesh Thakor"
+          ENABLE_GITHUB_RELEASES: "true"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -c "
-          from core.database import init_db
-          from core.ceo_orchestrator import ceo
-          from tools.freelance_harvester import freelance_harvester
-          from core.freelance_distributor import freelance_distributor
-          
-          init_db()
-          print('🚀 Running MicroCorp AI Cloud Autonomous Cycle...')
-          
-          # 1. Run internal income generation cycle
-          summary = ceo.run_daily_income_cycle()
-          print('Income cycle completed:', summary)
-          
-          # 2. Harvest legal freelance jobs and execute 100% turnkey plan
-          jobs = freelance_harvester.fetch_all_platform_gigs()
-          approved = [j for j in jobs if j.get('legal_audit', {}).get('is_legal')]
-          if approved:
-              print(f'Discovered {len(approved)} legal freelance opportunities. Distributing top gig...')
-              res = freelance_distributor.plan_and_distribute_gig(approved[0])
-              print('Freelance gig distribution result:', res.get('status'), res.get('deliverable_zip'))
-          "
+          python3 scripts/run_cloud_cycle.py --domain "${{ inputs.domain || 'all' }}"
 
-      - name: Commit and Push Generated Cloud Deliverables
+      - name: Upload Generated Release Packages (ZIP Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: microcorp-deliverables-${{ github.run_number }}
+          path: |
+            deliverables/**/*.zip
+            deliverables/**/*.md
+            deliverables/**/*.html
+          retention-days: 30
+
+      - name: Publish GitHub Releases with Downloadable Toolkits & UPI Settlement
+        if: ${{ inputs.create_release != false }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="release-run-${{ github.run_number }}"
+          TITLE="MicroCorp AI • Commercial Release #${{ github.run_number }}"
+          ZIP_FILES=$(find deliverables -type f -name "*.zip" | head -n 3)
+          if [ -n "$ZIP_FILES" ]; then
+            echo "Publishing release $TAG_NAME with files:"
+            echo "$ZIP_FILES"
+            gh release create "$TAG_NAME" $ZIP_FILES \
+              --title "$TITLE" \
+              --notes "Autonomous enterprise commercial release #${{ github.run_number }}. Verified by Legal Guardian. Direct settlement: talpesh100@ybl (Alpesh Thakor)." || echo "Release creation skipped or already exists."
+          fi
+
+      - name: Commit and Push Updated Deliverables & Enterprise Treasury State
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add deliverables/ data/ || true
           if git diff --staged --quiet; then
-            echo "No new cloud deliverables to commit."
+            echo "No state changes to commit."
           else
-            git commit -m "auto(cloud): record autonomous cloud deliverables & treasury state [$(date -u +'%Y-%m-%d %H:%M:%SZ')]"
+            git commit -m "auto(cloud): record autonomous 24/7 cloud deliverables & state [$(date -u +'%Y-%m-%d %H:%M:%SZ')]"
             git push origin main
           fi
