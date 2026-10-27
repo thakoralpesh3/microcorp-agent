@@ -88,7 +88,7 @@ jobs:
           retention-days: 30
 
       - name: Publish GitHub Releases with Downloadable Toolkits & UPI Settlement
-        if: ${{ inputs.create_release != false }}
+        if: ${{ github.event_name == 'schedule' || inputs.create_release != false }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -107,7 +107,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add deliverables/ data/ || true
+          git add -f deliverables/ || true
+          git add data/*.db data/*.json || true
           if git diff --staged --quiet; then
             echo "No state changes to commit."
           else
