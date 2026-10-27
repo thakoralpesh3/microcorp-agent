@@ -27,8 +27,10 @@ data/*.json
 data/*.svg
 !data/.gitkeep
 
-# Deliverables generated locally
-deliverables/**/*
+# Deliverables tracking
+!deliverables/**/*.zip
+!deliverables/**/*.md
+!deliverables/**/*.html
 !deliverables/**/.gitkeep
 
 
