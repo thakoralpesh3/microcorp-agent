@@ -1,14 +1,28 @@
 # 🏢 MicroCorp AI — Autonomous Laptop Enterprise & Developer Marketplace
 
 [![Enterprise Status](https://img.shields.io/badge/Enterprise-Autonomous%20Fleet-2563eb.svg)](https://github.com/thakoralpesh3/microcorp-agent)
+[![24/7 Web Simulator](https://img.shields.io/badge/🎮%2024%2F7%20Simulator-Live%20on%20GitHub-10b981.svg)](https://thakoralpesh3.github.io/microcorp-agent/)
 [![Legal Compliance](https://img.shields.io/badge/Legal%20Guardian-100%25%20Verified-16a34a.svg)](#-legal--ethical-governance)
 [![Settlement](https://img.shields.io/badge/Direct%20UPI-talpesh100%40ybl-10b981.svg)](#-instant-upi-settlement)
 [![License](https://img.shields.io/badge/Commercial%20License-Client%20Ownership-8b5cf6.svg)](#-commercial-license)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 
-**MicroCorp AI** is an autonomous AI-driven corporate enterprise running 24/7 on local laptop hardware. It orchestrates a multi-department fleet of specialized subagents to autonomously research, architect, package, and monetize commercial developer toolkits, starter packs, and turnkey freelance contracts.
+**MicroCorp AI** is an autonomous AI-driven corporate enterprise running 24/7 on local laptop hardware and GitHub Cloud. It orchestrates a multi-department fleet of specialized subagents to autonomously research, architect, package, and monetize commercial developer toolkits, starter packs, and turnkey freelance contracts.
 
 All revenue is settled with zero platform intermediary fees directly to the enterprise beneficiary UPI ID: **`talpesh100@ybl`** (**Alpesh Thakor**).
+
+---
+
+## 🎮 Live 24/7 Web Simulator (Always Online on GitHub)
+
+Experience the complete autonomous enterprise fleet running live in your browser 24/7 with zero installation:
+
+👉 **[🚀 Launch 24/7 Interactive Web Simulator](https://thakoralpesh3.github.io/microcorp-agent/)**
+
+- ⚡ **Autonomous Sprint Dispatcher**: Test real-time product discovery, persona pairing, code synthesis, and treasury accounting.
+- 👥 **268+ Agency Persona Explorer**: Browse through all 18 professional divisions (Engineering, Security, Design, Finance, GIS...).
+- 🛡️ **Legal Guardian Live Audit**: Test real-time filtering of malware/fraud requests with legal statute citations.
+- 💳 **Instant UPI Checkout Simulator**: Test UTR payment validation and automatic release unlock for `talpesh100@ybl`.
 
 ---
 
@@ -16,9 +30,10 @@ All revenue is settled with zero platform intermediary fees directly to the ente
 
 | Access Channel | Destination | Description |
 | :--- | :--- | :--- |
-| 🛒 **Live Public Storefront** | **[/store](https://threatened-doctor-consortium-gadgets.trycloudflare.com/store)** | Browse 170+ ready-to-download developer toolkits with live search & instant UPI checkout. |
-| 💼 **Hire Agent / Custom Work** | **[/hire](https://threatened-doctor-consortium-gadgets.trycloudflare.com/hire)** | Submit custom engineering requests with instant automated feasibility audit and quote. |
-| ⚡ **Instant Delivery Tracker** | **[/store](https://threatened-doctor-consortium-gadgets.trycloudflare.com/store)** | Enter your 12-digit UPI UTR to immediately download your purchased ZIP package. |
+| 🎮 **24/7 Live Web Simulator** | **[Launch Simulator](https://thakoralpesh3.github.io/microcorp-agent/)** | Run sprints, browse 268+ personas, and test UPI checkout 24/7 in browser. |
+| 🛒 **Live Public Storefront** | **[/store](https://various-chain-bracelet-dubai.trycloudflare.com/store)** | Browse 190+ ready-to-download developer toolkits with live search & instant UPI checkout. |
+| 💼 **Hire Agent / Custom Work** | **[/hire](https://various-chain-bracelet-dubai.trycloudflare.com/hire)** | Submit custom engineering requests with instant automated feasibility audit and quote. |
+| ⚡ **Instant Delivery Tracker** | **[/store](https://various-chain-bracelet-dubai.trycloudflare.com/store)** | Enter your 12-digit UPI UTR to immediately download your purchased ZIP package. |
 | 💬 **WhatsApp Developer** | **[Chat on WhatsApp](https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20am%20interested%20in%20MicroCorp%20AI%20toolkits%20and%20custom%20projects)** | Direct communication with host engineer Alpesh Thakor. |
 | 💳 **Direct Payee UPI ID** | **`talpesh100@ybl`** | Accepted across Google Pay, PhonePe, Paytm, BHIM, and Cred. |
 
