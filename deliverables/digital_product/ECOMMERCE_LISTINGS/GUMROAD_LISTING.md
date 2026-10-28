@@ -1,15 +1,15 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Developer Toolkit: macOS Git eMudhra Certificate Compromise Mitigation & Remediation Guide
-- **Suggested Price:** $4.99 USD (Allow customers to pay what they want: Yes, minimum $4.99)
+- **Name:** Full-Stack FastAPI Backend with JWT Auth and Docker Setup
+- **Suggested Price:** $250.00 USD (Allow customers to pay what they want: Yes, minimum $250.00)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
 
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Developer Toolkit: macOS Git eMudhra Certificate Compromise Mitigation & Remediation Guide**
+> **The Definitive Production Engineering Kit for Full-Stack FastAPI Backend with JWT Auth and Docker Setup**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 
