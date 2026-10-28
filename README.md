@@ -2,6 +2,8 @@
 
 [![Enterprise Status](https://img.shields.io/badge/Enterprise-Autonomous%20Fleet-2563eb.svg)](https://github.com/thakoralpesh3/microcorp-agent)
 [![24/7 Web Simulator](https://img.shields.io/badge/🎮%2024%2F7%20Simulator-Live%20on%20GitHub-10b981.svg)](https://thakoralpesh3.github.io/microcorp-agent/)
+[![Buy Me a Coffee](https://img.shields.io/badge/☕%20Buy%20Me%20a%20Coffee-Support%20Creator-f59e0b.svg)](https://thakoralpesh3.github.io/microcorp-agent/)
+[![Contact Email](https://img.shields.io/badge/✉️%20Contact-thakoralpesh3%40proton.me-blue.svg)](mailto:thakoralpesh3@proton.me)
 [![Legal Compliance](https://img.shields.io/badge/Legal%20Guardian-100%25%20Verified-16a34a.svg)](#-legal--ethical-governance)
 [![Settlement](https://img.shields.io/badge/Direct%20UPI-talpesh100%40ybl-10b981.svg)](#-instant-upi-settlement)
 [![License](https://img.shields.io/badge/Commercial%20License-Client%20Ownership-8b5cf6.svg)](#-commercial-license)
@@ -9,7 +11,24 @@
 
 **MicroCorp AI** is an autonomous AI-driven corporate enterprise running 24/7 on local laptop hardware and GitHub Cloud. It orchestrates a multi-department fleet of specialized subagents to autonomously research, architect, package, and monetize commercial developer toolkits, starter packs, and turnkey freelance contracts.
 
-All revenue is settled with zero platform intermediary fees directly to the enterprise beneficiary UPI ID: **`talpesh100@ybl`** (**Alpesh Thakor**).
+All revenue and coffee support are settled with zero platform intermediary fees directly to the enterprise beneficiary UPI ID: **`talpesh100@ybl`** (**Alpesh Thakor**). For custom projects or inquiries, contact **`thakoralpesh3@proton.me`**.
+
+---
+
+## ☕ Buy Me a Coffee — Support Open-Source Innovation
+
+Enjoying MicroCorp AI or utilizing our autonomous developer toolkits? You can directly support continuous open-source AI development, server hosting, and background LLM model cycles:
+
+- ☕ **1 Coffee (₹150 INR / ~$1.80 USD)**: Fuels background sprint cycles.
+- ☕☕ **3 Coffees (₹450 INR / ~$5.40 USD)**: Supports toolkit packaging & unit test verification.
+- ☕☕☕ **5 Coffees (₹750 INR / ~$9.00 USD)**: Sponsors an entire new departmental subagent division.
+- ✨ **Custom Sponsorship / Products**: Select any product or custom amount.
+
+👉 **[☕ Open Interactive Payment & Coffee Modal on Simulator](https://thakoralpesh3.github.io/microcorp-agent/)**
+
+- **Direct Payee UPI ID:** `talpesh100@ybl` (Alpesh Thakor)
+- **Supported Apps:** Google Pay, PhonePe, Paytm, BHIM, Cred, Amazon Pay
+- **Official Contact Email:** [`thakoralpesh3@proton.me`](mailto:thakoralpesh3@proton.me)
 
 ---
 
@@ -19,10 +38,12 @@ Experience the complete autonomous enterprise fleet running live in your browser
 
 👉 **[🚀 Launch 24/7 Interactive Web Simulator](https://thakoralpesh3.github.io/microcorp-agent/)**
 
+- ☕ **Buy Me a Coffee & UPI Checkout**: 1-click payment options, dynamic QR generation, and UTR verification for `talpesh100@ybl`.
+- 🛒 **32+ Manufactured Products Catalog**: Browse all generated developer toolkits, backend microservices, and blueprints with live search and preview.
+- ✉️ **Contact Me Portal**: Direct inquiry and priority support via `thakoralpesh3@proton.me`.
 - ⚡ **Autonomous Sprint Dispatcher**: Test real-time product discovery, persona pairing, code synthesis, and treasury accounting.
 - 👥 **268+ Agency Persona Explorer**: Browse through all 18 professional divisions (Engineering, Security, Design, Finance, GIS...).
 - 🛡️ **Legal Guardian Live Audit**: Test real-time filtering of malware/fraud requests with legal statute citations.
-- 💳 **Instant UPI Checkout Simulator**: Test UTR payment validation and automatic release unlock for `talpesh100@ybl`.
 
 ---
 
@@ -30,11 +51,11 @@ Experience the complete autonomous enterprise fleet running live in your browser
 
 | Access Channel | Destination | Description |
 | :--- | :--- | :--- |
-| 🎮 **24/7 Live Web Simulator** | **[Launch Simulator](https://thakoralpesh3.github.io/microcorp-agent/)** | Run sprints, browse 268+ personas, and test UPI checkout 24/7 in browser. |
-| 🛒 **Live Public Storefront** | **[/store](https://various-chain-bracelet-dubai.trycloudflare.com/store)** | Browse 190+ ready-to-download developer toolkits with live search & instant UPI checkout. |
+| 🎮 **24/7 Live Web Simulator** | **[Launch Simulator](https://thakoralpesh3.github.io/microcorp-agent/)** | Run sprints, browse 32+ products, buy me a coffee, and test UPI checkout 24/7. |
+| ☕ **Buy Me a Coffee** | **[Support MicroCorp](https://thakoralpesh3.github.io/microcorp-agent/)** | Direct peer-to-peer developer tip to `talpesh100@ybl` (Alpesh Thakor). |
+| ✉️ **Contact Developer (Email)** | **[`thakoralpesh3@proton.me`](mailto:thakoralpesh3@proton.me)** | Official developer email for orders, support, invoices, and custom work. |
+| 🛒 **Live Public Storefront** | **[/store](https://various-chain-bracelet-dubai.trycloudflare.com/store)** | Browse ready-to-download developer toolkits with live search & instant UPI checkout. |
 | 💼 **Hire Agent / Custom Work** | **[/hire](https://various-chain-bracelet-dubai.trycloudflare.com/hire)** | Submit custom engineering requests with instant automated feasibility audit and quote. |
-| ⚡ **Instant Delivery Tracker** | **[/store](https://various-chain-bracelet-dubai.trycloudflare.com/store)** | Enter your 12-digit UPI UTR to immediately download your purchased ZIP package. |
-| 💬 **WhatsApp Developer** | **[Chat on WhatsApp](https://wa.me/919999999999?text=Hi%20Alpesh,%20I%20am%20interested%20in%20MicroCorp%20AI%20toolkits%20and%20custom%20projects)** | Direct communication with host engineer Alpesh Thakor. |
 | 💳 **Direct Payee UPI ID** | **`talpesh100@ybl`** | Accepted across Google Pay, PhonePe, Paytm, BHIM, and Cred. |
 
 ---
@@ -199,13 +220,32 @@ MicroCorp AI operates under a strict legal governance framework governed by our 
 
 ---
 
+## 📦 32+ Manufactured Developer Toolkits & Products (Ready to Sell)
+
+MicroCorp AI has autonomously synthesized, packaged, and verified over 32+ commercial software products across 5 primary categories:
+
+| Category | Count | Sample Manufactured Toolkits & Blueprints | Price (INR / USD) |
+| :--- | :---: | :--- | :--- |
+| **Developer Toolkits** | 22 | macOS Git Code-Signing Pipeline, Google Genie 4 Generative World Models, DSC Token Bridges | ₹1,799 (~$21.99 USD) |
+| **Enterprise Systems** | 2 | Full-Stack FastAPI Backend with JWT, Full-Stack E-Commerce Platform with UPI | ₹3,999 (~$49.00 USD) |
+| **Backend & Microservices** | 2 | FastAPI High-Throughput Async Webhooks, Redis Token Bucket Rate Limiters | ₹1,799 (~$21.99 USD) |
+| **Turnkey Client Contracts** | 2 | Turnkey Full-Stack FastAPI Microservice Deliverables with Tests | ₹21,500 (~$250.00 USD) |
+| **Cheatsheets & Blueprints** | 4 | Python AsyncIO & TaskGroup Concurrency, FastAPI Async Architecture Cheatsheets | ₹399 (~$4.85 USD) |
+
+👉 **[🛒 Browse Full Interactive 32+ Products Catalog on Simulator](https://thakoralpesh3.github.io/microcorp-agent/)**
+
+---
+
 ## 📞 Host Developer & Corporate Office
 
 - **Corporate Founder & Payee:** Alpesh Thakor
+- **Official Developer Contact Email:** [`thakoralpesh3@proton.me`](mailto:thakoralpesh3@proton.me)
 - **Official Payout UPI ID:** `talpesh100@ybl`
 - **Supported Payment Apps:** PhonePe, Google Pay, Paytm, BHIM, Cred, Amazon Pay
 - **GitHub Repository:** [thakoralpesh3/microcorp-agent](https://github.com/thakoralpesh3/microcorp-agent)
+- **Live 24/7 Web Simulator:** [thakoralpesh3.github.io/microcorp-agent](https://thakoralpesh3.github.io/microcorp-agent/)
 
 ---
 
 *Engineered autonomously by MicroCorp AI Autonomous Enterprise Fleet.*
+
