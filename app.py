@@ -204,7 +204,7 @@ async def track_customer_order(req: TrackOrderRequest):
 
     return {
         "found": False,
-        "message": "No matching order or verified UTR found. If you just made a UPI payment, please allow 1-2 minutes or contact Alpesh Thakor at talpesh100@ybl."
+        "message": "No matching order or verified UTR found. If you just made a UPI payment, please allow 1-2 minutes or contact Alpesh Thakor directly at thakoralpesh3@proton.me (UPI: talpesh100@ybl)."
     }
 
 @app.post("/api/chat/assistant")
@@ -215,22 +215,25 @@ async def chat_assistant_endpoint(req: ChatAssistantRequest):
     
     from core.pricing_engine import pricing_engine
     from core.upi_payment import upi_gateway
+    from config import CONTACT_EMAIL
     
     catalog = pricing_engine.get_catalog()
     catalog_summary = "\n".join([f"- {t.get('tier_name')}: ${t.get('price_usd')} (₹{t.get('price_inr')}) - {t.get('description')}" for t in catalog.get("tiers", {}).values() if isinstance(t, dict)])
 
     system_prompt = f"""You are the official AI Solution Architect and Technical Pre-Sales Consultant for MicroCorp AI (an autonomous AI software engineering enterprise operated by Alpesh Thakor).
 Official Payee UPI ID: {upi_gateway.upi_id} ({upi_gateway.payee_name}).
+Official Developer Contact Email: {CONTACT_EMAIL}
 WhatsApp Direct Support: https://wa.me/{WHATSAPP_NUMBER}
 
 YOUR ROLE:
 1. Help prospective clients and developers understand our products, architecture, and custom engineering services.
 2. Recommend relevant toolkits and cheatsheets based on what the client needs.
-3. Explain how to buy with zero fees using PhonePe/GooglePay/Paytm via UPI to {upi_gateway.upi_id}, and how entering a 12-digit bank UTR unlocks instant ZIP download.
-4. Explain how clients can commission custom software from the AI fleet at /hire.
-5. All deliverables include standalone modular Python code (main.py), 1-click launchers (START_HERE.html & RUN_WINDOWS.bat), and full commercial ownership rights.
-6. Powered by The Agency: MicroCorp AI integrates 268+ specialized autonomous agent personas across 18 divisions (Engineering, Security, Design, Testing, Finance, DevOps, Product, Spatial Computing, etc.). Every project is matched to its exact expert persona with its AGENT_PERSONA.md blueprint bundled in delivery.
-7. Keep responses friendly, concise, technically sharp, and formatted in clean markdown.
+3. Support "Buy Me a Coffee" tips and direct developer contributions via UPI to {upi_gateway.upi_id} (or contact {CONTACT_EMAIL} for international card/invoice payments).
+4. Explain how to buy with zero fees using PhonePe/GooglePay/Paytm via UPI to {upi_gateway.upi_id}, and how entering a 12-digit bank UTR unlocks instant ZIP download.
+5. Explain how clients can commission custom software from the AI fleet at /hire.
+6. All deliverables include standalone modular Python code (main.py), 1-click launchers (START_HERE.html & RUN_WINDOWS.bat), and full commercial ownership rights.
+7. Powered by The Agency: MicroCorp AI integrates 268+ specialized autonomous agent personas across 18 divisions (Engineering, Security, Design, Testing, Finance, DevOps, Product, Spatial Computing, etc.).
+8. Keep responses friendly, concise, technically sharp, and formatted in clean markdown.
 
 AVAILABLE TIERS:
 {catalog_summary}
@@ -244,24 +247,30 @@ AVAILABLE TIERS:
             "reply": reply_text.strip(),
             "payout_upi_id": upi_gateway.upi_id,
             "payee_name": upi_gateway.payee_name,
+            "contact_email": CONTACT_EMAIL,
             "whatsapp_url": f"https://wa.me/{WHATSAPP_NUMBER}?text=Hi%20Alpesh,%20I%20have%20an%20inquiry%20about%20MicroCorp%20AI"
         }
     except Exception as e:
         lower = user_msg.lower()
-        if "agency" in lower or "specialist" in lower or "persona" in lower or "division" in lower:
+        if "coffee" in lower or "tip" in lower or "donate" in lower or "support" in lower:
+            fallback = f"☕ **Buy Me a Coffee / Support MicroCorp AI**: You can support our autonomous engineering fleet directly via UPI to `{upi_gateway.upi_id}` ({upi_gateway.payee_name}) on PhonePe, GPay, or Paytm (e.g. ₹150 for 1 coffee, ₹450 for 3 coffees). For international supporters without Indian UPI, reach out to Alpesh Thakor at `{CONTACT_EMAIL}`!"
+        elif "contact" in lower or "email" in lower:
+            fallback = f"✉️ You can contact the founder & lead developer Alpesh Thakor directly at `{CONTACT_EMAIL}` for custom orders, technical support, or international payment options."
+        elif "agency" in lower or "specialist" in lower or "persona" in lower or "division" in lower:
             fallback = f"MicroCorp AI integrates **The Agency**—featuring **268+ specialized AI personas across 18 enterprise divisions** (Engineering, Security, Design, DevOps, Testing, Finance, etc.). When you order or commission work at [/hire](/hire), the exact expert persona is automatically matched and executes your task with full persona attribution and an `AGENT_PERSONA.md` blueprint bundled in your download!"
         elif "hire" in lower or "custom" in lower or "project" in lower:
-            fallback = f"You can commission custom software from our 24/7 autonomous engineering fleet at [/hire](/hire), powered by The Agency's 268+ specialized personas. Every project includes clean modular architecture, automated tests, Docker setup, and 1-click launchers. Payments settle directly to UPI ID `{upi_gateway.upi_id}`."
+            fallback = f"You can commission custom software from our 24/7 autonomous engineering fleet at [/hire](/hire), powered by The Agency's 268+ specialized personas. Every project includes clean modular architecture, automated tests, Docker setup, and 1-click launchers. Payments settle directly to UPI ID `{upi_gateway.upi_id}`. Contact `{CONTACT_EMAIL}` for priority scoping."
         elif "pay" in lower or "upi" in lower or "phonepe" in lower or "gpay" in lower or "price" in lower:
-            fallback = f"We support zero-fee direct UPI settlements to `{upi_gateway.upi_id}` ({upi_gateway.payee_name}) using PhonePe, Google Pay, Paytm, or BHIM. After paying, entering your 12-digit bank UTR instantly unlocks your download!"
+            fallback = f"We support zero-fee direct UPI settlements to `{upi_gateway.upi_id}` ({upi_gateway.payee_name}) using PhonePe, Google Pay, Paytm, or BHIM. After paying, entering your 12-digit bank UTR instantly unlocks your download! For international cards, email `{CONTACT_EMAIL}`."
         elif "fastapi" in lower or "backend" in lower or "microservice" in lower:
             fallback = f"Our Full-Stack FastAPI Async Microservice toolkit is our most popular package, engineered by our Backend Architect persona! It includes JWT authentication, Docker configs, background workers, and an interactive `START_HERE.html` dashboard. Check it out on the [/store](/store)."
         else:
-            fallback = f"Hello! I am the MicroCorp AI Assistant. Powered by The Agency's 268+ specialized AI personas across 18 divisions, you can browse our production-ready developer toolkits on the [/store](/store), or commission a custom project tailored to your specifications at [/hire](/hire). All deliverables settle securely to UPI `{upi_gateway.upi_id}`."
+            fallback = f"Hello! I am the MicroCorp AI Assistant. Powered by The Agency's 268+ specialized AI personas across 18 divisions, you can browse our production-ready developer toolkits on the [/store](/store), buy me a coffee to support development, or commission a custom project at [/hire](/hire). Contact: `{CONTACT_EMAIL}`, UPI: `{upi_gateway.upi_id}`."
         return {
             "reply": fallback,
             "payout_upi_id": upi_gateway.upi_id,
             "payee_name": upi_gateway.payee_name,
+            "contact_email": CONTACT_EMAIL,
             "whatsapp_url": f"https://wa.me/{WHATSAPP_NUMBER}?text=Hi%20Alpesh,%20I%20have%20an%20inquiry%20about%20MicroCorp%20AI"
         }
 

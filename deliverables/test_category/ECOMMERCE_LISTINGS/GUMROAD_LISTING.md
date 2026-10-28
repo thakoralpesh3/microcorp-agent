@@ -1,7 +1,7 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Terms Verified Pack
+- **Name:** Test Packaged Asset
 - **Suggested Price:** $21.99 USD (Allow customers to pay what they want: Yes, minimum $21.99)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
@@ -9,7 +9,7 @@
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Terms Verified Pack**
+> **The Definitive Production Engineering Kit for Test Packaged Asset**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 
