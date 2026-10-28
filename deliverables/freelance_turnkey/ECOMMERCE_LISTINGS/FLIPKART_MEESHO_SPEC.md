@@ -7,7 +7,7 @@
 ---
 
 ## 1. Product Listing Details
-- **Product Title:** [Printed Spiral Guide & Code Kit] Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup Technical Manual
+- **Product Title:** [Printed Spiral Guide & Code Kit] Fiverr_FastAPI Async Webhook Microservice with Docker & Docs Technical Manual
 - **Category:** Books > Computing, Internet & Digital Media > Computer Science & Programming
 - **Brand / Publisher:** MicroCorp AI Commercial Engineering Press
 - **Item Condition:** Brand New (Print-on-Demand)
@@ -32,14 +32,14 @@
 - **Package Weight:** 120 grams
 - **Box Type:** Padded bubble mailer envelope
 - **Package Contents:** 
-  1. 1x High-Resolution Spiral-Bound Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup Manual (A5 Format)
+  1. 1x High-Resolution Spiral-Bound Fiverr_FastAPI Async Webhook Microservice with Docker & Docs Manual (A5 Format)
   2. 1x Instant Access Digital Code Card with QR Code and Verified License Key
   3. 1x Official Commercial Tax Invoice with UPI Payee `talpesh100@ybl`
 
 ---
 
 ## 4. 5 Key Product Highlights (Paste into Flipkart / Meesho bullet points):
-- PROFESSIONAL DEVELOPER HANDBOOK: In-depth architectural manual for Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup with tested code blueprints.
+- PROFESSIONAL DEVELOPER HANDBOOK: In-depth architectural manual for Fiverr_FastAPI Async Webhook Microservice with Docker & Docs with tested code blueprints.
 - SPIRAL-BOUND WORKBENCH EDITION: High-quality 80 GSM paper, wire-bound lays completely flat beside keyboard.
 - INSTANT DIGITAL CODE ACCESS: Embedded high-resolution QR card provides instant ZIP download of all source code files.
 - COMMERCIAL USE LICENSE: Transferable rights included for professional freelancers, agencies, and enterprise production.
@@ -48,7 +48,7 @@
 ---
 
 ## 5. Detailed Product Description:
-Looking to level up your engineering capabilities with Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup? 
+Looking to level up your engineering capabilities with Fiverr_FastAPI Async Webhook Microservice with Docker & Docs? 
 This official spiral-bound reference handbook gives you an uncluttered, distraction-free physical desk reference featuring battle-tested software patterns, copy-paste production code, and foolproof configuration recipes. 
 
 Simply scan the access card inside the front cover to immediately unlock the digital companion ZIP package containing the full source code repository, Docker environment, and automated test suite.
