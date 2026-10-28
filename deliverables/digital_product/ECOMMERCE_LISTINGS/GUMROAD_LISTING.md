@@ -1,7 +1,7 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Developer Toolkit: Ten days later, Git on macOS still trusts the compromised eMudhra certificates
+- **Name:** Python Asyncio & ThreadPoolExecutor Cheatsheet
 - **Suggested Price:** $4.99 USD (Allow customers to pay what they want: Yes, minimum $4.99)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
@@ -9,7 +9,7 @@
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Developer Toolkit: Ten days later, Git on macOS still trusts the compromised eMudhra certificates**
+> **The Definitive Production Engineering Kit for Python Asyncio & ThreadPoolExecutor Cheatsheet**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 

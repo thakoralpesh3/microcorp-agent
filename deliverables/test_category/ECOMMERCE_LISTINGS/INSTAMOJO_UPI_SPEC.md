@@ -1,7 +1,7 @@
 # 🇮🇳 Instamojo & Cosmofeed (Indian Creator Commerce) Spec
 
 ## 1. Product Configuration
-- **Title:** Test Packaged Asset - Commercial Developer Toolkit
+- **Title:** Terms Verified Pack - Commercial Developer Toolkit
 - **Price:** ₹1799.00 INR (Fixed Price)
 - **Payment Modes:** UPI (PhonePe, Google Pay, Paytm, BHIM), NetBanking, Credit/Debit Cards
 - **Product Type:** Digital File Download (Instant ZIP delivery upon successful payment)
@@ -11,7 +11,7 @@
 
 ## 2. Product Description (Paste into Instamojo / Cosmofeed):
 ### 🚀 Instant Access Developer Toolkit
-Get immediate access to the complete source code, architectural patterns, and commercial license for **Test Packaged Asset**. 
+Get immediate access to the complete source code, architectural patterns, and commercial license for **Terms Verified Pack**. 
 
 **Key Benefits:**
 - Instant ZIP download unlocked immediately upon payment.
