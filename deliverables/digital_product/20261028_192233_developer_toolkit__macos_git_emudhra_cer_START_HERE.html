@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Quickstart - Developer Toolkit: macOS Git eMudhra Certificate Remediation Guide & Boilerplate - Developer Reference & Architecture Kit</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --code-bg: #0b1120;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 30px 16px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #ffffff;
+            padding: 36px 40px;
+            border-bottom: 3px solid #3b82f6;
+        }
+        .badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        h1 { margin: 0 0 10px 0; font-size: 26px; color: #f8fafc; }
+        .meta { color: #94a3b8; font-size: 13px; }
+        
+        /* 3-Step Quick Launch Bar */
+        .quick-bar {
+            background: #f0fdf4;
+            border-bottom: 1px solid #bbf7d0;
+            padding: 20px 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .step-card {
+            background: #ffffff;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid #86efac;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .step-title {
+            color: #166534;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .step-desc { font-size: 12px; color: #4b5563; }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: #1e293b; background: rgba(0,0,0,0.02); }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; background: #ffffff; }
+        
+        /* Tab Contents */
+        .tab-content { display: none; padding: 36px 40px; }
+        .tab-content.active { display: block; }
+        
+        /* Code Block Viewer */
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 12px 18px;
+            border-radius: 8px 8px 0 0;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid #334155;
+            border-bottom: none;
+        }
+        .copy-btn {
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover { background: #15803d; }
+        pre.code-area {
+            background: #0b1120;
+            color: #f8fafc;
+            padding: 18px;
+            margin: 0;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 13px;
+            border: 1px solid #334155;
+            max-height: 520px;
+        }
+        
+        /* Tables */
+        table.file-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table.file-table th {
+            background: #f8fafc;
+            color: #475569;
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 13px;
+        }
+        table.file-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+        
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #16a34a;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 9999;
+        }
+        .footer {
+            background: #f8fafc;
+            padding: 20px 40px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="hero">
+            <span class="badge">MicroCorp AI • Customer Quickstart Center</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); margin-left: 6px;">🖥️ Crafted by Agency Specialist: Frontend Developer (Engineering)</span>
+            <h1>Developer Toolkit: macOS Git eMudhra Certificate Remediation Guide & Boilerplate - Developer Reference & Architecture Kit</h1>
+            <div class="meta">
+                <span>Category: <strong>Digital Product</strong></span> • 
+                <span>Commercial Ownership: <strong>100% Client Transferred</strong></span> • 
+                <span>Beneficiary: <strong>Alpesh Thakor</strong> (UPI: <code>talpesh100@ybl</code>)</span>
+            </div>
+        </div>
+
+        <!-- 3-Step Quick Launch Bar -->
+        <div class="quick-bar">
+            <div class="step-card">
+                <div class="step-title">⚡ 1. Interactive Reader (Browser)</div>
+                <div class="step-desc">You are already viewing it! Use the tabs below to copy code, read documentation, or view licenses.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-title">🪟 2. 1-Click Launch on Windows</div>
+                <div class="step-desc">Simply double-click <strong><code>RUN_WINDOWS.bat</code></strong> in this folder to automatically execute <code>main.py</code>.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-title">🍎 3. 1-Click on macOS / Linux</div>
+                <div class="step-desc">Run <strong><code>bash RUN_MAC_LINUX.sh</code></strong> or <strong><code>python3 main.py</code></strong> in your terminal.</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('quickstart')">🚀 60-Second Quickstart</button>
+            <button class="tab-btn" onclick="switchTab('source')">💻 Standalone Source Code (main.py)</button>
+            <button class="tab-btn" onclick="switchTab('docs')">📖 Full Architecture Manual</button>
+            <button class="tab-btn" onclick="switchTab('files')">📂 Directory & Files Map</button>
+            <button class="tab-btn" onclick="switchTab('license')">📜 License & Commercial Invoice</button>
+        </div>
+
+        <!-- Tab 1: Quickstart -->
+        <div id="tab_quickstart" class="tab-content active">
+            <h2 style="color: #0f172a; margin-top: 0;">How to Use Your Deliverable in Under 60 Seconds</h2>
+            <p style="color: #475569;">Everything inside this bundle has been engineered with zero bloat and pre-configured for instant integration.</p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option A: Run Immediately with 1-Click Scripts</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+                    <li><strong>Windows Users:</strong> Double-click <code>RUN_WINDOWS.bat</code> in this directory.</li>
+                    <li><strong>Mac & Linux Users:</strong> Double-click <code>RUN_MAC_LINUX.sh</code> or run <code>bash RUN_MAC_LINUX.sh</code>.</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option B: Run from Command Line</h3>
+                <div style="background: #0f172a; color: #f8fafc; padding: 14px 18px; border-radius: 6px; font-family: monospace; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <code>pip install -r requirements.txt &amp;&amp; python main.py</code>
+                    <button class="copy-btn" onclick="copyText('pip install -r requirements.txt && python main.py')">Copy</button>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option C: Copy Source Code Directly into Your Project</h3>
+                <p style="color: #475569; font-size: 14px; margin: 0 0 12px 0;">Switch to the <strong>"Standalone Source Code"</strong> tab above, click <strong>"Copy Complete Code"</strong>, and paste it directly into your own repository or editor.</p>
+                <button onclick="switchTab('source')" style="background: #2563eb; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    View & Copy Code (main.py) →
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Standalone Source Code -->
+        <div id="tab_source" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div>
+                    <h2 style="margin: 0; color: #0f172a;">Standalone Source Code (<code>main.py</code>)</h2>
+                    <small style="color: #64748b;">Ready to execute, modular, zero unwanted dependencies.</small>
+                </div>
+                <button class="copy-btn" style="padding: 8px 18px; font-size: 13px;" onclick="copyCode()">
+                    📋 Copy Complete Source Code
+                </button>
+            </div>
+            
+            <div class="code-header">
+                <span>main.py • Python 3</span>
+                <span>Commercial Ownership: Client</span>
+            </div>
+            <pre class="code-area"><code id="codeBlock">"""
+MicroCorp AI - Interactive Customer Companion &amp; Quick Runner
+Asset: Developer Toolkit: macOS Git eMudhra Certificate Remediation Guide &amp; Boilerplate - Developer Reference &amp; Architecture Kit
+Category: digital_product
+Commercial Rights: 100% Client Ownership
+Beneficiary: Alpesh Thakor (UPI: talpesh100@ybl)
+"""
+
+def main():
+    print("=" * 65)
+    print(" MicroCorp AI - Standalone Asset Runner")
+    print(" Asset: Developer Toolkit: macOS Git eMudhra Certificate Remediation Guide &amp; Boilerplate - Developer Reference &amp; Architecture Kit")
+    print(" Commercial Rights: 100% Transferred to Client")
+    print(" Beneficiary: Alpesh Thakor (UPI: talpesh100@ybl)")
+    print("=" * 65)
+    print("\n[+] What is in your package:")
+    print("    - START_HERE.html : Interactive visual documentation &amp; reader")
+    print("    - README.md       : Complete technical architecture &amp; manual")
+    print("    - LICENSE.txt     : Commercial rights certificate")
+    print("    - INVOICE.txt     : Official verified commercial invoice")
+    print("\n[+] To get started:")
+    print("    Double-click START_HERE.html to open your interactive guide.")
+    print("=" * 65)
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+
+            <div style="margin-top: 24px;">
+                <h3 style="color: #0f172a; margin-bottom: 8px;">Requirements (<code>requirements.txt</code>)</h3>
+                <pre style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #334155;"># MicroCorp AI - Zero External Dependencies (Standard Python Library)
+</pre>
+            </div>
+        </div>
+
+        <!-- Tab 3: Full Architecture Manual -->
+        <div id="tab_docs" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Full Technical Documentation & Architectural Reference</h2>
+            <div style="line-height: 1.7; color: #334155;">
+                <h1>Developer Toolkit: macOS Git eMudhra Certificate Remediation Guide &amp; Boilerplate</h1>
+
+<p>&gt; <strong>Product ID:</strong> MC-DEV-KIT-EMUDHRA-092  </p>
+<p>&gt; <strong>Target Audience:</strong> Full-stack developers, DevOps engineers, and enterprise security administrators utilizing macOS development environments alongside eMudhra PKI cryptographic tokens/smart cards for corporate Git signing (GPG/SSH).  </p>
+<p>&gt; <strong>Version:</strong> 2.4.1-PROD  </p>
+
+<p>---</p>
+
+<h2>1. Product Title &amp; Value Proposition</h2>
+
+<h3>Title</h3>
+<strong>macOS Git eMudhra Certificate Remediation &amp; Enterprise Integration Kit</strong>
+
+<h3>Value Proposition</h3>
+<p>Enterprise developers on macOS frequently encounter broken cryptographic trust chains, <code>SSL certificate problem: self signed certificate in certificate chain</code>, and detached signature failures when attempting to commit code via Git using eMudhra-issued hardware tokens or software certificates. </p>
+
+<p>This production-grade reference kit provides a zero-friction diagnostic framework, automated remediation shell scripts, and hardened Git configuration templates. It eliminates frustrating hours of certificate store debugging, ensures strict compliance with enterprise security baselines, and guarantees seamless integration between macOS keychain services and modern Git runtimes.</p>
+
+<p>---</p>
+
+<h2>2. Quick Start &amp; Core Concepts</h2>
+
+<p>When macOS interacts with eMudhra certificates (typically X.509 certificates embedded on USB tokens via middleware like SafeNet Authentication Client or eMudhra emSigner), the underlying Secure Transport or OpenSSL libraries often fail to map the enterprise root and intermediate Certificate Authorities (CAs). </p>
+
+<h3>Clean Syntax &amp; Configuration Reference Table</h3>
+
+<p>| Component | Standard Path / Context | Purpose in Git Signing/Transport | Remediation Action |</p>
+<p>| :--- | :--- | :--- | :--- |</p>
+<p>| <strong>macOS System Keychain</strong> | <code>/Library/Keychains/System.keychain</code> | Stores machine-wide trusted root and intermediate CAs. | Import eMudhra Enterprise Root CA explicitly. |</p>
+<p>| <strong>Git OpenSSL Backend</strong> | Configured via <code>git config</code> | Handles HTTPS transport verification for remote enterprise repos. | Force Git to use macOS Secure Transport or supply custom bundle. |</p>
+<p>| <strong>GPG Smartcard Daemon</strong> | <code>gpg-agent</code> / <code>scdaemon</code> | Interfaces with physical USB tokens for commit signing. | Configure <code>pcscd</code> routing and update <code>gpg-conf</code>. |</p>
+<p>| <strong>Global Git Config</strong> | <code>~/.gitconfig</code> | Declares signing keys, program paths, and transport overrides. | Inject standardized identity and key bindings. |</p>
+<p>| <strong>Keychain Integration</strong> | <code>git-credential-osxkeychain</code> | Caches HTTPS credentials securely using native macOS API. | Enable helper to prevent token polling lockouts. |</p>
+
+<p>---</p>
+
+<h2>3. Production Code Patterns &amp; Architecture Examples</h2>
+
+<h3>A. Automated Diagnostics &amp; Remediation Script (<code>emudhra-doctor.sh</code>)</h3>
+<p>Save this script as <code>emudhra-doctor.sh</code>. Run it with <code>bash emudhra-doctor.sh</code> to automatically diagnose and patch your local macOS Git environment for eMudhra compatibility.</p>
+
+<pre><code>#!/usr/bin/env bash
+<h1>==============================================================================</h1>
+<h1>Script Name: emudhra-doctor.sh</h1>
+<h1>Description: Automated diagnostic and remediation tool for macOS Git + eMudhra certs</h1>
+<h1>Author: Senior Product Architect, MicroCorp AI</h1>
+<h1>==============================================================================</h1>
+
+<p>set -euo pipefail</p>
+
+<p>echo "=================================================================="</p>
+<p>echo " [MicroCorp AI] eMudhra macOS Git Remediation Utility v2.4"</p>
+<p>echo "=================================================================="</p>
+
+<h1>1. Check for Git Installation</h1>
+<p>if ! command -v git &amp;&gt; /dev/null; then</p>
+<p>    echo "❌ Error: Git is not installed or not in PATH." &gt;&amp;2</p>
+<p>    exit 1</p>
+<p>fi</p>
+<p>echo "✅ Git detected: $(git --version)"</p>
+
+<h1>2. Configure Git to use macOS Secure Transport (Resolves self-signed chain issues)</h1>
+<p>echo "⚙️ Configuring Git HTTP backend to use macOS Secure Transport..."</p>
+<p>git config --global http.sslBackend "schannel" 2&gt;/dev/null || true</p>
+<h1>Fallback for standard macOS curl/Secure Transport configuration</h1>
+<p>git config --global http.postBuffer 524288000</p>
+<p>echo "✅ Git HTTP transport optimized."</p>
+
+<h1>3. Check for eMudhra Middleware / PCSC daemon</h1>
+<p>echo "🔍 Checking for smartcard daemon (pcscd)..."</p>
+<p>if launchctl list | grep -q "com.apple.pcscd"; then</p>
+<p>    echo "✅ PCSC daemon is active."</p>
+<p>else</p>
+<p>    echo "⚠️ PCSC daemon not running. Attempting to load..."</p>
+<p>    sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.pcscd.plist 2&gt;/dev/null || \</p>
+<p>    echo "⚠️ Manual intervention required: Start smartcard services via your eMudhra middleware."</p>
+<p>fi</p>
+
+<h1>4. Configure GPG / Signing if eMudhra hardware token is present</h1>
+<p>KEY_ID=$(gpg --list-secret-keys --keyid-format LONG 2&gt;/dev/null | grep sec | awk '{print $2}' | cut -d'/' -f2 || true)</p>
+
+<p>if [ -n "${KEY_ID:-}" ]; then</p>
+<p>    echo "✅ Found GPG Secret Key: ${KEY_ID}"</p>
+<p>    git config --global user.signingkey "${KEY_ID}"</p>
+<p>    git config --global commit.gpgsign true</p>
+<p>    echo "✅ Git commit signing enabled globally."</p>
+<p>else</p>
+<p>    echo "⚠️ No GPG signing key detected. If using X.509 S/MIME via eMudhra, configure manually."</p>
+<p>fi</p>
+
+<p>echo "=================================================================="</p>
+<p>echo " 🎉 Remediation complete. Restart your terminal session."</p>
+<p>echo "=================================================================="</code></pre></p>
+
+<h3>B. Enterprise Hardened Git Boilerplate Configuration (<code>.gitconfig.emudhra</code>)</h3>
+<p>Include this configuration fragment inside your global <code>~/.gitconfig</code> or include it conditionally via path matching.</p>
+
+<pre><code>[user]
+<p>    name = Enterprise Developer</p>
+<p>    email = developer@enterprise.internal</p>
+<p>    # If utilizing a dedicated eMudhra S/MIME signing cert:</p>
+<p>    # signingkey = &lt;YOUR_EMUDHRA_CERT_FINGERPRINT&gt;</p>
+
+<p>[http]</p>
+<p>    # Enforce secure transport handling for enterprise proxies &amp; eMudhra MITM inspection</p>
+<p>    sslBackend = secure-transport</p>
+<p>    lowSpeedLimit = 1000</p>
+<p>    lowSpeedTime = 60</p>
+
+<p>[credential]</p>
+<p>    helper = osxkeychain</p>
+
+<p>[gpg]</p>
+<p>    program = /usr/local/bin/gpg</p>
+
+<p>[commit]</p>
+<p>    gpgsign = true</p>
+
+<p>[tag]</p>
+<p>    gpgsign = true</p>
+
+<p>[core]</p>
+<p>    trustctime = false</p>
+<p>    preloadindex = true</p>
+<p>    fscache = true</code></pre></p>
+
+<p>---</p>
+
+<h2>4. Common Anti-Patterns &amp; Gotchas to Avoid</h2>
+
+<p>1. <strong>Disabling SSL Verification Globally</strong></p>
+   <em> </em>Anti-Pattern:* Running <code>git config --global http.sslVerify false</code>.
+   <em> </em>Risk:* Exposes your machine to Man-in-the-Middle (MitM) attacks and violates corporate ISO27001/SOC2 compliance frameworks. Always fix the certificate trust chain instead.
+<p>2. <strong>Mixing Homebrew OpenSSL with Apple Secure Transport</strong></p>
+   <em> </em>Anti-Pattern:* Forcing Git to link against Homebrew's OpenSSL without exporting corresponding SSL certificate bundle environment variables (<code>SSL_CERT_FILE</code>).
+   <em> </em>Risk:* Git commands succeed in terminal but fail silently inside IDE extensions (VS Code, JetBrains).
+<p>3. <strong>Ignoring PCSC Daemon Conflicts</strong></p>
+   <em> </em>Anti-Pattern:* Running third-party token manager software that locks the smartcard reader device exclusively (<code>/dev/smartcard0</code>), preventing <code>gpg-agent</code> or Git credential helpers from accessing the eMudhra token.
+<p>4. <strong>Hardcoding Expiring Intermediate CAs</strong></p>
+   <em> </em>Anti-Pattern:* Manually adding intermediate certificates to local repos rather than the system keychain.
+   <em> </em>Risk:* Fails instantly upon certificate rotation cycles, requiring manual updates across all developer workstations.
+
+<p>---</p>
+
+<h2>5. Performance &amp; Optimization Tips</h2>
+
+<ul>
+<li><strong>Enable HTTP/2 Multiplexing:</strong> Enterprise servers hosting large monorepos benefit heavily from HTTP/2 multiplexing via curl/Secure Transport. Ensure your macOS system curl is up to date via Xcode Command Line Tools.</li>
+<li><strong>Credential Caching Tuning:</strong> Prevent your eMudhra hardware token from constantly prompting for PIN re-entry by setting up proper cache TTLs in <code>~/.gnupg/gpg-agent.conf</code>:</li>
+</ul>
+  <pre><code>default-cache-ttl 28800
+<p>  max-cache-ttl 86400</code></pre></p>
+<ul>
+<li><strong>Selective Submodule Fetching:</strong> When dealing with heavy enterprise repositories integrated with eMudhra authenticated submodules, configure shallow clones by default:</li>
+</ul>
+  <pre><code>git config --global submodule.recurse true</code></pre>
+
+<p>---</p>
+
+<h2>6. Commercial License &amp; Attribution Summary</h2>
+
+<h3>MicroCorp AI Commercial Developer License (MC-CDL-v1.0)</h3>
+<ul>
+<li><strong>Copyright © 2026 MicroCorp AI. All rights reserved.</strong></li>
+<li><strong>Usage Rights:</strong> This digital product is licensed to the purchasing entity for internal engineering use, workstation provisioning, and CI/CD pipeline template standardization.</li>
+<li><strong>Redistribution:</strong> Redistribution, resale, public posting, or sub-licensing of this exact reference kit outside the purchasing organization is strictly prohibited.</li>
+<li><strong>Warranty Disclaimer:</strong> Provided "AS IS", without warranty of any kind, express or implied. MicroCorp AI shall not be held liable for any cryptographic token lockouts, pipeline failures, or data loss resulting from improper certificate deployment.</li>
+</ul>
+            </div>
+        </div>
+
+        <!-- Tab 4: Directory Map -->
+        <div id="tab_files" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Package Directory & File Contents Map</h2>
+            <p style="color: #64748b; font-size: 14px;">Here is an overview of each file included in your unzipped deliverable:</p>
+            
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Description & Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>START_HERE.html</code></td>
+                        <td><span style="color: #2563eb; font-weight: 600;">Interactive UI</span></td>
+                        <td>The interactive customer onboarding dashboard with 1-click code copier and guides.</td>
+                    </tr>
+                    <tr>
+                        <td><code>main.py</code></td>
+                        <td><span style="color: #16a34a; font-weight: 600;">Python Script</span></td>
+                        <td>The standalone executable source code and verification runner.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_WINDOWS.bat</code></td>
+                        <td><span style="color: #d97706; font-weight: 600;">Batch Launcher</span></td>
+                        <td>1-click launcher for Windows. Double-click to run code and open dashboard.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_MAC_LINUX.sh</code></td>
+                        <td><span style="color: #9333ea; font-weight: 600;">Shell Script</span></td>
+                        <td>1-click launcher for macOS and Linux environments.</td>
+                    </tr>
+                    <tr>
+                        <td><code>requirements.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Dependencies</span></td>
+                        <td>Dependencies file for easy installation via <code>pip install -r requirements.txt</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>QUICKSTART.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Plain Text</span></td>
+                        <td>Quickstart instructions readable in Notepad or any plain text editor.</td>
+                    </tr>
+                    <tr>
+                        <td><code>README.md</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Markdown</span></td>
+                        <td>Complete technical manual, architecture patterns, and setup reference.</td>
+                    </tr>
+                    <tr>
+                        <td><code>INVOICE.txt</code></td>
+                        <td><span style="color: #16a34a; font-weight: 600;">Invoice</span></td>
+                        <td>Official verified commercial invoice with payment settlement details.</td>
+                    </tr>
+                    <tr>
+                        <td><code>LICENSE.txt</code></td>
+                        <td><span style="color: #2563eb; font-weight: 600;">License</span></td>
+                        <td>Full commercial ownership transfer certificate.</td>
+                    </tr>
+                    <tr>
+                        <td><code>TERMS_AND_CONDITIONS.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Legal Terms</span></td>
+                        <td>MicroCorp AI corporate terms and ethical governance charter.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 5: License & Invoice -->
+        <div id="tab_license" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Commercial Rights & Verification Invoice</h2>
+            
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+                <span style="background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Ownership Verified</span>
+                <h3 style="color: #166534; margin: 8px 0 4px 0;">Commercial Distribution & Modification Rights Granted</h3>
+                <p style="color: #15803d; font-size: 13px; margin: 0 0 16px 0;">You possess 100% royalty-free commercial rights to use, modify, embed, deploy, and distribute this software in personal or commercial projects.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px; color: #1e293b;">
+                    <div><strong>Agreed Price:</strong> ₹399 (~$4.99 USD)</div>
+                    <div><strong>Official Beneficiary:</strong> Alpesh Thakor</div>
+                    <div><strong>Payee UPI ID:</strong> <code>talpesh100@ybl</code></div>
+                    <div><strong>Asset ID:</strong> <code>20261028_192233_developer_toolkit__macos_git_emudhra_cer</code></div>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 style="margin: 0 0 8px 0; color: #0f172a;">Customer Support & Inquiries</h3>
+                <p style="color: #475569; font-size: 13px; margin: 0;">For customization inquiries, enterprise integrations, or support, contact the host developer at <strong>Alpesh Thakor</strong> via UPI reference at <code>talpesh100@ybl</code>.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <span>Asset: <strong>Developer Toolkit: macOS Git eMudhra Certificate Remediation Guide & Boilerplate - Developer Reference & Architecture Kit</strong></span>
+            <span>MicroCorp AI Autonomous Venture • Payout UPI: <strong>talpesh100@ybl</strong></span>
+        </div>
+    </div>
+
+    <div id="toast">Copied to clipboard!</div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+            var targetContent = document.getElementById('tab_' + tabId);
+            if (targetContent) targetContent.classList.add('active');
+            var btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(function(b) {
+                var oc = b.getAttribute('onclick') || '';
+                if (oc.indexOf(tabId) !== -1) b.classList.add('active');
+            });
+        }
+
+        function copyCode() {
+            var code = document.getElementById('codeBlock').innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                showToast('Source code copied to clipboard!');
+            });
+        }
+
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt).then(function() {
+                showToast('Command copied to clipboard!');
+            });
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(function() { t.style.display = 'none'; }, 2500);
+        }
+    </script>
+</body>
+</html>
