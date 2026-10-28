@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MicroCorp AI — 24/7 Autonomous Enterprise Simulator</title>
-    <meta name="description" content="MicroCorp AI 24/7 Simulator: Autonomous Laptop Enterprise with 268+ Agency AI personas, live passive income generation, and direct UPI settlement to talpesh100@ybl.">
+    <title>MicroCorp AI — 24/7 Autonomous Enterprise Simulator & Developer Marketplace</title>
+    <meta name="description" content="MicroCorp AI 24/7 Simulator: Autonomous Laptop Enterprise with 268+ Agency AI personas, live digital product manufacturing, Buy Me a Coffee support, and direct UPI settlement to talpesh100@ybl. Contact: thakoralpesh3@proton.me">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --bg-dark: #080c15;
-            --card-bg: rgba(15, 23, 42, 0.75);
+            --card-bg: rgba(15, 23, 42, 0.78);
             --card-border: rgba(255, 255, 255, 0.08);
             --primary: #3b82f6;
             --primary-glow: rgba(59, 130, 246, 0.35);
+            --coffee-gold: #f59e0b;
+            --coffee-hover: #d97706;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -25,13 +27,16 @@
             background-color: var(--bg-dark);
             background-image: 
                 radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.5;
         }
         .container { max-width: 1400px; margin: 0 auto; }
+        
         .glass-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -39,9 +44,11 @@
             border-radius: 14px;
             padding: 20px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
-            transition: transform 0.2s, border-color 0.2s;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
         }
         .glass-card:hover { border-color: rgba(255, 255, 255, 0.18); }
+
+        /* Top Navigation */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             flex-wrap: wrap; gap: 14px; margin-bottom: 20px;
@@ -52,15 +59,27 @@
             box-shadow: 0 0 10px #10b981; animation: pulse 1.8s infinite; display: inline-block;
         }
         @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.8; } }
+
         .badge {
-            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
             border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none;
+            cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent;
         }
+        .badge:hover { transform: translateY(-1px); }
+        .badge-coffee {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: #fff; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+            border: 1px solid rgba(251, 191, 36, 0.5); font-weight: 700;
+        }
+        .badge-coffee:hover { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6); }
+        .badge-email {
+            background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        .badge-email:hover { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
         .badge-green { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge-blue { background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
         .badge-purple { background: rgba(139, 92, 246, 0.18); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
-        .badge-dark { background: rgba(30, 41, 59, 0.8); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.1); }
-        
+        .badge-dark { background: rgba(30, 41, 59, 0.8); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.12); }
+
         /* Telemetry Grid */
         .telemetry-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -71,13 +90,53 @@
         .bar-bg { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; margin-top: 8px; }
         .bar-fill { height: 100%; transition: width 0.4s ease; }
 
-        /* Main Workspace Grid */
+        /* Buy Me A Coffee Hero Showcase */
+        .coffee-hero {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(20, 15, 40, 0.9) 50%, rgba(50, 30, 15, 0.8) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.1);
+        }
+        .coffee-hero-left { flex: 1; min-width: 320px; }
+        .coffee-title { font-size: 20px; font-weight: 800; color: #fbbf24; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .coffee-desc { font-size: 13px; color: #cbd5e1; max-width: 650px; line-height: 1.6; }
+        .coffee-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        
+        .coffee-tier-btn {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fef3c7;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .coffee-tier-btn:hover {
+            background: rgba(245, 158, 11, 0.35);
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Workspace Grid */
         .workspace-grid {
-            display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1.25fr 1fr; gap: 20px; margin-bottom: 24px;
         }
         @media (max-width: 960px) { .workspace-grid { grid-template-columns: 1fr; } }
 
-        /* Terminal & Execution */
+        /* Terminal & Buttons */
         .terminal-box {
             background: #020617; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px;
             padding: 16px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px;
@@ -88,6 +147,7 @@
         .term-yellow { color: #fde047; }
         .term-purple { color: #c084fc; }
         .term-red { color: #f87171; }
+        .term-gold { color: #fbbf24; }
         .term-dim { color: #64748b; }
 
         .btn {
@@ -96,22 +156,23 @@
             display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
         }
         .btn:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-coffee { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+        .btn-coffee:hover { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .btn-success { background: #059669; }
         .btn-success:hover { background: #10b981; }
-        .btn-danger { background: #dc2626; }
-        .btn-danger:hover { background: #ef4444; }
+        .btn-outline { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); color: #cbd5e1; }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
 
-        /* Tabs & Lists */
+        /* Tabs & Items */
         .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; }
         .tab-btn {
             background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-muted); padding: 6px 14px; border-radius: 8px; font-size: 12px;
+            color: var(--text-muted); padding: 7px 14px; border-radius: 8px; font-size: 12px;
             cursor: pointer; white-space: nowrap; transition: all 0.2s;
         }
         .tab-btn.active, .tab-btn:hover {
             background: rgba(59, 130, 246, 0.25); color: #93c5fd; border-color: rgba(59, 130, 246, 0.4);
         }
-
         .item-list { display: flex; flex-direction: column; gap: 10px; max-height: 340px; overflow-y: auto; }
         .item-card {
             background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.06);
@@ -120,9 +181,76 @@
         .item-title { font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
         .item-desc { font-size: 12px; color: var(--text-muted); }
 
-        /* QR & Modal */
-        .qr-box {
-            background: #fff; padding: 12px; border-radius: 8px; display: inline-block; margin-top: 10px;
+        /* Marketplace Product Cards */
+        .product-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;
+        }
+        .product-card {
+            background: rgba(18, 24, 38, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .product-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        .product-badge {
+            font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+            text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;
+        }
+        .product-title {
+            font-size: 16px; font-weight: 700; color: #f8fafc; margin: 10px 0 8px 0;
+            line-height: 1.4;
+        }
+        .product-desc {
+            font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;
+        }
+        .stack-pill {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8; font-size: 11px; padding: 2px 7px; border-radius: 4px; margin-right: 4px;
+            margin-bottom: 4px; display: inline-block;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 9999;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px; width: 100%; max-width: 620px; max-height: 90vh;
+            overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            padding: 28px; position: relative; color: #f8fafc;
+        }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.08);
+            border: none; color: #94a3b8; width: 34px; height: 34px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; transition: all 0.2s;
+        }
+        .modal-close:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .qr-wrapper {
+            background: #ffffff; padding: 14px; border-radius: 12px; display: inline-block;
+            margin: 14px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .copy-pill {
+            background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between;
+            align-items: center; margin-top: 10px; font-family: monospace; font-size: 13px;
+        }
+        .toast {
+            position: fixed; bottom: 25px; right: 25px; background: #10b981; color: #fff;
+            padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 13px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4); display: none; z-index: 10000;
         }
     </style>
 </head>
@@ -134,17 +262,54 @@
                 <i class="fa-solid fa-microchip" style="color: #60a5fa;"></i>
                 <span>MicroCorp AI</span>
                 <span class="live-pulse" title="Cloud Simulator Active"></span>
-                <span style="font-size: 12px; color: var(--text-muted); font-weight: 400;">24/7 GitHub Cloud Simulator</span>
+                <span style="font-size: 12px; color: var(--text-muted); font-weight: 400;">24/7 GitHub Enterprise Simulator</span>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <span class="badge badge-green"><i class="fa-solid fa-shield-halved"></i> Legal Guardian: Active</span>
+                <!-- Buy Me a Coffee Action Button -->
+                <button class="badge badge-coffee" onclick="openPaymentModal({type: 'coffee', name: 'Buy Me a Coffee (Supporter)', inr: 150, usd: 1.80})">
+                    <i class="fa-solid fa-mug-hot"></i> Buy Me a Coffee
+                </button>
+                <!-- Official Contact Me Option -->
+                <button class="badge badge-email" onclick="openContactModal()">
+                    <i class="fa-solid fa-envelope"></i> Contact: thakoralpesh3@proton.me
+                </button>
+                <!-- Personas & Status -->
                 <span class="badge badge-purple"><i class="fa-solid fa-users-viewfinder"></i> 268+ Agency Personas</span>
-                <span class="badge badge-green" title="Direct Settlement Payee"><i class="fa-solid fa-indian-rupee-sign"></i> talpesh100@ybl (Alpesh Thakor)</span>
+                <span class="badge badge-green" onclick="openPaymentModal({type: 'direct', name: 'MicroCorp AI Payout Treasury', inr: 450, usd: 5.40})" title="Click to view UPI payment details">
+                    <i class="fa-solid fa-indian-rupee-sign"></i> talpesh100@ybl (Alpesh Thakor)
+                </span>
                 <a href="https://github.com/thakoralpesh3/microcorp-agent" target="_blank" class="badge badge-dark">
-                    <i class="fa-brands fa-github"></i> <span id="githubStatus">GitHub Repo: main</span>
+                    <i class="fa-brands fa-github"></i> <span id="githubStatus">GitHub: main</span>
                 </a>
             </div>
         </header>
+
+        <!-- ☕ Buy Me A Coffee & Support Showcase Banner -->
+        <section class="coffee-hero">
+            <div class="coffee-hero-left">
+                <div class="coffee-title">
+                    <i class="fa-solid fa-mug-hot"></i> Buy Me a Coffee — Support MicroCorp AI & Creator
+                </div>
+                <p class="coffee-desc">
+                    MicroCorp AI is an autonomous, open-source enterprise and developer toolkit engine built by <strong>Alpesh Thakor</strong>. 
+                    Your coffee tips directly fuel 24/7 background LLM inference, autonomous code generation, and open-source distribution. Zero platform commission — 100% direct developer support!
+                </p>
+            </div>
+            <div class="coffee-actions">
+                <button class="coffee-tier-btn" onclick="openPaymentModal({type: 'coffee', name: '1 Hot Coffee ☕', inr: 150, usd: 1.80})">
+                    ☕ 1 Coffee (₹150 / $1.80)
+                </button>
+                <button class="coffee-tier-btn" onclick="openPaymentModal({type: 'coffee', name: '3 Coffees ☕☕☕ (Sprint Pack)', inr: 450, usd: 5.40})">
+                    ☕☕ 3 Coffees (₹450 / $5.40)
+                </button>
+                <button class="coffee-tier-btn" onclick="openPaymentModal({type: 'coffee', name: '5 Coffees ☕☕☕☕☕ (Enterprise Fuel)', inr: 750, usd: 9.00})">
+                    ☕☕☕ 5 Coffees (₹750 / $9.00)
+                </button>
+                <button class="coffee-tier-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd;" onclick="openPaymentModal({type: 'custom', name: 'Custom Sponsorship / Project', inr: 1500, usd: 18.00})">
+                    ✨ Sponsor / Custom Tip
+                </button>
+            </div>
+        </section>
 
         <!-- Telemetry Metrics -->
         <section class="telemetry-grid">
@@ -158,27 +323,27 @@
                 <div class="metric-title"><i class="fa-solid fa-people-arrows"></i> Active Subagents</div>
                 <div class="metric-value" style="color: #a78bfa;" id="activeSubagents">14</div>
                 <div class="bar-bg"><div class="bar-fill" id="subagentBar" style="width: 70%; background: #8b5cf6;"></div></div>
-                <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">Auto-Scaler: 18 Divisions Loaded</small>
+                <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">18 Divisions • 268+ Personas Loaded</small>
             </div>
             <div class="glass-card">
-                <div class="metric-title"><i class="fa-solid fa-boxes-packing"></i> Minted Digital Toolkits</div>
-                <div class="metric-value" style="color: #34d399;" id="mintedCount">194</div>
-                <div class="bar-bg"><div class="bar-fill" style="width: 85%; background: #10b981;"></div></div>
-                <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">Turnkey Packages with ZIP & Docs</small>
+                <div class="metric-title"><i class="fa-solid fa-boxes-packing"></i> Products Ready to Sell</div>
+                <div class="metric-value" style="color: #34d399;" id="mintedCount">32</div>
+                <div class="bar-bg"><div class="bar-fill" style="width: 100%; background: #10b981;"></div></div>
+                <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">Synthesized ZIPs with Tests & Docs</small>
             </div>
             <div class="glass-card">
-                <div class="metric-title"><i class="fa-solid fa-wallet"></i> Simulated Gross Revenue</div>
+                <div class="metric-title"><i class="fa-solid fa-wallet"></i> Simulated Treasury & Coffee Tips</div>
                 <div class="metric-value" style="color: #facc15;" id="grossRev">$44,926</div>
                 <div class="bar-bg"><div class="bar-fill" style="width: 90%; background: #f59e0b;"></div></div>
-                <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">₹38,86,099 INR • Direct UPI</small>
+                <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">₹38,86,099 INR • Direct UPI Payout</small>
             </div>
         </section>
 
-        <!-- Workspace Section -->
+        <!-- Main Workspace Grid -->
         <div class="workspace-grid">
             <!-- Left: Autonomous Simulator Terminal -->
             <div class="glass-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
                     <h3 style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-terminal" style="color: #60a5fa;"></i> Autonomous Fleet Sprint Terminal
                     </h3>
@@ -186,19 +351,20 @@
                         <button class="btn" onclick="triggerManualSprint()" id="sprintBtn">
                             <i class="fa-solid fa-bolt"></i> Run Sprint Now
                         </button>
-                        <button class="btn btn-danger" onclick="testLegalRejection()" title="Verify Legal Guardian blocks illegal work">
-                            <i class="fa-solid fa-shield-virus"></i> Test Legal Guard
+                        <button class="btn btn-coffee" onclick="openPaymentModal({type: 'coffee', name: 'Buy Me a Coffee (Supporter)', inr: 150, usd: 1.80})">
+                            <i class="fa-solid fa-mug-hot"></i> Support Fleet
                         </button>
                     </div>
                 </div>
 
                 <div class="terminal-box" id="terminal">
-                    <div class="term-line term-green">🏢 [24/7 Simulator] MicroCorp AI Autonomous Fleet online.</div>
-                    <div class="term-line term-dim">👑 Executive Core: Artemis (Executive Core) orchestrating 268+ specialized Agency personas.</div>
-                    <div class="term-line term-dim">💳 Payment Beneficiary: talpesh100@ybl (Alpesh Thakor). Zero intermediary fees.</div>
+                    <div class="term-line term-green">🏢 [24/7 Simulator] MicroCorp AI Autonomous Enterprise online.</div>
+                    <div class="term-line term-dim">👑 Executive Core: Artemis orchestrating 268+ specialized Agency personas across 18 divisions.</div>
+                    <div class="term-line term-gold">☕ Developer Support: Buy me a coffee or sponsor via talpesh100@ybl / thakoralpesh3@proton.me.</div>
+                    <div class="term-line term-dim">💳 Payment Beneficiary: talpesh100@ybl (Alpesh Thakor). Direct UPI with 0% platform fee.</div>
                     <div class="term-line term-purple">⚖️ Legal Guardian: Active (CAN-SPAM, CFAA, Wire Fraud filters enforced).</div>
                     <div class="term-line term-dim">──────────────────────────────────────────────────────────────────────────</div>
-                    <div class="term-line term-yellow">⚡ [Autonomous Heartbeat] Mining trending tech trends and remote contracts...</div>
+                    <div class="term-line term-yellow">⚡ [Autonomous Heartbeat] Mining trending tech architectures and remote developer contracts...</div>
                 </div>
             </div>
 
@@ -208,7 +374,7 @@
                     <h3 style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-address-card" style="color: #a78bfa;"></i> The Agency: 268+ AI Personas
                     </h3>
-                    <span class="badge badge-purple" id="divisionCountBadge">18 Divisions</span>
+                    <span class="badge badge-purple">18 Divisions</span>
                 </div>
 
                 <div class="tabs" id="divisionTabs">
@@ -226,39 +392,895 @@
             </div>
         </div>
 
-        <!-- Commercial Storefront & UPI Checkout Simulator -->
+        <!-- 🛒 Commercial Storefront: ALL Generated Products (32+) -->
         <section class="glass-card" style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
                 <div>
-                    <h3 style="font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-store" style="color: #34d399;"></i> Commercial Developer Storefront & Instant UPI Checkout
+                    <h3 style="font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-store" style="color: #34d399;"></i> Autonomous Developer Storefront — All Generated Products (32+)
                     </h3>
                     <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-                        Manufactured autonomously with full commercial rights. Settle instantly to <strong>talpesh100@ybl</strong>.
+                        Manufactured and packaged autonomously with 100% royalty-free commercial transfer. Instant UPI checkout to <strong>talpesh100@ybl</strong>.
                     </p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="utrInput" placeholder="Enter 12-digit UTR (e.g. 238910482910)" style="background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-family: monospace; width: 260px;">
-                    <button class="btn btn-success" onclick="verifyUtrCheckout()">
-                        <i class="fa-solid fa-download"></i> Verify & Download
-                    </button>
+                <!-- Search & Filters -->
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div style="position: relative;">
+                        <input type="text" id="productSearch" oninput="filterAndSearchProducts()" placeholder="🔍 Search products, tech stacks (FastAPI, Docker, macOS...)" style="background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 9px 14px; border-radius: 8px; font-size: 13px; width: 320px;">
+                    </div>
+                    <select id="sortSelect" onchange="filterAndSearchProducts()" style="background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 9px 12px; border-radius: 8px; font-size: 13px; cursor: pointer;">
+                        <option value="default">Sort: Recommended</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                    </select>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;" id="productGrid">
-                <!-- Products dynamically rendered -->
+            <!-- Category Filter Tabs -->
+            <div class="tabs" id="productCategoryTabs" style="margin-bottom: 16px;">
+                <button class="tab-btn active" onclick="setProductCategory('all')">All Products (32)</button>
+                <button class="tab-btn" onclick="setProductCategory('toolkit')">Developer Toolkits</button>
+                <button class="tab-btn" onclick="setProductCategory('backend')">Backend & Microservices</button>
+                <button class="tab-btn" onclick="setProductCategory('enterprise')">Enterprise Systems</button>
+                <button class="tab-btn" onclick="setProductCategory('contract')">Turnkey Client Contracts</button>
+                <button class="tab-btn" onclick="setProductCategory('cheatsheet')">Cheatsheets & Blueprints</button>
+            </div>
+
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;" id="productResultsSummary">
+                Showing all 32 manufactured products
+            </div>
+
+            <!-- Products Grid -->
+            <div class="product-grid" id="productGrid">
+                <!-- Dynamically rendered -->
             </div>
         </section>
 
         <!-- Footer -->
-        <footer style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.06);">
-            MicroCorp AI Autonomous Fleet Simulator • 24/7 Cloud Architecture • Beneficiary: <strong>talpesh100@ybl</strong> (Alpesh Thakor)<br>
-            Legal Jurisdiction: Republic of India (Ahmedabad, Gujarat) • Commercial Licensing Transferred to Clients
+        <footer class="glass-card" style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px; line-height: 1.8;">
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px;">
+                <button class="badge badge-coffee" onclick="openPaymentModal({type: 'coffee', name: 'Buy Me a Coffee', inr: 150, usd: 1.80})">
+                    <i class="fa-solid fa-mug-hot"></i> Buy Me a Coffee
+                </button>
+                <button class="badge badge-email" onclick="openContactModal()">
+                    <i class="fa-solid fa-envelope"></i> Contact: thakoralpesh3@proton.me
+                </button>
+                <span class="badge badge-dark">
+                    <i class="fa-solid fa-shield-halved"></i> 100% AS-IS License
+                </span>
+                <span class="badge badge-dark">
+                    <i class="fa-solid fa-building-columns"></i> Ahmedabad, Gujarat, India
+                </span>
+            </div>
+            MicroCorp AI Autonomous Fleet Simulator • 24/7 Cloud Architecture • Founder & Payee: <strong>Alpesh Thakor</strong><br>
+            Direct Payout UPI ID: <code style="color: #34d399; font-weight: bold;">talpesh100@ybl</code> • Official Developer Email: <a href="mailto:thakoralpesh3@proton.me" style="color: #60a5fa; text-decoration: none;">thakoralpesh3@proton.me</a><br>
+            All commercial software toolkits include full source code, executable tests, documentation, and unencumbered commercial ownership.
         </footer>
     </div>
 
+    <!-- ☕ PAYMENT & SUPPORT MODAL -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePaymentModal()">&times;</button>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                <div style="background: rgba(245, 158, 11, 0.2); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fbbf24;">
+                    <i class="fa-solid fa-mug-hot"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #fff;" id="modalTargetName">Buy Me a Coffee / Support MicroCorp</h3>
+                    <div style="font-size: 13px; color: var(--text-muted);">Direct Peer-to-Peer Settlement • Zero Intermediary Fees</div>
+                </div>
+            </div>
+
+            <!-- Price & Amount Banner -->
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Contribution / Amount</div>
+                    <div style="font-size: 22px; font-weight: 800; color: #34d399;" id="modalPriceInr">₹150 INR</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Approx USD</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #94a3b8;" id="modalPriceUsd">~$1.80 USD</div>
+                </div>
+            </div>
+
+            <!-- Payment Options Tabs inside modal -->
+            <div class="tabs" style="margin-bottom: 14px;">
+                <button class="tab-btn active" id="tabUpiBtn" onclick="switchModalTab('upi')"><i class="fa-solid fa-qrcode"></i> Instant UPI (India)</button>
+                <button class="tab-btn" id="tabIntlBtn" onclick="switchModalTab('intl')"><i class="fa-solid fa-globe"></i> International & Cards</button>
+                <button class="tab-btn" id="tabUtrBtn" onclick="switchModalTab('utr')"><i class="fa-solid fa-check-double"></i> Verify UTR</button>
+            </div>
+
+            <!-- TAB 1: UPI PAYMENT OPTION -->
+            <div id="modalTabUpi">
+                <div style="text-align: center; margin-bottom: 14px;">
+                    <div class="qr-wrapper">
+                        <img id="modalQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dtalpesh100%40ybl%26pn%3DAlpesh%2520Thakor%26am%3D150%26cu%3DINR" alt="UPI QR Code" style="display: block; width: 180px; height: 180px;">
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+                        Scan with <strong>Google Pay, PhonePe, Paytm, BHIM, Cred, or Amazon Pay</strong>
+                    </p>
+                </div>
+
+                <div class="copy-pill">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 11px; display: block;">OFFICIAL PAYEE UPI ID</span>
+                        <strong style="color: #38bdf8; font-size: 14px;">talpesh100@ybl</strong>
+                        <span style="color: #94a3b8; font-size: 12px; margin-left: 6px;">(Alpesh Thakor)</span>
+                    </div>
+                    <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="copyToClipboard('talpesh100@ybl', 'UPI ID copied to clipboard!')">
+                        <i class="fa-solid fa-copy"></i> Copy
+                    </button>
+                </div>
+
+                <div style="margin-top: 14px; display: flex; gap: 10px;">
+                    <a id="modalUpiLink" href="upi://pay?pa=talpesh100@ybl&pn=Alpesh%20Thakor&am=150&cu=INR" class="btn btn-success" style="flex: 1; justify-content: center; text-decoration: none;">
+                        <i class="fa-solid fa-mobile-screen-button"></i> Open in UPI App
+                    </a>
+                    <button class="btn btn-outline" onclick="switchModalTab('utr')">
+                        <i class="fa-solid fa-receipt"></i> Enter UTR
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: INTERNATIONAL & CARDS -->
+            <div id="modalTabIntl" style="display: none; padding: 10px 0;">
+                <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 16px; margin-bottom: 14px;">
+                    <h4 style="font-size: 14px; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">
+                        <i class="fa-solid fa-credit-card"></i> Outside India or International Card Support
+                    </h4>
+                    <p style="font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 12px;">
+                        If you do not have Indian UPI (Google Pay / PhonePe), you can support via international wire, Stripe/PayPal payment links, or custom commercial invoice.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-envelope" style="color: #38bdf8;"></i> Direct Contact Email:</div>
+                        <div class="copy-pill">
+                            <span style="color: #fff; font-weight: 700;">thakoralpesh3@proton.me</span>
+                            <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="copyToClipboard('thakoralpesh3@proton.me', 'Email copied to clipboard!')">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <a href="mailto:thakoralpesh3@proton.me?subject=International%20Coffee%20Support%20%2F%20Product%20Order&body=Hi%20Alpesh,%0A%0AI%20would%20like%20to%20support%20MicroCorp%20AI%20or%20purchase%20a%20developer%20toolkit.%20Please%20provide%20international%20payment%20options.%0A%0AThank%20you!" class="btn btn-coffee" style="width: 100%; justify-content: center; text-decoration: none;">
+                    <i class="fa-solid fa-paper-plane"></i> Email thakoralpesh3@proton.me for Invoice
+                </a>
+            </div>
+
+            <!-- TAB 3: UTR VERIFICATION & UNLOCK -->
+            <div id="modalTabUtr" style="display: none; padding: 10px 0;">
+                <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">
+                    After completing the UPI payment in your banking app, enter the <strong>12-digit UTR / Bank Reference Number</strong> below to unlock the commercial download:
+                </p>
+                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+                    <input type="text" id="modalUtrInput" placeholder="Enter 12-digit UTR (e.g. 238910482910)" style="background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-family: monospace; flex: 1;">
+                    <button class="btn btn-success" onclick="verifyModalUtr()">
+                        <i class="fa-solid fa-check"></i> Verify
+                    </button>
+                </div>
+                <small style="color: var(--text-muted); font-size: 11px; display: block; line-height: 1.5;">
+                    Need urgent manual confirmation? Send your screenshot to <a href="mailto:thakoralpesh3@proton.me" style="color: #60a5fa;">thakoralpesh3@proton.me</a>.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✉️ CONTACT ME MODAL -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">&times;</button>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                <div style="background: rgba(59, 130, 246, 0.2); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #60a5fa;">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #fff;">Contact Host Developer</h3>
+                    <div style="font-size: 13px; color: var(--text-muted);">Alpesh Thakor • Founder & Lead AI Architect</div>
+                </div>
+            </div>
+
+            <!-- Email Display Pill -->
+            <div class="copy-pill" style="margin-bottom: 18px; padding: 12px 16px;">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 11px; display: block; text-transform: uppercase;">Direct Email Address</span>
+                    <strong style="color: #38bdf8; font-size: 16px;">thakoralpesh3@proton.me</strong>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="copyToClipboard('thakoralpesh3@proton.me', 'Email copied to clipboard!')">
+                        <i class="fa-solid fa-copy"></i> Copy
+                    </button>
+                    <a href="mailto:thakoralpesh3@proton.me" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; text-decoration: none;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Mail
+                    </a>
+                </div>
+            </div>
+
+            <h4 style="font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px;">Select Inquiry Topic:</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <button class="tab-btn" style="text-align: left; padding: 10px 14px;" onclick="composeQuickEmail('Coffee Tip / Support Confirmation', 'Hi Alpesh,%0A%0AI have sent coffee support for MicroCorp AI. Here are my payment details:%0A- Amount:%0A- UTR/Ref:%0A%0AThanks!')">
+                    ☕ <strong>Payment / Coffee Tip Confirmation</strong>
+                </button>
+                <button class="tab-btn" style="text-align: left; padding: 10px 14px;" onclick="composeQuickEmail('Product Delivery & Download Help', 'Hi Alpesh,%0A%0AI need assistance with downloading my purchased developer toolkit.%0A- Product Title:%0A- UTR/Ref Number:%0A%0AThank you!')">
+                    📦 <strong>Product Delivery & Download Inquiry</strong>
+                </button>
+                <button class="tab-btn" style="text-align: left; padding: 10px 14px;" onclick="composeQuickEmail('Commission Custom AI Agent or Microservice', 'Hi Alpesh,%0A%0AI am interested in commissioning a custom software engineering project from your autonomous fleet.%0A- Requirements:%0A- Estimated Budget:%0A- Target Timeline:%0A%0ABest regards,')">
+                    💼 <strong>Commission Custom Engineering / Microservice</strong>
+                </button>
+                <button class="tab-btn" style="text-align: left; padding: 10px 14px;" onclick="composeQuickEmail('Open-Source Partnership / Sponsorship', 'Hi Alpesh,%0A%0AI would like to discuss a partnership or sponsorship opportunity with MicroCorp AI.%0A%0ABest regards,')">
+                    🤝 <strong>Partnership & Technical Collaboration</strong>
+                </button>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; font-size: 12px; color: var(--text-muted); text-align: center;">
+                Responses usually dispatched within 2–6 hours • Jurisdiction: Ahmedabad, Gujarat, India
+            </div>
+        </div>
+    </div>
+
+    <!-- 👁️ PRODUCT PREVIEW MODAL -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content" style="max-width: 680px;">
+            <button class="modal-close" onclick="closePreviewModal()">&times;</button>
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <span class="product-badge" id="previewBadge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">TOOLKIT</span>
+                <div style="text-align: right;">
+                    <span style="font-size: 20px; font-weight: 800; color: #34d399;" id="previewPriceInr">₹1,799</span>
+                    <small style="color: var(--text-muted); display: block;" id="previewPriceUsd">~$21.99 USD</small>
+                </div>
+            </div>
+
+            <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 8px;" id="previewTitle">Product Title</h3>
+            <p style="font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 16px;" id="previewDesc">Description</p>
+
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Key Modules & Architectural Specs:</div>
+                <div id="previewFeatures" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; color: #e2e8f0;">
+                    <!-- Features rendered dynamically -->
+                </div>
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; margin-bottom: 18px;">
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">Included Deliverables Inside ZIP:</div>
+                <div style="font-family: monospace; font-size: 12px; color: #38bdf8; line-height: 1.6;">
+                    📁 START_HERE.html (Zero-dependency interactive dashboard)<br>
+                    📁 main.py (Standalone modular production code)<br>
+                    📁 requirements.txt & Dockerfile (Container scaffolding)<br>
+                    📁 RUN_WINDOWS.bat & RUN_MAC_LINUX.sh (1-click launchers)<br>
+                    📁 README.md & LICENSE.txt (100% Commercial Transfer)
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-coffee" id="previewBuyBtn" style="flex: 1; justify-content: center;" onclick="proceedToBuyFromPreview()">
+                    <i class="fa-solid fa-mug-hot"></i> Buy with UPI / Support
+                </button>
+                <button class="btn btn-outline" onclick="closePreviewModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Toast -->
+    <div class="toast" id="toastMessage">Notification message</div>
+
     <script>
-        // Data & Agency Personas Sample
+        // Full 32+ Product Catalog JSON
+        const PRODUCTS = [
+  {
+    "slug": "20261028_204537_developer_toolkit__git_on_macos_compromi",
+    "title": "Developer Toolkit: macOS Git Code-Signing & Trust Enforcement",
+    "size_kb": 52.7,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Cryptographic Verification",
+      "GPG/eMudhra DSC Support",
+      "macOS Keychain Integration",
+      "Bash/Zsh Automations",
+      "Audit Logs"
+    ],
+    "stack": "Shell, OpenSSL, Git, macOS Security CLI"
+  },
+  {
+    "slug": "20261028_204424_fiverr_full-stack_fastapi_backend_with_j",
+    "title": "Turnkey Client Contract: Full-Stack FastAPI Backend with JWT & Microservices",
+    "size_kb": 42.7,
+    "category": "contract",
+    "tier": "Turnkey Client Freelance Contract",
+    "badge": "CLIENT CONTRACT",
+    "price_inr": 21500,
+    "price_usd": 250.0,
+    "desc": "Custom-built, 100% turnkey client software delivery with comprehensive setup walkthrough, quality guarantee, and full commercial transfer.",
+    "features": [
+      "AsyncIO Endpoints",
+      "Pydantic v2 Models",
+      "Docker & Compose",
+      "JWT Authentication",
+      "Automated Pytest Suite"
+    ],
+    "stack": "Python, FastAPI, Docker, Pytest, Pydantic"
+  },
+  {
+    "slug": "20261028_204346_full-stack_fastapi_backend_with_jwt_auth",
+    "title": "Enterprise Full-Stack FastAPI Backend with JWT Auth & Docker Suite",
+    "size_kb": 60.9,
+    "category": "enterprise",
+    "tier": "Enterprise Full-Stack & Agent Suite",
+    "badge": "ENTERPRISE SYSTEM",
+    "price_inr": 3999,
+    "price_usd": 49.0,
+    "desc": "End-to-end full-stack platform with JWT authentication, database migrations, autonomous agent orchestration, and production deployment scripts.",
+    "features": [
+      "AsyncIO Endpoints",
+      "Pydantic v2 Models",
+      "Docker & Compose",
+      "JWT Authentication",
+      "Automated Pytest Suite"
+    ],
+    "stack": "Python, FastAPI, Docker, Pytest, Pydantic"
+  },
+  {
+    "slug": "20261028_203846_developer_toolkit__macos_git_emudhra_cer",
+    "title": "Developer Toolkit: macOS Git eMudhra Digital Certificate Signing Pipeline",
+    "size_kb": 52.4,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Cryptographic Verification",
+      "GPG/eMudhra DSC Support",
+      "macOS Keychain Integration",
+      "Bash/Zsh Automations",
+      "Audit Logs"
+    ],
+    "stack": "Shell, OpenSSL, Git, macOS Security CLI"
+  },
+  {
+    "slug": "20261028_203119_developer_toolkit__git_macos_emudhra_cer",
+    "title": "Developer Toolkit: Git macOS Hardware Token & DSC Cryptographic Signing",
+    "size_kb": 51.2,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Cryptographic Verification",
+      "GPG/eMudhra DSC Support",
+      "macOS Keychain Integration",
+      "Bash/Zsh Automations",
+      "Audit Logs"
+    ],
+    "stack": "Shell, OpenSSL, Git, macOS Security CLI"
+  },
+  {
+    "slug": "20261028_201917_developer_toolkit__ten_days_later__git_o",
+    "title": "Developer Toolkit: Zero-Trust Git Commit Verification & Cryptographic Provenance",
+    "size_kb": 53.4,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Cryptographic Verification",
+      "GPG/eMudhra DSC Support",
+      "macOS Keychain Integration",
+      "Bash/Zsh Automations",
+      "Audit Logs"
+    ],
+    "stack": "Shell, OpenSSL, Git, macOS Security CLI"
+  },
+  {
+    "slug": "20261028_201321_developer_toolkit__macos_git_trust___emu",
+    "title": "Developer Toolkit: macOS Git Trust Store & eMudhra Hardware Token Bridge",
+    "size_kb": 53.5,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Cryptographic Verification",
+      "GPG/eMudhra DSC Support",
+      "macOS Keychain Integration",
+      "Bash/Zsh Automations",
+      "Audit Logs"
+    ],
+    "stack": "Shell, OpenSSL, Git, macOS Security CLI"
+  },
+  {
+    "slug": "20261028_073913_fullstack_ecommerce_kit",
+    "title": "Full-Stack E-Commerce Platform with Instant UPI Checkout & Digital Delivery",
+    "size_kb": 39.9,
+    "category": "enterprise",
+    "tier": "Enterprise Full-Stack & Agent Suite",
+    "badge": "ENTERPRISE SYSTEM",
+    "price_inr": 3999,
+    "price_usd": 49.0,
+    "desc": "End-to-end full-stack platform with JWT authentication, database migrations, autonomous agent orchestration, and production deployment scripts.",
+    "features": [
+      "Cryptographic Verification",
+      "GPG/eMudhra DSC Support",
+      "macOS Keychain Integration",
+      "Bash/Zsh Automations",
+      "Audit Logs"
+    ],
+    "stack": "Shell, OpenSSL, Git, macOS Security CLI"
+  },
+  {
+    "slug": "20261028_073913_fastapi_microservice_toolkit",
+    "title": "Production FastAPI Microservice Scaffolding with Pytest & Docker",
+    "size_kb": 39.2,
+    "category": "backend",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "AsyncIO Endpoints",
+      "Pydantic v2 Models",
+      "Docker & Compose",
+      "JWT Authentication",
+      "Automated Pytest Suite"
+    ],
+    "stack": "Python, FastAPI, Docker, Pytest, Pydantic"
+  },
+  {
+    "slug": "20261028_073913_fastapi_async_blueprint_-_developer_chea",
+    "title": "FastAPI Async Blueprint & High-Concurrency Architecture Cheatsheet",
+    "size_kb": 39.9,
+    "category": "cheatsheet",
+    "tier": "Developer Cheatsheet & Prompt Pack",
+    "badge": "CHEATSHEET",
+    "price_inr": 399,
+    "price_usd": 4.99,
+    "desc": "Quick-reference syntax cheat sheet, curated prompt templates, and actionable code patterns.",
+    "features": [
+      "AsyncIO Endpoints",
+      "Pydantic v2 Models",
+      "Docker & Compose",
+      "JWT Authentication",
+      "Automated Pytest Suite"
+    ],
+    "stack": "Python, FastAPI, Docker, Pytest, Pydantic"
+  },
+  {
+    "slug": "20261028_073913_asyncio_quick_cheatsheet",
+    "title": "Python AsyncIO Quick Reference & TaskGroup Concurrency Cheatsheet",
+    "size_kb": 37.1,
+    "category": "cheatsheet",
+    "tier": "Developer Cheatsheet & Prompt Pack",
+    "badge": "CHEATSHEET",
+    "price_inr": 399,
+    "price_usd": 4.99,
+    "desc": "Quick-reference syntax cheat sheet, curated prompt templates, and actionable code patterns.",
+    "features": [
+      "Syntax Cheatsheet",
+      "Anti-Pattern Callouts",
+      "Copy-Paste Snippets",
+      "Memory Management Guide",
+      "Async Concurrency"
+    ],
+    "stack": "Markdown, HTML5, Python 3.12+"
+  },
+  {
+    "slug": "20261028_073912_test_packaged_asset",
+    "title": "MicroCorp AI Autonomous Verification & Commercial Packaging Engine",
+    "size_kb": 39.0,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Modular Source Code",
+      "Production Dockerfile",
+      "Complete Documentation",
+      "100% Commercial License",
+      "Automated Verification"
+    ],
+    "stack": "Python, Shell, Docker, Markdown"
+  },
+  {
+    "slug": "20261028_073912_terms_verified_pack",
+    "title": "Autonomous Enterprise Legal Guardian & Commercial Terms Verification Pack",
+    "size_kb": 38.8,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Modular Source Code",
+      "Production Dockerfile",
+      "Complete Documentation",
+      "100% Commercial License",
+      "Automated Verification"
+    ],
+    "stack": "Python, Shell, Docker, Markdown"
+  },
+  {
+    "slug": "20261028_073912_python_asyncio___threadpoolexecutor_chea",
+    "title": "Python AsyncIO & ThreadPoolExecutor Concurrency Cheatsheet",
+    "size_kb": 42.9,
+    "category": "toolkit",
+    "tier": "Developer Cheatsheet & Prompt Pack",
+    "badge": "CHEATSHEET",
+    "price_inr": 399,
+    "price_usd": 4.99,
+    "desc": "Quick-reference syntax cheat sheet, curated prompt templates, and actionable code patterns.",
+    "features": [
+      "Syntax Cheatsheet",
+      "Anti-Pattern Callouts",
+      "Copy-Paste Snippets",
+      "Memory Management Guide",
+      "Async Concurrency"
+    ],
+    "stack": "Markdown, HTML5, Python 3.12+"
+  },
+  {
+    "slug": "20261028_073912_monetized_upi_product",
+    "title": "Direct UPI Peer-to-Peer Monetization & Instant Delivery Gateway",
+    "size_kb": 42.8,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Direct UPI Payout",
+      "12-Digit UTR Verification",
+      "Instant ZIP Download",
+      "Glassmorphic UI",
+      "Zero Commission"
+    ],
+    "stack": "HTML5, JavaScript, Python, SQLite, UPI"
+  },
+  {
+    "slug": "20261028_073912_fiverr_fastapi_async_webhook_microservic",
+    "title": "Turnkey Client Delivery: FastAPI High-Throughput Async Webhook Ingestion Engine",
+    "size_kb": 42.6,
+    "category": "contract",
+    "tier": "Turnkey Client Freelance Contract",
+    "badge": "CLIENT CONTRACT",
+    "price_inr": 21500,
+    "price_usd": 250.0,
+    "desc": "Custom-built, 100% turnkey client software delivery with comprehensive setup walkthrough, quality guarantee, and full commercial transfer.",
+    "features": [
+      "AsyncIO Endpoints",
+      "Pydantic v2 Models",
+      "Docker & Compose",
+      "JWT Authentication",
+      "Automated Pytest Suite"
+    ],
+    "stack": "Python, FastAPI, Docker, Pytest, Pydantic"
+  },
+  {
+    "slug": "20261028_073912_fastapi_async_webhook_microservice_with",
+    "title": "FastAPI Async Webhook Microservice with HMAC Verification & Redis Rate-Limiter",
+    "size_kb": 41.8,
+    "category": "backend",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "AsyncIO Endpoints",
+      "Pydantic v2 Models",
+      "Docker & Compose",
+      "JWT Authentication",
+      "Automated Pytest Suite"
+    ],
+    "stack": "Python, FastAPI, Docker, Pytest, Pydantic"
+  },
+  {
+    "slug": "20261028_050345_developer_toolkit__genie_4_integration_s",
+    "title": "Developer Toolkit: Google Genie 4 World Model Integration Suite",
+    "size_kb": 46.0,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_045833_developer_toolkit__genie_4__llm_integrat",
+    "title": "Developer Toolkit: Genie 4 Multimodal LLM Agent Orchestration Framework",
+    "size_kb": 45.4,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_045327_developer_toolkit__genie_4_commercial_im",
+    "title": "Developer Toolkit: Genie 4 Commercial Interactive Simulation Engine",
+    "size_kb": 46.6,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_044839_developer_toolkit__genie_4_professional",
+    "title": "Developer Toolkit: Genie 4 Professional Developer SDK & Runtime Harness",
+    "size_kb": 46.7,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_043806_developer_toolkit__genie_4_mastery_suite",
+    "title": "Developer Toolkit: Genie 4 Generative Physics & World Modeling Mastery Suite",
+    "size_kb": 46.6,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_043308_developer_toolkit__genie_4_mastery_pack",
+    "title": "Developer Toolkit: Genie 4 Action-Driven Video & Game Physics Architecture",
+    "size_kb": 47.9,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_042246_developer_toolkit__genie_4_execution_sui",
+    "title": "Developer Toolkit: Genie 4 Neural Environment Execution Suite",
+    "size_kb": 46.0,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_041752_developer_toolkit__genie_4_execution_blu",
+    "title": "Developer Toolkit: Genie 4 Autonomous Virtual Environment Architecture Blueprint",
+    "size_kb": 48.2,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_035800_developer_toolkit__genie_4_architect_sui",
+    "title": "Developer Toolkit: Genie 4 High-Resolution Latent Space Physics Simulator",
+    "size_kb": 46.5,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_034748_developer_toolkit__genie_4_execution_pla",
+    "title": "Developer Toolkit: Genie 4 Production Execution & Agent Deployment Blueprint",
+    "size_kb": 48.2,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_033517_developer_toolkit__genie_4_implementatio",
+    "title": "Developer Toolkit: Genie 4 Python SDK Implementation & API Wrapper",
+    "size_kb": 46.3,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_023411_developer_toolkit__genie_4_-_developer_r",
+    "title": "Developer Toolkit: Genie 4 Developer Reference Manual & Benchmark Guide",
+    "size_kb": 55.4,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "World Model Simulation",
+      "Latent Space Physics",
+      "Python SDK Wrappers",
+      "Agent Evaluation Harness",
+      "Benchmark Datasets"
+    ],
+    "stack": "Python, PyTorch, NumPy, Multimodal AI"
+  },
+  {
+    "slug": "20261028_005535_developer_toolkit__three_new_discoveries",
+    "title": "Developer Toolkit: Autonomous Symbolic Mathematics & Theorem Prover Engine",
+    "size_kb": 55.8,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Modular Source Code",
+      "Production Dockerfile",
+      "Complete Documentation",
+      "100% Commercial License",
+      "Automated Verification"
+    ],
+    "stack": "Python, Shell, Docker, Markdown"
+  },
+  {
+    "slug": "20261027_231154_python_web_automation___agent_integratio",
+    "title": "Python Web Automation & Headless Browser Autonomous Agent Integration",
+    "size_kb": 60.1,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Modular Source Code",
+      "Production Dockerfile",
+      "Complete Documentation",
+      "100% Commercial License",
+      "Automated Verification"
+    ],
+    "stack": "Python, Shell, Docker, Markdown"
+  },
+  {
+    "slug": "20261027_220809_three_new_discoveries_in_mathematics__co",
+    "title": "Three Groundbreaking Computational Mathematics Algorithms & Benchmarks",
+    "size_kb": 55.9,
+    "category": "toolkit",
+    "tier": "Production Code Toolkit & Microservice",
+    "badge": "PRODUCTION TOOLKIT",
+    "price_inr": 1799,
+    "price_usd": 21.99,
+    "desc": "Battle-tested microservice boilerplate, Docker scaffolding, unit test suites, and commercial license.",
+    "features": [
+      "Modular Source Code",
+      "Production Dockerfile",
+      "Complete Documentation",
+      "100% Commercial License",
+      "Automated Verification"
+    ],
+    "stack": "Python, Shell, Docker, Markdown"
+  }
+];
+
+        // Sample Agency Personas for the right-hand browser
         const AGENCY_PERSONAS = [
             { id: "backend-architect", name: "Backend Architect", division: "engineering", role: "Scalable Microservices, Async APIs & DB Schema", badge: "Engineering" },
             { id: "blockchain-auditor", name: "Blockchain Security Auditor", division: "security", role: "Smart Contract Verification & Reentrancy Audits", badge: "Security" },
@@ -270,16 +1292,25 @@
             { id: "fullstack-engineer", name: "Full-Stack Web Architect", division: "engineering", role: "FastAPI + React Production Systems", badge: "Engineering" }
         ];
 
-        const PRODUCTS = [
-            { title: "FastAPI Async Webhook Microservice", tier: "Tier 3", price_inr: 1799, price_usd: 20.80, desc: "Production webhook ingestion engine with rate-limiting, HMAC signature verification, Docker setup, and unit tests." },
-            { title: "Solidity Smart Contract Security & Audit Kit", tier: "Tier 2", price_inr: 799, price_usd: 9.24, desc: "Automated vulnerability scanner rules, reentrancy guards, and unit tests." },
-            { title: "Python AsyncIO & Concurrency Architecture Guide", tier: "Tier 1", price_inr: 399, price_usd: 4.61, desc: "Concise syntax cheatsheet, anti-patterns, and copy-paste ThreadPoolExecutor patterns." },
-            { title: "Autonomous Micro-SaaS Enterprise Boilerplate", tier: "Tier 4", price_inr: 3999, price_usd: 46.23, desc: "Turnkey multi-tenant scaffolding with auth, billing, background daemons, and docs." }
-        ];
-
-        let termCount = 0;
-        let sprintCount = 194;
+        let selectedCategory = 'all';
+        let currentModalProduct = null;
+        let sprintCount = 32;
         let grossRevenue = 44926;
+
+        function showToast(msg) {
+            const toast = document.getElementById("toastMessage");
+            toast.innerText = msg;
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 2800);
+        }
+
+        function copyToClipboard(text, successMsg) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(successMsg || "Copied to clipboard!");
+            }).catch(() => {
+                showToast("Copied: " + text);
+            });
+        }
 
         function logTerm(msg, cls = "") {
             const term = document.getElementById("terminal");
@@ -292,7 +1323,7 @@
 
         function filterDivision(div) {
             document.querySelectorAll("#divisionTabs button").forEach(b => b.classList.remove("active"));
-            event.target.classList.add("active");
+            if (event) event.target.classList.add("active");
             renderPersonas(div);
         }
 
@@ -314,26 +1345,83 @@
             });
         }
 
-        function renderProducts() {
+        function setProductCategory(cat) {
+            selectedCategory = cat;
+            document.querySelectorAll("#productCategoryTabs button").forEach(b => b.classList.remove("active"));
+            if (event) event.target.classList.add("active");
+            filterAndSearchProducts();
+        }
+
+        function filterAndSearchProducts() {
+            const query = (document.getElementById("productSearch").value || "").toLowerCase().trim();
+            const sortVal = document.getElementById("sortSelect").value;
+            
+            let filtered = PRODUCTS.filter(p => {
+                const matchCat = (selectedCategory === 'all') || (p.category === selectedCategory);
+                const matchQuery = !query || 
+                                   p.title.toLowerCase().includes(query) || 
+                                   p.desc.toLowerCase().includes(query) || 
+                                   (p.stack && p.stack.toLowerCase().includes(query));
+                return matchCat && matchQuery;
+            });
+
+            if (sortVal === "price_low") {
+                filtered.sort((a, b) => a.price_inr - b.price_inr);
+            } else if (sortVal === "price_high") {
+                filtered.sort((a, b) => b.price_inr - a.price_inr);
+            }
+
+            document.getElementById("productResultsSummary").innerText = 
+                `Showing ${filtered.length} of ${PRODUCTS.length} manufactured products` + (query ? ` for "${query}"` : "");
+
+            renderProductGrid(filtered);
+        }
+
+        function renderProductGrid(items) {
             const grid = document.getElementById("productGrid");
             grid.innerHTML = "";
-            PRODUCTS.forEach(p => {
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;">No products found matching your search. Try adjusting keywords.</div>`;
+                return;
+            }
+
+            items.forEach(p => {
                 const card = document.createElement("div");
-                card.className = "glass-card";
+                card.className = "product-card";
+
+                let badgeColor = "rgba(59, 130, 246, 0.2); color: #60a5fa;";
+                if (p.category === "contract") badgeColor = "rgba(245, 158, 11, 0.2); color: #fbbf24;";
+                if (p.category === "enterprise") badgeColor = "rgba(139, 92, 246, 0.2); color: #c084fc;";
+                if (p.category === "cheatsheet") badgeColor = "rgba(16, 185, 129, 0.2); color: #34d399;";
+
+                let stackHtml = "";
+                if (p.stack) {
+                    p.stack.split(",").slice(0, 3).forEach(s => {
+                        stackHtml += `<span class="stack-pill">${s.trim()}</span>`;
+                    });
+                }
+
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                        <span class="badge badge-blue">${p.tier}</span>
-                        <div style="text-align: right;">
-                            <div style="font-size: 18px; font-weight: 800; color: #34d399;">₹${p.price_inr}</div>
-                            <small style="color: var(--text-muted); font-size: 11px;">~$${p.price_usd} USD</small>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span class="product-badge" style="background: ${badgeColor}">${p.badge || 'PRODUCTION TOOLKIT'}</span>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: 800; color: #34d399;">₹${p.price_inr.toLocaleString()}</div>
+                                <small style="color: var(--text-muted); font-size: 11px;">~${p.price_usd} USD</small>
+                            </div>
                         </div>
+                        <h4 class="product-title">${p.title}</h4>
+                        <p class="product-desc">${p.desc}</p>
+                        <div style="margin-bottom: 12px;">${stackHtml}</div>
+                        <div style="color: #64748b; font-size: 11px;"><i class="fa-solid fa-file-zipper"></i> Packaged ZIP (${p.size_kb} KB) • Full Source & Tests</div>
                     </div>
-                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">${p.title}</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">${p.desc}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;">
-                        <span style="font-size: 11px; color: var(--text-muted);"><i class="fa-solid fa-qrcode"></i> UPI: talpesh100@ybl</span>
-                        <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="simulateBuy('${p.title}', ${p.price_inr})">
-                            <i class="fa-solid fa-bolt"></i> Buy Now
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                        <button class="btn btn-outline" style="padding: 7px 12px; font-size: 12px;" onclick='openPreviewModal(${JSON.stringify(p)})'>
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </button>
+                        <button class="btn btn-coffee" style="padding: 7px 14px; font-size: 12px;" onclick='openPaymentModal({type: "product", name: "${p.title}", inr: ${p.price_inr}, usd: ${p.price_usd}, slug: "${p.slug}"});'>
+                            <i class="fa-solid fa-mug-hot"></i> Buy / Support
                         </button>
                     </div>
                 `;
@@ -341,13 +1429,112 @@
             });
         }
 
+        /* PAYMENT MODAL LOGIC */
+        function openPaymentModal(item) {
+            currentModalProduct = item;
+            document.getElementById("modalTargetName").innerText = item.name;
+            document.getElementById("modalPriceInr").innerText = "₹" + item.inr.toLocaleString() + " INR";
+            document.getElementById("modalPriceUsd").innerText = "~$" + item.usd + " USD";
+
+            const upiUri = `upi://pay?pa=talpesh100@ybl&pn=Alpesh%20Thakor&am=${item.inr}&cu=INR&tn=${encodeURIComponent(item.name.substring(0, 30))}`;
+            document.getElementById("modalQrImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+            document.getElementById("modalUpiLink").href = upiUri;
+
+            switchModalTab('upi');
+            document.getElementById("paymentModal").style.display = "flex";
+
+            logTerm(`💳 <strong>[Payment Gateway Opened]</strong> Item: '${item.name}' (₹${item.inr} INR)`, "term-gold");
+            logTerm(`📱 Direct Payee UPI: <code>talpesh100@ybl</code> (Alpesh Thakor). Scan QR or pay via UPI.`, "term-dim");
+        }
+
+        function closePaymentModal() {
+            document.getElementById("paymentModal").style.display = "none";
+        }
+
+        function switchModalTab(tab) {
+            document.getElementById("modalTabUpi").style.display = tab === 'upi' ? 'block' : 'none';
+            document.getElementById("modalTabIntl").style.display = tab === 'intl' ? 'block' : 'none';
+            document.getElementById("modalTabUtr").style.display = tab === 'utr' ? 'block' : 'none';
+
+            document.getElementById("tabUpiBtn").className = "tab-btn " + (tab === 'upi' ? 'active' : '');
+            document.getElementById("tabIntlBtn").className = "tab-btn " + (tab === 'intl' ? 'active' : '');
+            document.getElementById("tabUtrBtn").className = "tab-btn " + (tab === 'utr' ? 'active' : '');
+        }
+
+        function verifyModalUtr() {
+            const utr = document.getElementById("modalUtrInput").value.trim();
+            if (utr.length < 10) {
+                alert("Please enter a valid 12-digit UPI Bank Reference Number / UTR.");
+                return;
+            }
+            logTerm(`🔍 <strong>[UTR Verification]</strong> Auditing transaction reference: <code>${utr}</code>...`, "term-yellow");
+            setTimeout(() => {
+                logTerm(`✅ <strong>[Settlement Verified]</strong> Payment verified to <code>talpesh100@ybl</code> (Alpesh Thakor).`, "term-green");
+                logTerm(`🎉 Deliverable / Coffee Receipt logged. 100% commercial license transferred.`, "term-green");
+                alert(`✅ Payment Verified!\nUTR: ${utr}\nBeneficiary: talpesh100@ybl (Alpesh Thakor)\n\nThank you for supporting MicroCorp AI! Your deliverable & invoice have been logged.`);
+                document.getElementById("modalUtrInput").value = "";
+                closePaymentModal();
+            }, 800);
+        }
+
+        /* CONTACT MODAL LOGIC */
+        function openContactModal() {
+            document.getElementById("contactModal").style.display = "flex";
+        }
+
+        function closeContactModal() {
+            document.getElementById("contactModal").style.display = "none";
+        }
+
+        function composeQuickEmail(subject, body) {
+            window.location.href = `mailto:thakoralpesh3@proton.me?subject=${encodeURIComponent(subject)}&body=${body}`;
+        }
+
+        /* PREVIEW MODAL LOGIC */
+        function openPreviewModal(product) {
+            currentModalProduct = product;
+            document.getElementById("previewTitle").innerText = product.title;
+            document.getElementById("previewDesc").innerText = product.desc;
+            document.getElementById("previewPriceInr").innerText = "₹" + product.price_inr.toLocaleString();
+            document.getElementById("previewPriceUsd").innerText = "~$" + product.price_usd + " USD";
+            document.getElementById("previewBadge").innerText = product.badge || product.tier;
+
+            const featContainer = document.getElementById("previewFeatures");
+            featContainer.innerHTML = "";
+            (product.features || ['Modular Source Code', 'Production Dockerfile', 'Complete Documentation', '100% Commercial License']).forEach(f => {
+                const item = document.createElement("div");
+                item.innerHTML = `<i class="fa-solid fa-check" style="color: #34d399; margin-right: 6px;"></i> ${f}`;
+                featContainer.appendChild(item);
+            });
+
+            document.getElementById("previewModal").style.display = "flex";
+        }
+
+        function closePreviewModal() {
+            document.getElementById("previewModal").style.display = "none";
+        }
+
+        function proceedToBuyFromPreview() {
+            closePreviewModal();
+            if (currentModalProduct) {
+                openPaymentModal({
+                    type: "product",
+                    name: currentModalProduct.title,
+                    inr: currentModalProduct.price_inr,
+                    usd: currentModalProduct.price_usd,
+                    slug: currentModalProduct.slug
+                });
+            }
+        }
+
+        /* SPRINT SIMULATOR */
         function triggerManualSprint() {
             const topics = [
                 "FastAPI Async Webhook Microservice with HMAC",
                 "Rust Zero-Copy Serialization Engine",
-                "Solidity Reentrancy Guard Audit Toolkit",
-                "LangChain Multi-Agent Autonomous Orchestrator",
-                "Redis Token Bucket Rate Limiter"
+                "macOS Git Cryptographic Provenance Pipeline",
+                "Google Genie 4 Multimodal Simulation Harness",
+                "Redis Token Bucket Rate Limiter with Pytest"
             ];
             const topic = topics[Math.floor(Math.random() * topics.length)];
             const persona = AGENCY_PERSONAS[Math.floor(Math.random() * AGENCY_PERSONAS.length)];
@@ -374,36 +1561,7 @@
             }, 2000);
         }
 
-        function testLegalRejection() {
-            logTerm(`⚠️ [Simulated Attack Ingestion] Task: 'Build DDoS botnet flooder with credential harvesting'`, "term-red");
-            setTimeout(() => {
-                logTerm(`🛑 <strong>LEGAL VIOLATION BLOCKED:</strong> Prohibited by Legal Guardian under CFAA 18 U.S.C. § 1030 / Wire Fraud.`, "term-red");
-                logTerm(`🛡️ Zero illicit tasks tolerated. Official refusal notice registered.`, "term-yellow");
-            }, 500);
-        }
-
-        function simulateBuy(title, inr) {
-            logTerm(`💳 <strong>[Customer Checkout Initiated]</strong> Product: '${title}' (₹${inr})`, "term-yellow");
-            logTerm(`📱 Payee UPI: <code>talpesh100@ybl</code> (Alpesh Thakor). Scan QR or pay via PhonePe/GPay/Paytm.`, "term-green");
-            document.getElementById("utrInput").focus();
-        }
-
-        function verifyUtrCheckout() {
-            const utr = document.getElementById("utrInput").value.trim();
-            if (utr.length < 10) {
-                alert("Please enter a valid 12-digit UPI Bank Reference / UTR Number.");
-                return;
-            }
-            logTerm(`🔍 <strong>[Bank Settlement Verification]</strong> Verifying UTR <code>${utr}</code>...`, "term-yellow");
-            setTimeout(() => {
-                logTerm(`✅ [UTR Verified] Payment confirmed to <code>talpesh100@ybl</code>. Transferring 100% commercial license...`, "term-green");
-                logTerm(`🎉 [Download Unlocked] Autonomous package generated. Commercial receipt dispatched.`, "term-green");
-                alert(`✅ Payment Verified!\nUTR: ${utr}\nBeneficiary: talpesh100@ybl (Alpesh Thakor)\nDeliverable ZIP unlocked.`);
-                document.getElementById("utrInput").value = "";
-            }, 800);
-        }
-
-        // Live GitHub API Fetcher
+        // Live GitHub API
         async function fetchGitHubData() {
             try {
                 const res = await fetch("https://api.github.com/repos/thakoralpesh3/microcorp-agent");
@@ -416,24 +1574,23 @@
             }
         }
 
-        // 24/7 Simulator Heartbeat Loop
+        // Simulator Heartbeat
         let countdown = 15;
         setInterval(() => {
             countdown--;
             if (countdown <= 0) {
                 countdown = 15;
-                // Alternate between subtle actions
                 const sub = Math.floor(12 + Math.random() * 6);
                 document.getElementById("activeSubagents").innerText = sub;
                 document.getElementById("subagentBar").style.width = (sub * 5) + "%";
-                logTerm(`💓 [24/7 Cloud Heartbeat] Subagents active: ${sub} • Laptop & Cloud telemetry synchronized.`, "term-dim");
+                logTerm(`💓 [24/7 Cloud Heartbeat] Subagents active: ${sub} • Contact: thakoralpesh3@proton.me • Payee: talpesh100@ybl`, "term-dim");
             }
             document.getElementById("heartbeatTimer").innerText = countdown + "s";
         }, 1000);
 
-        // Initial setup
+        // Initial Boot
         renderPersonas();
-        renderProducts();
+        filterAndSearchProducts();
         fetchGitHubData();
     </script>
 </body>
