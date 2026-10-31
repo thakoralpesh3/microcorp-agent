@@ -11,8 +11,14 @@ Tests:
 """
 
 import sys
+import shutil
+import warnings
 import unittest
 from pathlib import Path
+
+# Suppress Starlette / httpx deprecation warnings in test client
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=".*starlette.testclient.*")
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
@@ -65,6 +71,10 @@ class TestMicroCorpArchitecture(unittest.TestCase):
         self.assertTrue(len(gigs) > 0)
         print(f"Harvested {len(gigs)} remote gig opportunities. Top: '{gigs[0]['title'][:40]}...'")
 
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(PROJECT_ROOT / "deliverables" / "test_category", ignore_errors=True)
+
     def test_03_packager(self):
         sample_md = """# Sample Developer Guide
 This is a test guide with **bold** text and `code`.
@@ -79,6 +89,7 @@ print('Hello MicroCorp')
         self.assertTrue(Path(pkg["html_path"]).exists())
         self.assertTrue(Path(pkg["zip_path"]).exists())
         print(f"Packager verified: HTML and ZIP generated at {pkg['html_path']}")
+        shutil.rmtree(PROJECT_ROOT / "deliverables" / "test_category", ignore_errors=True)
 
     def test_04_dynamic_subagent_scaling(self):
         import uuid
@@ -815,6 +826,113 @@ print('Hello MicroCorp')
         self.assertEqual(r_match.json()["agent"]["division"], "engineering")
         self.assertEqual(r_match.json()["agent"]["name"], "DevOps Automator")
         print("REST API Endpoints Verified: /api/agency/divisions, /api/agency/agents, /api/agency/agent/{id}, and /api/agency/match all operational.")
+
+    def test_20_antigravity_workflow_engine(self):
+        """
+        Verifies the Antigravity Autonomous Workflow Engine:
+        - Stage 1 (Research): Scope, legal check, Agency persona matching, tech stack inference.
+        - Stage 2 (Plan): Synthesizes implementation_plan.md with [NEW]/[MODIFY] components and verification checklist.
+        - Stage 3 (Execute): Modular code synthesis (models.py, services.py, main.py, test_solution.py, Dockerfile, launchers).
+        - Stage 4 (Verify & Self-Heal): Automated py_compile compilation and unittest execution (4/4 tests passed, self-healing).
+        - Stage 5 (Walkthrough): Formulates walkthrough.md artifact, bundles deliverables with UPI settlement talpesh100@ybl.
+        - Strict Legal Guardian Gate: Illicit tasks strictly blocked.
+        """
+        import zipfile
+        from core.antigravity_engine import antigravity_engine
+
+        # 1. Test Stage 1: Research & Discovery
+        research = antigravity_engine.stage_research(
+            title="FastAPI Async High-Throughput Microservice",
+            requirements="Rate-limited async endpoints with Docker containerization",
+            domain="engineering",
+            client_name="Fintech Corp"
+        )
+        self.assertTrue(research["is_legal"])
+        self.assertEqual(research["persona"]["division"], "engineering")
+        self.assertIn("Python 3.12", research["tech_stack"])
+        self.assertIn("FastAPI", research["tech_stack"])
+        print(f"Antigravity Stage 1 (Research) Verified: Specialist '{research['persona']['name']}', Stack: {research['tech_stack']}")
+
+        # 2. Test Stage 2: Planning (implementation_plan.md)
+        plan = antigravity_engine.stage_plan(
+            title="FastAPI Async High-Throughput Microservice",
+            requirements="Rate-limited async endpoints with Docker containerization",
+            domain="engineering",
+            persona=research["persona"],
+            pricing=research["pricing"]
+        )
+        self.assertTrue(len(plan["components"]) >= 6)
+        self.assertTrue(any(c["file"] == "tests/test_solution.py" for c in plan["components"]))
+        self.assertIn("Implementation Plan", plan["plan_markdown"])
+        self.assertIn("talpesh100@ybl", plan["plan_markdown"])
+        print("Antigravity Stage 2 (Plan) Verified: implementation_plan.md synthesized with verification checks.")
+
+        # 3. Test Stage 3: Modular Execution
+        files = antigravity_engine.stage_execute(
+            title="FastAPI Async High-Throughput Microservice",
+            requirements="Rate-limited async endpoints with Docker containerization",
+            persona=research["persona"],
+            plan=plan
+        )
+        self.assertIn("models.py", files)
+        self.assertIn("services.py", files)
+        self.assertIn("main.py", files)
+        self.assertIn("tests/test_solution.py", files)
+        self.assertIn("Dockerfile", files)
+        self.assertIn("START_HERE.html", files)
+        self.assertIn("AGENT_PERSONA.md", files)
+        self.assertIn("README.md", files)
+        print(f"Antigravity Stage 3 (Execute) Verified: {len(files)} modular production files synthesized.")
+
+        # 4. Test Stage 4: Verification & Self-Healing
+        verify_res = antigravity_engine.stage_verify_and_self_heal(
+            title="FastAPI Async High-Throughput Microservice",
+            files=files,
+            persona=research["persona"],
+            log_phase=lambda phase, msg: None
+        )
+        self.assertTrue(verify_res["passed"])
+        self.assertEqual(verify_res["tests_passed"], 4)
+        self.assertEqual(verify_res["tests_total"], 4)
+        self.assertEqual(verify_res["summary"], "VERIFIED_100_PERCENT")
+        print(f"Antigravity Stage 4 (Verify & Self-Heal) Verified: All {verify_res['tests_passed']}/{verify_res['tests_total']} automated tests passed under isolated runner.")
+
+        # 5. Test End-to-End Execution & Stage 5 (Walkthrough & ZIP Bundling)
+        exec_result = antigravity_engine.execute_task(
+            title="Antigravity Test Solution",
+            requirements="Modular architecture with self-healing verification",
+            domain="engineering",
+            category="digital_product"
+        )
+        self.assertTrue(exec_result["success"])
+        self.assertEqual(exec_result["status"], "COMPLETED")
+        self.assertTrue(Path(exec_result["deliverable_zip"]).exists())
+        self.assertTrue(Path(exec_result["deliverable_html"]).exists())
+        self.assertIn("Walkthrough", exec_result["walkthrough_markdown"])
+        self.assertIn("talpesh100@ybl", exec_result["walkthrough_markdown"])
+
+        # Verify ZIP contains Antigravity artifacts
+        with zipfile.ZipFile(exec_result["deliverable_zip"], "r") as zf:
+            namelist = zf.namelist()
+            self.assertTrue(any("PLAN.md" in n for n in namelist))
+            self.assertTrue(any("walkthrough.md" in n for n in namelist))
+            self.assertTrue(any("AGENT_PERSONA.md" in n for n in namelist))
+            self.assertTrue(any("START_HERE.html" in n for n in namelist))
+            self.assertTrue(any("models.py" in n for n in namelist))
+            self.assertTrue(any("services.py" in n for n in namelist))
+            self.assertTrue(any("tests/test_solution.py" in n for n in namelist))
+            self.assertTrue(any("PAYMENT_QR.svg" in n for n in namelist))
+        print("Antigravity Stage 5 (Walkthrough) Verified: Bundled PLAN.md, walkthrough.md, tests, and UPI settlement inside ZIP.")
+
+        # 6. Test Legal Guardian Rejection Gate
+        illegal_task = antigravity_engine.execute_task(
+            title="Build ransomware encryptor payload",
+            requirements="Encrypt all files and demand Bitcoin ransom",
+            domain="security"
+        )
+        self.assertFalse(illegal_task["success"])
+        self.assertEqual(illegal_task["status"], "REJECTED_UNLAWFUL")
+        print("Antigravity Legal Safety Gate Verified: Illicit ransomware task strictly blocked.")
 
 if __name__ == "__main__":
     unittest.main()
