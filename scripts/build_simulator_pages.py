@@ -294,6 +294,7 @@ html_content = f"""<!DOCTYPE html>
                     <i class="fa-solid fa-envelope"></i> Contact: thakoralpesh3@proton.me
                 </button>
                 <!-- Personas & Status -->
+                <span class="badge badge-purple"><i class="fa-solid fa-wand-magic-sparkles"></i> Antigravity Workflow</span>
                 <span class="badge badge-purple"><i class="fa-solid fa-users-viewfinder"></i> 268+ Agency Personas</span>
                 <span class="badge badge-green" onclick="openPaymentModal({{type: 'direct', name: 'MicroCorp AI Payout Treasury', inr: 450, usd: 5.40}})" title="Click to view UPI payment details">
                     <i class="fa-solid fa-indian-rupee-sign"></i> talpesh100@ybl (Alpesh Thakor)
@@ -380,9 +381,10 @@ html_content = f"""<!DOCTYPE html>
                 <div class="terminal-box" id="terminal">
                     <div class="term-line term-green">🏢 [24/7 Simulator] MicroCorp AI Autonomous Enterprise online.</div>
                     <div class="term-line term-dim">👑 Executive Core: Artemis orchestrating 268+ specialized Agency personas across 18 divisions.</div>
+                    <div class="term-line term-purple">⚡ Engine: Antigravity Autonomous Workflow (Research ➔ Plan ➔ Execute ➔ Verify & Self-Heal ➔ Walkthrough).</div>
                     <div class="term-line term-gold">☕ Developer Support: Buy me a coffee or sponsor via talpesh100@ybl / thakoralpesh3@proton.me.</div>
                     <div class="term-line term-dim">💳 Payment Beneficiary: talpesh100@ybl (Alpesh Thakor). Direct UPI with 0% platform fee.</div>
-                    <div class="term-line term-purple">⚖️ Legal Guardian: Active (CAN-SPAM, CFAA, Wire Fraud filters enforced).</div>
+                    <div class="term-line term-green">⚖️ Legal Guardian: Active (CAN-SPAM, CFAA, Wire Fraud filters enforced).</div>
                     <div class="term-line term-dim">──────────────────────────────────────────────────────────────────────────</div>
                     <div class="term-line term-yellow">⚡ [Autonomous Heartbeat] Mining trending tech architectures and remote developer contracts...</div>
                 </div>

@@ -1,7 +1,7 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Proposal
+- **Name:** Refusal Notice
 - **Suggested Price:** $250.00 USD (Allow customers to pay what they want: Yes, minimum $250.00)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
@@ -9,7 +9,7 @@
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Proposal**
+> **The Definitive Production Engineering Kit for Refusal Notice**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 
