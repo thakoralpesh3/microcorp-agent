@@ -32,6 +32,8 @@ data/*.svg
 !deliverables/**/*.md
 !deliverables/**/*.html
 !deliverables/**/.gitkeep
+deliverables/test_category/
+deliverables/test_category/**
 
 
 # IDE and OS files
