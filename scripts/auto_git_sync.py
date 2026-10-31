@@ -68,6 +68,8 @@ def sync_now(custom_msg: str = None) -> bool:
             if pcode == 0:
                 print(f"[{time.strftime('%X')}] ✅ Rebase and push succeeded!")
                 return True
+        else:
+            run_git(["rebase", "--abort"])
         print(f"[{time.strftime('%X')}] ❌ Push failed: {out}")
         return False
 

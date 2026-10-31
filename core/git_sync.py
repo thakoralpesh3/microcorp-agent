@@ -159,6 +159,7 @@ class GitSyncEngine:
                 retry_push = self._run_git(["push", self.remote_name, branch], timeout=60)
                 pushed = (retry_push.returncode == 0)
             else:
+                self._run_git(["rebase", "--abort"])
                 return {
                     "success": False,
                     "committed": commit_created,

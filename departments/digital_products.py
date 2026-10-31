@@ -73,15 +73,25 @@ Make it thorough, elegant, and directly useful for engineers.
             agency_persona=agent_persona
         )
 
+        # Antigravity Autonomous Task Execution (synthesizes modular code, tests, self-healing, and walkthrough)
+        from core.antigravity_engine import antigravity_engine
+        antigravity_res = antigravity_engine.execute_task(
+            title=title,
+            requirements=product_type,
+            domain="engineering",
+            category="digital_product"
+        )
+
         persona_title = agent_persona.get('name') if agent_persona else 'Chief Product Architect'
         return {
             "title": title,
             "category": "digital_product",
             "deliverable_path": pkg["primary_path"],
-            "summary": f"Manufactured and packaged {product_type} on '{topic}' by {persona_title}. Size: {pkg['size_bytes']} bytes.",
+            "summary": f"Manufactured and packaged {product_type} on '{topic}' by {persona_title}. Size: {pkg['size_bytes']} bytes. Antigravity: {antigravity_res.get('status')}.",
             "prompt_tokens": prompt_tokens,
             "completion_tokens": candidate_tokens,
             "agency_persona": agent_persona.get("name") if agent_persona else None,
-            "agency_division": agent_persona.get("division") if agent_persona else None
+            "agency_division": agent_persona.get("division") if agent_persona else None,
+            "antigravity_verified": antigravity_res.get("success", False)
         }
 
