@@ -17,8 +17,7 @@ import unittest
 from pathlib import Path
 
 # Suppress Starlette / httpx deprecation warnings in test client
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-warnings.filterwarnings("ignore", message=".*starlette.testclient.*")
+warnings.simplefilter("ignore")
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
@@ -704,7 +703,9 @@ print('Hello MicroCorp')
         """
         import zipfile
         from unittest.mock import patch
-        from fastapi.testclient import TestClient
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            from fastapi.testclient import TestClient
         from app import app
         from core.agency_agents_manager import agency_agents_manager
         from tools.packager import packager
