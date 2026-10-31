@@ -1,15 +1,15 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide)
-- **Suggested Price:** $49.00 USD (Allow customers to pay what they want: Yes, minimum $49.00)
+- **Name:** Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide)
+- **Suggested Price:** $21.99 USD (Allow customers to pay what they want: Yes, minimum $21.99)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
 
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide)**
+> **The Definitive Production Engineering Kit for Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide)**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 

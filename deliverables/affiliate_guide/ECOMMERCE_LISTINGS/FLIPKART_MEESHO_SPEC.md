@@ -7,7 +7,7 @@
 ---
 
 ## 1. Product Listing Details
-- **Product Title:** [Printed Spiral Guide & Code Kit] Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide) Technical Manual
+- **Product Title:** [Printed Spiral Guide & Code Kit] Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide) Technical Manual
 - **Category:** Books > Computing, Internet & Digital Media > Computer Science & Programming
 - **Brand / Publisher:** MicroCorp AI Commercial Engineering Press
 - **Item Condition:** Brand New (Print-on-Demand)
@@ -18,12 +18,12 @@
 ---
 
 ## 2. Pricing & Margin Strategy
-- **MRP:** ₹5998.00 INR
-- **Selling Price:** ₹3999.00 INR
-- **Flipkart / Meesho Referral Fee:** ~12-15% (₹600 INR)
+- **MRP:** ₹2698.00 INR
+- **Selling Price:** ₹1799.00 INR
+- **Flipkart / Meesho Referral Fee:** ~12-15% (₹270 INR)
 - **Courier Shipping (National):** ~₹45 - ₹60 INR (Meesho offers free zero-commission shipping)
 - **Print Cost (Local Print Shop A5 Spiral 24-page):** ~₹35 - ₹45 INR
-- **Estimated Net Profit per Order:** ~₹2799 INR
+- **Estimated Net Profit per Order:** ~₹1259 INR
 
 ---
 
@@ -32,14 +32,14 @@
 - **Package Weight:** 120 grams
 - **Box Type:** Padded bubble mailer envelope
 - **Package Contents:** 
-  1. 1x High-Resolution Spiral-Bound Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide) Manual (A5 Format)
+  1. 1x High-Resolution Spiral-Bound Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide) Manual (A5 Format)
   2. 1x Instant Access Digital Code Card with QR Code and Verified License Key
   3. 1x Official Commercial Tax Invoice with UPI Payee `talpesh100@ybl`
 
 ---
 
 ## 4. 5 Key Product Highlights (Paste into Flipkart / Meesho bullet points):
-- PROFESSIONAL DEVELOPER HANDBOOK: In-depth architectural manual for Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide) with tested code blueprints.
+- PROFESSIONAL DEVELOPER HANDBOOK: In-depth architectural manual for Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide) with tested code blueprints.
 - SPIRAL-BOUND WORKBENCH EDITION: High-quality 80 GSM paper, wire-bound lays completely flat beside keyboard.
 - INSTANT DIGITAL CODE ACCESS: Embedded high-resolution QR card provides instant ZIP download of all source code files.
 - COMMERCIAL USE LICENSE: Transferable rights included for professional freelancers, agencies, and enterprise production.
@@ -48,7 +48,7 @@
 ---
 
 ## 5. Detailed Product Description:
-Looking to level up your engineering capabilities with Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide)? 
+Looking to level up your engineering capabilities with Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide)? 
 This official spiral-bound reference handbook gives you an uncluttered, distraction-free physical desk reference featuring battle-tested software patterns, copy-paste production code, and foolproof configuration recipes. 
 
 Simply scan the access card inside the front cover to immediately unlock the digital companion ZIP package containing the full source code repository, Docker environment, and automated test suite.

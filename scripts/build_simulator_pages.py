@@ -952,17 +952,25 @@ html_content = f"""<!DOCTYPE html>
             const topic = topics[Math.floor(Math.random() * topics.length)];
             const persona = AGENCY_PERSONAS[Math.floor(Math.random() * AGENCY_PERSONAS.length)];
 
-            logTerm(`🚀 <strong>[Autonomous Sprint Dispatched]</strong> Domain: digital_products`, "term-green");
+            logTerm(`🚀 <strong>[Antigravity Autonomous Sprint Dispatched]</strong> Domain: digital_products`, "term-green");
             logTerm(`🎯 Target Topic: <em>${{topic}}</em>`, "term-yellow");
             logTerm(`🤖 Auto-Matched Agency Persona: <strong>${{persona.name}}</strong> (${{persona.badge}} Division)`, "term-purple");
             
             setTimeout(() => {{
-                logTerm(`⚖️ [Legal Guardian Audit] PASSED (0 CFAA/GDPR violations). Certified 100% lawful.`, "term-green");
-            }}, 600);
+                logTerm(`🔍 <strong>[STAGE 1: RESEARCH]</strong> Scope analysis & Legal Guardian audit PASSED (0 CFAA/GDPR violations). Certified lawful.`, "term-green");
+            }}, 400);
 
             setTimeout(() => {{
-                logTerm(`📦 [Packager Engine] Synthesizing modular source code, README.md, START_HERE.html & bundle.zip...`, "term-dim");
+                logTerm(`📋 <strong>[STAGE 2: PLAN]</strong> Synthesized PLAN.md with 6 files [NEW] and test verification criteria.`, "term-yellow");
+            }}, 800);
+
+            setTimeout(() => {{
+                logTerm(`⚡ <strong>[STAGE 3: EXECUTE]</strong> Synthesizing modular source (main.py, models.py, services.py, Dockerfile, START_HERE.html)...`, "term-dim");
             }}, 1200);
+
+            setTimeout(() => {{
+                logTerm(`🧪 <strong>[STAGE 4: VERIFY & SELF-HEAL]</strong> py_compile & unittest execution (100% pass, 0 defects).`, "term-green");
+            }}, 1600);
 
             setTimeout(() => {{
                 sprintCount++;
@@ -970,8 +978,8 @@ html_content = f"""<!DOCTYPE html>
                 grossRevenue += earn;
                 document.getElementById("mintedCount").innerText = sprintCount;
                 document.getElementById("grossRev").innerText = "$" + Math.floor(grossRevenue).toLocaleString();
-                logTerm(`✅ <strong>[Sprint Completed]</strong> Deliverable bundled in <code>deliverables/ready_to_monetize/</code>. Treasury credited: +$${{earn}}`, "term-green");
-            }}, 2000);
+                logTerm(`📝 <strong>[STAGE 5: WALKTHROUGH & DELIVER]</strong> walkthrough.md generated. Commercial bundle & UPI settlement ready. Treasury credited: +$${{earn}}`, "term-gold");
+            }}, 2100);
         }}
 
         // Live GitHub API

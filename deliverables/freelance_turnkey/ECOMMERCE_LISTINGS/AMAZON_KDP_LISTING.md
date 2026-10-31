@@ -1,7 +1,7 @@
 # 📚 Amazon KDP (Kindle & Paperback) Publication Spec
 
 ## 1. Book Metadata
-- **Book Title:** Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup
+- **Book Title:** Fiverr_FastAPI Async Webhook Microservice with Docker & Docs
 - **Subtitle:** A Practical Production Engineering Handbook & Architectural Implementation Guide
 - **Author:** MicroCorp AI Editorial Bureau (Alpesh Thakor, Host Director)
 - **Language:** English
@@ -15,7 +15,7 @@
 2. `COM060000 COMPUTERS / Web Services & APIs / Distributed Systems`
 
 ### 7 Target Amazon Backend Keywords:
-- `fiverr_full-stack fastapi backend with jwt auth and docker setup tutorial`
+- `fiverr_fastapi async webhook microservice with docker & docs tutorial`
 - `software architecture guide`
 - `python developer cheatsheet`
 - `production backend microservice`
@@ -45,8 +45,8 @@
 
 ## 5. Amazon Product Description (Copy & Paste HTML directly into KDP):
 ```html
-<h3>Master Modern Software Architecture with Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup</h3>
-<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Fiverr_Full-Stack FastAPI Backend with JWT Auth and Docker Setup</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
+<h3>Master Modern Software Architecture with Fiverr_FastAPI Async Webhook Microservice with Docker & Docs</h3>
+<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Fiverr_FastAPI Async Webhook Microservice with Docker & Docs</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
 
 <h4>What You Will Learn & Build:</h4>
 <ul>

@@ -1,7 +1,7 @@
 # 📚 Amazon KDP (Kindle & Paperback) Publication Spec
 
 ## 1. Book Metadata
-- **Book Title:** FastAPI Async Webhook Microservice with Docker & Docs
+- **Book Title:** Antigravity Test Solution
 - **Subtitle:** A Practical Production Engineering Handbook & Architectural Implementation Guide
 - **Author:** MicroCorp AI Editorial Bureau (Alpesh Thakor, Host Director)
 - **Language:** English
@@ -15,7 +15,7 @@
 2. `COM060000 COMPUTERS / Web Services & APIs / Distributed Systems`
 
 ### 7 Target Amazon Backend Keywords:
-- `fastapi async webhook microservice with docker & docs tutorial`
+- `antigravity test solution tutorial`
 - `software architecture guide`
 - `python developer cheatsheet`
 - `production backend microservice`
@@ -26,10 +26,10 @@
 ---
 
 ## 3. Royalty & Pricing Strategy
-- **Digital Kindle Price (USD):** $250.00 USD (70% Royalty Tier = ~$175.00 per sale)
-- **Digital Kindle Price (INR):** ₹21500.00 INR
-- **Paperback MRP (INR):** ₹21650.00 INR
-- **Paperback MRP (USD):** $255.00 USD
+- **Digital Kindle Price (USD):** $21.99 USD (70% Royalty Tier = ~$15.39 per sale)
+- **Digital Kindle Price (INR):** ₹1799.00 INR
+- **Paperback MRP (INR):** ₹1949.00 INR
+- **Paperback MRP (USD):** $26.99 USD
 - **KDP Select Enrollment:** Recommended (Earn royalties per page read on Kindle Unlimited)
 
 ---
@@ -45,8 +45,8 @@
 
 ## 5. Amazon Product Description (Copy & Paste HTML directly into KDP):
 ```html
-<h3>Master Modern Software Architecture with FastAPI Async Webhook Microservice with Docker & Docs</h3>
-<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>FastAPI Async Webhook Microservice with Docker & Docs</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
+<h3>Master Modern Software Architecture with Antigravity Test Solution</h3>
+<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Antigravity Test Solution</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
 
 <h4>What You Will Learn & Build:</h4>
 <ul>

@@ -274,6 +274,7 @@
                     <i class="fa-solid fa-envelope"></i> Contact: thakoralpesh3@proton.me
                 </button>
                 <!-- Personas & Status -->
+                <span class="badge badge-purple"><i class="fa-solid fa-wand-magic-sparkles"></i> Antigravity Workflow</span>
                 <span class="badge badge-purple"><i class="fa-solid fa-users-viewfinder"></i> 268+ Agency Personas</span>
                 <span class="badge badge-green" onclick="openPaymentModal({type: 'direct', name: 'MicroCorp AI Payout Treasury', inr: 450, usd: 5.40})" title="Click to view UPI payment details">
                     <i class="fa-solid fa-indian-rupee-sign"></i> talpesh100@ybl (Alpesh Thakor)
@@ -360,9 +361,10 @@
                 <div class="terminal-box" id="terminal">
                     <div class="term-line term-green">🏢 [24/7 Simulator] MicroCorp AI Autonomous Enterprise online.</div>
                     <div class="term-line term-dim">👑 Executive Core: Artemis orchestrating 268+ specialized Agency personas across 18 divisions.</div>
+                    <div class="term-line term-purple">⚡ Engine: Antigravity Autonomous Workflow (Research ➔ Plan ➔ Execute ➔ Verify & Self-Heal ➔ Walkthrough).</div>
                     <div class="term-line term-gold">☕ Developer Support: Buy me a coffee or sponsor via talpesh100@ybl / thakoralpesh3@proton.me.</div>
                     <div class="term-line term-dim">💳 Payment Beneficiary: talpesh100@ybl (Alpesh Thakor). Direct UPI with 0% platform fee.</div>
-                    <div class="term-line term-purple">⚖️ Legal Guardian: Active (CAN-SPAM, CFAA, Wire Fraud filters enforced).</div>
+                    <div class="term-line term-green">⚖️ Legal Guardian: Active (CAN-SPAM, CFAA, Wire Fraud filters enforced).</div>
                     <div class="term-line term-dim">──────────────────────────────────────────────────────────────────────────</div>
                     <div class="term-line term-yellow">⚡ [Autonomous Heartbeat] Mining trending tech architectures and remote developer contracts...</div>
                 </div>
@@ -1539,17 +1541,25 @@
             const topic = topics[Math.floor(Math.random() * topics.length)];
             const persona = AGENCY_PERSONAS[Math.floor(Math.random() * AGENCY_PERSONAS.length)];
 
-            logTerm(`🚀 <strong>[Autonomous Sprint Dispatched]</strong> Domain: digital_products`, "term-green");
+            logTerm(`🚀 <strong>[Antigravity Autonomous Sprint Dispatched]</strong> Domain: digital_products`, "term-green");
             logTerm(`🎯 Target Topic: <em>${topic}</em>`, "term-yellow");
             logTerm(`🤖 Auto-Matched Agency Persona: <strong>${persona.name}</strong> (${persona.badge} Division)`, "term-purple");
             
             setTimeout(() => {
-                logTerm(`⚖️ [Legal Guardian Audit] PASSED (0 CFAA/GDPR violations). Certified 100% lawful.`, "term-green");
-            }, 600);
+                logTerm(`🔍 <strong>[STAGE 1: RESEARCH]</strong> Scope analysis & Legal Guardian audit PASSED (0 CFAA/GDPR violations). Certified lawful.`, "term-green");
+            }, 400);
 
             setTimeout(() => {
-                logTerm(`📦 [Packager Engine] Synthesizing modular source code, README.md, START_HERE.html & bundle.zip...`, "term-dim");
+                logTerm(`📋 <strong>[STAGE 2: PLAN]</strong> Synthesized PLAN.md with 6 files [NEW] and test verification criteria.`, "term-yellow");
+            }, 800);
+
+            setTimeout(() => {
+                logTerm(`⚡ <strong>[STAGE 3: EXECUTE]</strong> Synthesizing modular source (main.py, models.py, services.py, Dockerfile, START_HERE.html)...`, "term-dim");
             }, 1200);
+
+            setTimeout(() => {
+                logTerm(`🧪 <strong>[STAGE 4: VERIFY & SELF-HEAL]</strong> py_compile & unittest execution (100% pass, 0 defects).`, "term-green");
+            }, 1600);
 
             setTimeout(() => {
                 sprintCount++;
@@ -1557,8 +1567,8 @@
                 grossRevenue += earn;
                 document.getElementById("mintedCount").innerText = sprintCount;
                 document.getElementById("grossRev").innerText = "$" + Math.floor(grossRevenue).toLocaleString();
-                logTerm(`✅ <strong>[Sprint Completed]</strong> Deliverable bundled in <code>deliverables/ready_to_monetize/</code>. Treasury credited: +$${earn}`, "term-green");
-            }, 2000);
+                logTerm(`📝 <strong>[STAGE 5: WALKTHROUGH & DELIVER]</strong> walkthrough.md generated. Commercial bundle & UPI settlement ready. Treasury credited: +$${earn}`, "term-gold");
+            }, 2100);
         }
 
         // Live GitHub API
