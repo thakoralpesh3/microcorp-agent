@@ -107,7 +107,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f deliverables/ || true
+          rm -rf deliverables/test_category || true
+          git add deliverables/ || true
           git add data/*.db data/*.json || true
           if git diff --staged --quiet; then
             echo "No state changes to commit."
