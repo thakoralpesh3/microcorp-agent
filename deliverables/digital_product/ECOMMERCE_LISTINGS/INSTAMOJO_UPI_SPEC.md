@@ -1,7 +1,7 @@
 # 🇮🇳 Instamojo & Cosmofeed (Indian Creator Commerce) Spec
 
 ## 1. Product Configuration
-- **Title:** Developer Toolkit: GPT-5.6 Sol can beat Factorio on peaceful mode - Commercial Developer Toolkit
+- **Title:** Developer Toolkit: HackerTube - Commercial Developer Toolkit
 - **Price:** ₹399.00 INR (Fixed Price)
 - **Payment Modes:** UPI (PhonePe, Google Pay, Paytm, BHIM), NetBanking, Credit/Debit Cards
 - **Product Type:** Digital File Download (Instant ZIP delivery upon successful payment)
@@ -11,7 +11,7 @@
 
 ## 2. Product Description (Paste into Instamojo / Cosmofeed):
 ### 🚀 Instant Access Developer Toolkit
-Get immediate access to the complete source code, architectural patterns, and commercial license for **Developer Toolkit: GPT-5.6 Sol can beat Factorio on peaceful mode**. 
+Get immediate access to the complete source code, architectural patterns, and commercial license for **Developer Toolkit: HackerTube**. 
 
 **Key Benefits:**
 - Instant ZIP download unlocked immediately upon payment.
