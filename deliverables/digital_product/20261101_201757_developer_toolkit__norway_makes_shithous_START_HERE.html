@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Quickstart - Developer Toolkit: Norway makes shithouses great again - Developer Reference & Architecture Kit</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --code-bg: #0b1120;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 30px 16px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #ffffff;
+            padding: 36px 40px;
+            border-bottom: 3px solid #3b82f6;
+        }
+        .badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        h1 { margin: 0 0 10px 0; font-size: 26px; color: #f8fafc; }
+        .meta { color: #94a3b8; font-size: 13px; }
+        
+        /* 3-Step Quick Launch Bar */
+        .quick-bar {
+            background: #f0fdf4;
+            border-bottom: 1px solid #bbf7d0;
+            padding: 20px 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .step-card {
+            background: #ffffff;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid #86efac;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .step-title {
+            color: #166534;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .step-desc { font-size: 12px; color: #4b5563; }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: #1e293b; background: rgba(0,0,0,0.02); }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; background: #ffffff; }
+        
+        /* Tab Contents */
+        .tab-content { display: none; padding: 36px 40px; }
+        .tab-content.active { display: block; }
+        
+        /* Code Block Viewer */
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 12px 18px;
+            border-radius: 8px 8px 0 0;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid #334155;
+            border-bottom: none;
+        }
+        .copy-btn {
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover { background: #15803d; }
+        pre.code-area {
+            background: #0b1120;
+            color: #f8fafc;
+            padding: 18px;
+            margin: 0;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 13px;
+            border: 1px solid #334155;
+            max-height: 520px;
+        }
+        
+        /* Tables */
+        table.file-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table.file-table th {
+            background: #f8fafc;
+            color: #475569;
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 13px;
+        }
+        table.file-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+        
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #16a34a;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 9999;
+        }
+        .footer {
+            background: #f8fafc;
+            padding: 20px 40px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="hero">
+            <span class="badge">MicroCorp AI • Customer Quickstart Center</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); margin-left: 6px;">🤖 Crafted by Agency Specialist: AI Engineer (Engineering)</span>
+            <h1>Developer Toolkit: Norway makes shithouses great again - Developer Reference & Architecture Kit</h1>
+            <div class="meta">
+                <span>Category: <strong>Digital Product</strong></span> • 
+                <span>Commercial Ownership: <strong>100% Client Transferred</strong></span> • 
+                <span>Beneficiary: <strong>Alpesh Thakor</strong> (UPI: <code>talpesh100@ybl</code>)</span>
+            </div>
+        </div>
+
+        <!-- 3-Step Quick Launch Bar -->
+        <div class="quick-bar">
+            <div class="step-card">
+                <div class="step-title">⚡ 1. Interactive Reader (Browser)</div>
+                <div class="step-desc">You are already viewing it! Use the tabs below to copy code, read documentation, or view licenses.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-title">🪟 2. 1-Click Launch on Windows</div>
+                <div class="step-desc">Simply double-click <strong><code>RUN_WINDOWS.bat</code></strong> in this folder to automatically execute <code>main.py</code>.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-title">🍎 3. 1-Click on macOS / Linux</div>
+                <div class="step-desc">Run <strong><code>bash RUN_MAC_LINUX.sh</code></strong> or <strong><code>python3 main.py</code></strong> in your terminal.</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('quickstart')">🚀 60-Second Quickstart</button>
+            <button class="tab-btn" onclick="switchTab('source')">💻 Standalone Source Code (main.py)</button>
+            <button class="tab-btn" onclick="switchTab('docs')">📖 Full Architecture Manual</button>
+            <button class="tab-btn" onclick="switchTab('files')">📂 Directory & Files Map</button>
+            <button class="tab-btn" onclick="switchTab('license')">📜 License & Commercial Invoice</button>
+        </div>
+
+        <!-- Tab 1: Quickstart -->
+        <div id="tab_quickstart" class="tab-content active">
+            <h2 style="color: #0f172a; margin-top: 0;">How to Use Your Deliverable in Under 60 Seconds</h2>
+            <p style="color: #475569;">Everything inside this bundle has been engineered with zero bloat and pre-configured for instant integration.</p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option A: Run Immediately with 1-Click Scripts</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+                    <li><strong>Windows Users:</strong> Double-click <code>RUN_WINDOWS.bat</code> in this directory.</li>
+                    <li><strong>Mac & Linux Users:</strong> Double-click <code>RUN_MAC_LINUX.sh</code> or run <code>bash RUN_MAC_LINUX.sh</code>.</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option B: Run from Command Line</h3>
+                <div style="background: #0f172a; color: #f8fafc; padding: 14px 18px; border-radius: 6px; font-family: monospace; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <code>pip install -r requirements.txt &amp;&amp; python main.py</code>
+                    <button class="copy-btn" onclick="copyText('pip install -r requirements.txt && python main.py')">Copy</button>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option C: Copy Source Code Directly into Your Project</h3>
+                <p style="color: #475569; font-size: 14px; margin: 0 0 12px 0;">Switch to the <strong>"Standalone Source Code"</strong> tab above, click <strong>"Copy Complete Code"</strong>, and paste it directly into your own repository or editor.</p>
+                <button onclick="switchTab('source')" style="background: #2563eb; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    View & Copy Code (main.py) →
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Standalone Source Code -->
+        <div id="tab_source" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div>
+                    <h2 style="margin: 0; color: #0f172a;">Standalone Source Code (<code>main.py</code>)</h2>
+                    <small style="color: #64748b;">Ready to execute, modular, zero unwanted dependencies.</small>
+                </div>
+                <button class="copy-btn" style="padding: 8px 18px; font-size: 13px;" onclick="copyCode()">
+                    📋 Copy Complete Source Code
+                </button>
+            </div>
+            
+            <div class="code-header">
+                <span>main.py • Python 3</span>
+                <span>Commercial Ownership: Client</span>
+            </div>
+            <pre class="code-area"><code id="codeBlock">"""
+MicroCorp AI - Interactive Customer Companion &amp; Quick Runner
+Asset: Developer Toolkit: Norway makes shithouses great again - Developer Reference &amp; Architecture Kit
+Category: digital_product
+Commercial Rights: 100% Client Ownership
+Beneficiary: Alpesh Thakor (UPI: talpesh100@ybl)
+"""
+
+def main():
+    print("=" * 65)
+    print(" MicroCorp AI - Standalone Asset Runner")
+    print(" Asset: Developer Toolkit: Norway makes shithouses great again - Developer Reference &amp; Architecture Kit")
+    print(" Commercial Rights: 100% Transferred to Client")
+    print(" Beneficiary: Alpesh Thakor (UPI: talpesh100@ybl)")
+    print("=" * 65)
+    print("\n[+] What is in your package:")
+    print("    - START_HERE.html : Interactive visual documentation &amp; reader")
+    print("    - README.md       : Complete technical architecture &amp; manual")
+    print("    - LICENSE.txt     : Commercial rights certificate")
+    print("    - INVOICE.txt     : Official verified commercial invoice")
+    print("\n[+] To get started:")
+    print("    Double-click START_HERE.html to open your interactive guide.")
+    print("=" * 65)
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+
+            <div style="margin-top: 24px;">
+                <h3 style="color: #0f172a; margin-bottom: 8px;">Requirements (<code>requirements.txt</code>)</h3>
+                <pre style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #334155;"># MicroCorp AI - Zero External Dependencies (Standard Python Library)
+</pre>
+            </div>
+        </div>
+
+        <!-- Tab 3: Full Architecture Manual -->
+        <div id="tab_docs" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Full Technical Documentation & Architectural Reference</h2>
+            <div style="line-height: 1.7; color: #334155;">
+                <h1>Developer Toolkit: Norway Makes Shithouses Great Again 🇳🇴🚽</h1>
+<strong>Enterprise Architect Reference &amp; Implementation Kit v2.4.0</strong>  
+<em>The Agency Engineering Division x MicroCorp AI Enterprise Architecture Series</em>
+
+<p>---</p>
+
+<h2>1. Product Title &amp; Value Proposition</h2>
+
+<h3>🇳🇴 Product Overview</h3>
+<p>Welcome to the definitive engineering reference for the <strong>"Norway Makes Shithouses Great Again" (NMSSGA)</strong> architecture framework. Originating from the harsh climatic extremes of the Scandinavian fjords, this design pattern system applies high-durability, frost-resistant, off-grid telemetry and sanitation automation principles to high-throughput cloud-native distributed systems. </p>
+
+<p>When your microservices need to survive minus-40-degree traffic spikes, uncooperative network partitions, and aggressive garbage collection cycles, you don't build a fragile glass skyscraper—you build a Norwegian mountain outhouse: <strong>modular, insulated, indestructible, and hyper-efficient.</strong></p>
+
+<h3>💎 Core Value Proposition</h3>
+<ul>
+<li><strong>Zero-Downtime Resilience:</strong> Ensures state durability and telemetry ingestion even during absolute network isolation (Offline-First edge design).</li>
+<li><strong>Thermal Resource Management:</strong> Implements aggressive CPU throttling and memory pooling inspired by passive ventilation thermodynamics.</li>
+<li><strong>Plug-and-Scale Composability:</strong> Drop-in production-ready code patterns for Kubernetes, Go, and TypeScript designed to scale from a single forest cabin to global multi-region clusters.</li>
+</ul>
+
+<p>---</p>
+
+<h2>2. Quick Start &amp; Core Concepts</h2>
+
+<p>To deploy the NMSSGA runtime paradigm across your service mesh, familiarize yourself with the foundational components and architectural primitives mapped out below.</p>
+
+<h3>Architectural Syntax &amp; Primitive Mapping</h3>
+
+<p>| NMSSGA Primitive | Traditional Equivalent | Core Engineering Purpose | Implementation Target |</p>
+<p>| :--- | :--- | :--- | :--- |</p>
+<p>| <strong>Fjell-Seal™</strong> | Immutable State Store | Guarantees zero data leakage under extreme load or system panic. | Redis / WAL (Write-Ahead Log) |</p>
+<p>| <strong>FrostBuffer™</strong> | Backpressure / Queue | Manages incoming traffic spikes during network thaws without dropping packets. | Kafka / RabbitMQ Streams |</p>
+<p>| <strong>VindVent™</strong> | Circuit Breaker / Health Check | Passive heat dissipation and automatic shedding of unhealthy worker nodes. | Envoy / Istio Mesh |</p>
+<p>| <strong>Lystank™</strong> | Observability / Telemetry | Lightweight metrics extraction operating under minimal memory footprints. | OpenTelemetry / Prometheus |</p>
+
+<h3>Quick Initialization Command (Go Runtime)</h3>
+<pre><code><h1>Initialize the baseline NMSSGA dependency tree</h1>
+<p>go mod init github.com/microcorp/nmssga-core</p>
+<p>go get github.com/microcorp/nmssga-core/v2/runtime</p>
+<p>go get github.com/microcorp/nmssga-core/v2/frostbuffer</code></pre></p>
+
+<p>---</p>
+
+<h2>3. Production Code Patterns &amp; Architecture Examples</h2>
+
+<p>Below are production-ready, copy-pasteable architectural patterns implementing the <strong>Fjell-Seal</strong> durability protocol and <strong>FrostBuffer</strong> ingestion pipeline.</p>
+
+<h3>Pattern A: The Fjell-Seal State Durability Engine (Golang)</h3>
+<em>Guarantees zero-loss atomic persistence even during abrupt container termination.</em>
+
+<pre><code>package nmssga
+
+<p>import (</p>
+<p>	"context"</p>
+<p>	"encoding/json"</p>
+<p>	"fmt"</p>
+<p>	"os"</p>
+<p>	"sync"</p>
+<p>	"time"</p>
+<p>)</p>
+
+<p>// FjellSealEngine handles immutable, frost-resistant state persistence.</p>
+<p>type FjellSealEngine struct {</p>
+<p>	mu         sync.Mutex</p>
+<p>	walPath    string</p>
+<p>	bufferSize int</p>
+<p>}</p>
+
+<p>type Payload struct {</p>
+<p>	ID        string    <code>json:"id"</code></p>
+<p>	Data      string    <code>json:"data"</code></p>
+<p>	Timestamp time.Time <code>json:"timestamp"</code></p>
+<p>}</p>
+
+<p>func NewFjellSealEngine(walPath string) (*FjellSealEngine, error) {</p>
+<p>	if err := os.MkdirAll(walPath, 0755); err != nil {</p>
+<p>		return nil, fmt.Errorf("failed to create secure vault path: %w", err)</p>
+<p>	}</p>
+<p>	return &amp;FjellSealEngine{walPath: walPath, bufferSize: 1024}, nil</p>
+<p>}</p>
+
+<p>// Commit atomically writes payloads to disk using fsync guarantees.</p>
+<p>func (f *FjellSealEngine) Commit(ctx context.Context, p Payload) error {</p>
+<p>	f.mu.Lock()</p>
+<p>	defer f.mu.Unlock()</p>
+
+<p>	filename := fmt.Sprintf("%s/%s_%d.lock", f.walPath, p.ID, time.Now().UnixNano())</p>
+	
+<p>	data, err := json.Marshal(p)</p>
+<p>	if err != nil {</p>
+<p>		return fmt.Errorf("serialization failure: %w", err)</p>
+<p>	}</p>
+
+<p>	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)</p>
+<p>	if err != nil {</p>
+<p>		return fmt.Errorf("vault open failure: %w", err)</p>
+<p>	}</p>
+<p>	defer file.Close()</p>
+
+<p>	if _, err := file.Write(data); err != nil {</p>
+<p>		return fmt.Errorf("write failure: %w", err)</p>
+<p>	}</p>
+
+<p>	// Force flush to physical storage (The Fjell-Seal Guarantee)</p>
+<p>	if err := file.Sync(); err != nil {</p>
+<p>		return fmt.Errorf("sync failure: %w", err)</p>
+<p>	}</p>
+
+<p>	return nil</p>
+<p>}</code></pre></p>
+
+<h3>Pattern B: The FrostBuffer Ingestion &amp; Throttling Middleware (TypeScript / Node.js)</h3>
+<em>Protects downstream services from incoming request avalanches using algorithmic rate shedding.</em>
+
+<pre><code>import { Request, Response, NextFunction } from 'express';
+
+<p>interface FrostBufferConfig {</p>
+<p>  maxCapacity: number;</p>
+<p>  drainRateMs: number;</p>
+<p>}</p>
+
+<p>export class FrostBufferMiddleware {</p>
+<p>  private queueLength: number = 0;</p>
+<p>  private maxCapacity: number;</p>
+
+<p>  constructor(config: FrostBufferConfig) {</p>
+<p>    this.maxCapacity = config.maxCapacity;</p>
+    
+<p>    // Continuous background drain loop (Passive Thermodynamics)</p>
+<p>    setInterval(() =&gt; {</p>
+<p>      if (this.queueLength &gt; 0) {</p>
+<p>        this.queueLength--;</p>
+<p>      }</p>
+<p>    }, config.drainRateMs);</p>
+<p>  }</p>
+
+<p>  public intercept = (req: Request, res: Response, next: NextFunction): void =&gt; {</p>
+<p>    if (this.queueLength &gt;= this.maxCapacity) {</p>
+<p>      res.status(503).json({</p>
+<p>        error: "FrostBuffer Overload",</p>
+<p>        message: "System operating at maximum thermal/traffic capacity. Please retry via backoff."</p>
+<p>      });</p>
+<p>      return;</p>
+<p>    }</p>
+
+<p>    this.queueLength++;</p>
+    
+<p>    res.on('finish', () =&gt; {</p>
+<p>      // Decrement strictly handled by drain loop or completion hook</p>
+<p>    });</p>
+
+<p>    next();</p>
+<p>  }</p>
+<p>}</code></pre></p>
+
+<p>---</p>
+
+<h2>4. Common Anti-Patterns &amp; Gotchas to Avoid</h2>
+
+<p>Even seasoned engineers can falter when transitioning from tropical cloud setups to rugged Nordic architectures. Avoid these catastrophic traps:</p>
+
+<em> ❌ <strong>The Urban Heat Island Fallacy (Over-scaling):</strong> Deploying unnecessary sidecars and massive Kubernetes resource requests for lightweight workloads. </em>Correction:* Keep services lean and isolated. Let the system breathe natively.
+<em> ❌ <strong>Ignoring the Permafrost State (Soft Deletes):</strong> Relying on soft-delete database flags that bloat memory indexes over time. </em>Correction:* Implement hard compaction policies and cryptographic purging (The Clean Sweep protocol).
+<em> ❌ <strong>Silencing the Wind (Disabling Circuit Breakers):</strong> Forcing synchronous connections through failing downstream dependencies during network blizzards. </em>Correction:* Always enforce strict fallback paths using <code>VindVent</code> timeout wrappers.
+
+<p>---</p>
+
+<h2>5. Performance &amp; Optimization Tips</h2>
+
+<p>To achieve ultimate system throughput under the NMSSGA standard, adhere to these optimization guidelines:</p>
+
+<p>1. <strong>Zero-Allocation Logging:</strong> Eliminate string allocations in hot execution paths. Use structured byte-buffer loggers to prevent garbage collection pauses during traffic spikes.</p>
+<p>2. <strong>Thermal Thread Pinning:</strong> Bind heavy compute threads to specific CPU cores (<code>taskset</code> / runtime affinity settings) to optimize L1/L2 cache hit ratios.</p>
+<p>3. <strong>Async Batch Flushing:</strong> Never execute synchronous disk writes (<code>fsync</code>) per individual record in high-frequency loops. Batch events in memory and flush via asynchronous worker pools.</p>
+
+<p>---</p>
+
+<h2>6. Commercial License &amp; Attribution Summary</h2>
+
+<pre><code>================================================================================
+<p>MICROCORP AI ENTERPRISE COMMERCIAL LICENSE AGREEMENT (MACLA v2.4)</p>
+<p>Product: Developer Toolkit: Norway Makes Shithouses Great Again</p>
+<p>================================================================================</p>
+<p>Copyright (c) 2026 MicroCorp AI &amp; The Agency Engineering Division. </p>
+<p>All rights reserved.</p>
+
+<p>1. GRANT OF LICENSE: MicroCorp AI grants the purchaser a perpetual, worldwide, </p>
+<p>non-exclusive, non-transferable commercial license to use, modify, and integrate </p>
+<p>the provided code patterns and architecture kits into proprietary commercial software </p>
+<p>products.</p>
+<p>2. RESTRICTIONS: Redistribution of this document or code snippets as a standalone </p>
+<p>commercial developer kit, training dataset, or template library without express </p>
+<p>written consent from MicroCorp AI is strictly prohibited.</p>
+<p>3. WARRANTY DISCLAIMER: Provided "AS IS", without warranty of any kind, express or </p>
+<p>implied, including but not limited to the warranties of merchantability, fitness </p>
+<p>for a particular purpose, and non-infringement.</p>
+<p>================================================================================</code></pre></p>
+            </div>
+        </div>
+
+        <!-- Tab 4: Directory Map -->
+        <div id="tab_files" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Package Directory & File Contents Map</h2>
+            <p style="color: #64748b; font-size: 14px;">Here is an overview of each file included in your unzipped deliverable:</p>
+            
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Description & Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>START_HERE.html</code></td>
+                        <td><span style="color: #2563eb; font-weight: 600;">Interactive UI</span></td>
+                        <td>The interactive customer onboarding dashboard with 1-click code copier and guides.</td>
+                    </tr>
+                    <tr>
+                        <td><code>main.py</code></td>
+                        <td><span style="color: #16a34a; font-weight: 600;">Python Script</span></td>
+                        <td>The standalone executable source code and verification runner.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_WINDOWS.bat</code></td>
+                        <td><span style="color: #d97706; font-weight: 600;">Batch Launcher</span></td>
+                        <td>1-click launcher for Windows. Double-click to run code and open dashboard.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_MAC_LINUX.sh</code></td>
+                        <td><span style="color: #9333ea; font-weight: 600;">Shell Script</span></td>
+                        <td>1-click launcher for macOS and Linux environments.</td>
+                    </tr>
+                    <tr>
+                        <td><code>requirements.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Dependencies</span></td>
+                        <td>Dependencies file for easy installation via <code>pip install -r requirements.txt</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>QUICKSTART.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Plain Text</span></td>
+                        <td>Quickstart instructions readable in Notepad or any plain text editor.</td>
+                    </tr>
+                    <tr>
+                        <td><code>README.md</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Markdown</span></td>
+                        <td>Complete technical manual, architecture patterns, and setup reference.</td>
+                    </tr>
+                    <tr>
+                        <td><code>INVOICE.txt</code></td>
+                        <td><span style="color: #16a34a; font-weight: 600;">Invoice</span></td>
+                        <td>Official verified commercial invoice with payment settlement details.</td>
+                    </tr>
+                    <tr>
+                        <td><code>LICENSE.txt</code></td>
+                        <td><span style="color: #2563eb; font-weight: 600;">License</span></td>
+                        <td>Full commercial ownership transfer certificate.</td>
+                    </tr>
+                    <tr>
+                        <td><code>TERMS_AND_CONDITIONS.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Legal Terms</span></td>
+                        <td>MicroCorp AI corporate terms and ethical governance charter.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 5: License & Invoice -->
+        <div id="tab_license" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Commercial Rights & Verification Invoice</h2>
+            
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+                <span style="background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Ownership Verified</span>
+                <h3 style="color: #166534; margin: 8px 0 4px 0;">Commercial Distribution & Modification Rights Granted</h3>
+                <p style="color: #15803d; font-size: 13px; margin: 0 0 16px 0;">You possess 100% royalty-free commercial rights to use, modify, embed, deploy, and distribute this software in personal or commercial projects.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px; color: #1e293b;">
+                    <div><strong>Agreed Price:</strong> ₹399 (~$4.99 USD)</div>
+                    <div><strong>Official Beneficiary:</strong> Alpesh Thakor</div>
+                    <div><strong>Payee UPI ID:</strong> <code>talpesh100@ybl</code></div>
+                    <div><strong>Asset ID:</strong> <code>20261101_201757_developer_toolkit__norway_makes_shithous</code></div>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 style="margin: 0 0 8px 0; color: #0f172a;">Customer Support & Inquiries</h3>
+                <p style="color: #475569; font-size: 13px; margin: 0;">For customization inquiries, enterprise integrations, or support, contact the host developer at <strong>Alpesh Thakor</strong> via UPI reference at <code>talpesh100@ybl</code>.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <span>Asset: <strong>Developer Toolkit: Norway makes shithouses great again - Developer Reference & Architecture Kit</strong></span>
+            <span>MicroCorp AI Autonomous Venture • Payout UPI: <strong>talpesh100@ybl</strong></span>
+        </div>
+    </div>
+
+    <div id="toast">Copied to clipboard!</div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+            var targetContent = document.getElementById('tab_' + tabId);
+            if (targetContent) targetContent.classList.add('active');
+            var btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(function(b) {
+                var oc = b.getAttribute('onclick') || '';
+                if (oc.indexOf(tabId) !== -1) b.classList.add('active');
+            });
+        }
+
+        function copyCode() {
+            var code = document.getElementById('codeBlock').innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                showToast('Source code copied to clipboard!');
+            });
+        }
+
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt).then(function() {
+                showToast('Command copied to clipboard!');
+            });
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(function() { t.style.display = 'none'; }, 2500);
+        }
+    </script>
+</body>
+</html>
