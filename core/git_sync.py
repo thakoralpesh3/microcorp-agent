@@ -20,14 +20,31 @@ class GitSyncEngine:
         self.remote_name = "origin"
         self.default_branch = "main"
 
+    def _clean_stale_locks(self):
+        lock = self.repo_dir / ".git/index.lock"
+        if lock.exists():
+            try:
+                import time
+                if time.time() - lock.stat().st_mtime > 5:
+                    lock.unlink(missing_ok=True)
+            except Exception:
+                pass
+
     def _run_git(self, args: list, timeout: int = 30) -> subprocess.CompletedProcess:
-        """Runs a git command inside the repository directory."""
+        """Runs a git command inside the repository directory with non-interactive env."""
+        self._clean_stale_locks()
+        env = os.environ.copy()
+        env["GIT_TERMINAL_PROMPT"] = "0"
+        env["GIT_EDITOR"] = "true"
+        env["GIT_SEQUENCE_EDITOR"] = "true"
         return subprocess.run(
             ["git"] + args,
             cwd=str(self.repo_dir),
+            stdin=subprocess.DEVNULL,
             capture_output=True,
             text=True,
             timeout=timeout,
+            env=env,
             check=False
         )
 
