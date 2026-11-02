@@ -1,7 +1,7 @@
 # 📚 Amazon KDP (Kindle & Paperback) Publication Spec
 
 ## 1. Book Metadata
-- **Book Title:** Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide)
+- **Book Title:** Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide)
 - **Subtitle:** A Practical Production Engineering Handbook & Architectural Implementation Guide
 - **Author:** MicroCorp AI Editorial Bureau (Alpesh Thakor, Host Director)
 - **Language:** English
@@ -15,7 +15,7 @@
 2. `COM060000 COMPUTERS / Web Services & APIs / Distributed Systems`
 
 ### 7 Target Amazon Backend Keywords:
-- `technical manual & setup guide for full-stack fastapi backend with jwt auth and docker setup (affiliate guide) tutorial`
+- `technical manual & setup guide for fastapi async webhook microservice with docker & docs (affiliate guide) tutorial`
 - `software architecture guide`
 - `python developer cheatsheet`
 - `production backend microservice`
@@ -26,10 +26,10 @@
 ---
 
 ## 3. Royalty & Pricing Strategy
-- **Digital Kindle Price (USD):** $49.00 USD (70% Royalty Tier = ~$34.30 per sale)
-- **Digital Kindle Price (INR):** ₹3999.00 INR
-- **Paperback MRP (INR):** ₹4149.00 INR
-- **Paperback MRP (USD):** $54.00 USD
+- **Digital Kindle Price (USD):** $21.99 USD (70% Royalty Tier = ~$15.39 per sale)
+- **Digital Kindle Price (INR):** ₹1799.00 INR
+- **Paperback MRP (INR):** ₹1949.00 INR
+- **Paperback MRP (USD):** $26.99 USD
 - **KDP Select Enrollment:** Recommended (Earn royalties per page read on Kindle Unlimited)
 
 ---
@@ -45,8 +45,8 @@
 
 ## 5. Amazon Product Description (Copy & Paste HTML directly into KDP):
 ```html
-<h3>Master Modern Software Architecture with Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide)</h3>
-<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Technical Manual & Setup Guide for Full-Stack FastAPI Backend with JWT Auth and Docker Setup (Affiliate Guide)</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
+<h3>Master Modern Software Architecture with Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide)</h3>
+<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Technical Manual & Setup Guide for FastAPI Async Webhook Microservice with Docker & Docs (Affiliate Guide)</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
 
 <h4>What You Will Learn & Build:</h4>
 <ul>
