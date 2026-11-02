@@ -114,5 +114,6 @@ jobs:
             echo "No state changes to commit."
           else
             git commit -m "auto(cloud): record autonomous 24/7 cloud deliverables & state [$(date -u +'%Y-%m-%d %H:%M:%SZ')]"
-            git push origin main
+            git pull --no-edit -s ort -X ours origin main || true
+            git push origin main || git push --force-with-lease origin main || true
           fi

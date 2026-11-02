@@ -170,13 +170,13 @@ class GitSyncEngine:
         if push_res.returncode == 0:
             pushed = True
         else:
-            # If push failed, try pulling rebase if remote has new commits
-            rebase_res = self._run_git(["pull", "--rebase", self.remote_name, branch], timeout=60)
-            if rebase_res.returncode == 0:
+            # If push failed, try pulling with -s ort -X ours to merge cloud commits
+            merge_res = self._run_git(["pull", "--no-edit", "-s", "ort", "-X", "ours", self.remote_name, branch], timeout=60)
+            if merge_res.returncode == 0:
                 retry_push = self._run_git(["push", self.remote_name, branch], timeout=60)
                 pushed = (retry_push.returncode == 0)
             else:
-                self._run_git(["rebase", "--abort"])
+                self._run_git(["merge", "--abort"])
                 return {
                     "success": False,
                     "committed": commit_created,
