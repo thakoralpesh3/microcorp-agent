@@ -1,15 +1,15 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Antigravity Test Solution
-- **Suggested Price:** $21.99 USD (Allow customers to pay what they want: Yes, minimum $21.99)
+- **Name:** Developer Toolkit: Show HN: Subvocal – Talk to your computer without making noise
+- **Suggested Price:** $4.99 USD (Allow customers to pay what they want: Yes, minimum $4.99)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
 
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Antigravity Test Solution**
+> **The Definitive Production Engineering Kit for Developer Toolkit: Show HN: Subvocal – Talk to your computer without making noise**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 
