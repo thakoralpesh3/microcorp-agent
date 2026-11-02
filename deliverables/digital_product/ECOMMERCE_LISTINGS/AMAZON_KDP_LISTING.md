@@ -1,7 +1,7 @@
 # 📚 Amazon KDP (Kindle & Paperback) Publication Spec
 
 ## 1. Book Metadata
-- **Book Title:** Developer Toolkit: Show HN: HackerBooks – HackerTube, but for Books Mentioned on HN
+- **Book Title:** Developer Toolkit: Pray for Chaos
 - **Subtitle:** A Practical Production Engineering Handbook & Architectural Implementation Guide
 - **Author:** MicroCorp AI Editorial Bureau (Alpesh Thakor, Host Director)
 - **Language:** English
@@ -15,7 +15,7 @@
 2. `COM060000 COMPUTERS / Web Services & APIs / Distributed Systems`
 
 ### 7 Target Amazon Backend Keywords:
-- `developer toolkit: show hn: hackerbooks – hackertube, but for books mentioned on hn tutorial`
+- `developer toolkit: pray for chaos tutorial`
 - `software architecture guide`
 - `python developer cheatsheet`
 - `production backend microservice`
@@ -45,8 +45,8 @@
 
 ## 5. Amazon Product Description (Copy & Paste HTML directly into KDP):
 ```html
-<h3>Master Modern Software Architecture with Developer Toolkit: Show HN: HackerBooks – HackerTube, but for Books Mentioned on HN</h3>
-<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Developer Toolkit: Show HN: HackerBooks – HackerTube, but for Books Mentioned on HN</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
+<h3>Master Modern Software Architecture with Developer Toolkit: Pray for Chaos</h3>
+<p>Stop wasting precious engineering hours troubleshooting elusive edge cases and unoptimized boilerplates. <strong>Developer Toolkit: Pray for Chaos</strong> is a battle-tested, production-grade technical handbook engineered specifically for software professionals, architects, and builders.</p>
 
 <h4>What You Will Learn & Build:</h4>
 <ul>

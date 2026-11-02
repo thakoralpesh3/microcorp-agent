@@ -1,7 +1,7 @@
 # 🌐 Gumroad & itch.io Digital Product Listing
 
 ## 1. Product Setup
-- **Name:** Developer Toolkit: Show HN: HackerBooks – HackerTube, but for Books Mentioned on HN
+- **Name:** Developer Toolkit: Pray for Chaos
 - **Suggested Price:** $4.99 USD (Allow customers to pay what they want: Yes, minimum $4.99)
 - **Currency:** USD (Gumroad automatically converts to INR, EUR, GBP)
 - **Category:** Software & Developer Tools
@@ -9,7 +9,7 @@
 ---
 
 ## 2. Product Summary & Description (Copy into Gumroad):
-> **The Definitive Production Engineering Kit for Developer Toolkit: Show HN: HackerBooks – HackerTube, but for Books Mentioned on HN**
+> **The Definitive Production Engineering Kit for Developer Toolkit: Pray for Chaos**
 
 Stop debugging boilerplate. This comprehensive toolkit provides everything you need to build, test, and ship production-grade architectures with zero friction.
 
