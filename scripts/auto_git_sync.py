@@ -20,13 +20,27 @@ def get_git_env() -> dict:
     user_home = str(Path.home())
     env["PATH"] = f"{user_home}/.local/bin:{env.get('PATH', '')}:/usr/local/bin:/usr/bin:/bin"
     env["HOME"] = user_home
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    env["GIT_EDITOR"] = "true"
+    env["GIT_SEQUENCE_EDITOR"] = "true"
     return env
 
+def clean_stale_locks():
+    lock = REPO_ROOT / ".git/index.lock"
+    if lock.exists():
+        try:
+            if time.time() - lock.stat().st_mtime > 5:
+                lock.unlink(missing_ok=True)
+        except Exception:
+            pass
+
 def run_git(args: list[str]) -> tuple[int, str]:
+    clean_stale_locks()
     git_bin = shutil.which("git") or str(Path.home() / ".local/bin/git")
     res = subprocess.run(
         [git_bin] + args,
         cwd=str(REPO_ROOT),
+        stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -60,16 +74,16 @@ def sync_now(custom_msg: str = None) -> bool:
         print(f"[{time.strftime('%X')}] ✅ Successfully synced to GitHub! ({commit_hash})")
         return True
     else:
-        # If push failed, try pull --rebase then push again
-        print(f"[{time.strftime('%X')}] ⚠️ Direct push failed, attempting pull --rebase: {out}")
-        rcode, rout = run_git(["pull", "--rebase", "origin", branch_name])
-        if rcode == 0:
+        # If push failed, try pull with -s ort -X ours to seamlessly integrate cloud commits
+        print(f"[{time.strftime('%X')}] ⚠️ Direct push rejected, merging remote changes: {out}")
+        mcode, mout = run_git(["pull", "--no-edit", "-s", "ort", "-X", "ours", "origin", branch_name])
+        if mcode == 0:
             pcode, pout = run_git(["push", "origin", branch_name])
             if pcode == 0:
-                print(f"[{time.strftime('%X')}] ✅ Rebase and push succeeded!")
+                print(f"[{time.strftime('%X')}] ✅ Merge and push succeeded!")
                 return True
         else:
-            run_git(["rebase", "--abort"])
+            run_git(["merge", "--abort"])
         print(f"[{time.strftime('%X')}] ❌ Push failed: {out}")
         return False
 
@@ -106,4 +120,4 @@ if __name__ == "__main__":
         success = sync_now(msg)
         sys.exit(0 if success else 1)
     else:
-        run_polling_sync(15)
+        run_polling_sync(30)
