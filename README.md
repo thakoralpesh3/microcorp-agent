@@ -1,5 +1,8 @@
 # 🏢 MicroCorp AI — Autonomous Laptop Enterprise & Developer Marketplace
 
+> ### 🎮 Live 24/7 Web Simulator & Store: [https://thakoralpesh3.github.io/microcorp-agent/](https://thakoralpesh3.github.io/microcorp-agent/)
+> **Always Online & Interactive**: Experience the complete autonomous multi-department fleet in your browser 24/7! Test real-time product discovery, run Antigravity sprints, browse 32+ manufactured developer toolkits, Buy Me a Coffee, and test instant zero-fee UPI settlement to **`talpesh100@ybl`** (**Alpesh Thakor**). Official Contact: **[`thakoralpesh3@proton.me`](mailto:thakoralpesh3@proton.me)**.
+
 [![Enterprise Status](https://img.shields.io/badge/Enterprise-Autonomous%20Fleet-2563eb.svg)](https://github.com/thakoralpesh3/microcorp-agent)
 [![24/7 Web Simulator](https://img.shields.io/badge/🎮%2024%2F7%20Simulator-Live%20on%20GitHub-10b981.svg)](https://thakoralpesh3.github.io/microcorp-agent/)
 [![Buy Me a Coffee](https://img.shields.io/badge/☕%20Buy%20Me%20a%20Coffee-Support%20Creator-f59e0b.svg)](https://thakoralpesh3.github.io/microcorp-agent/)
