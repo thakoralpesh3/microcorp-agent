@@ -1018,15 +1018,18 @@ html_content = f"""<!DOCTYPE html>
 </html>
 """
 
-# Write to docs/index.html and simulator/index.html
+# Write to root index.html, docs/index.html, and simulator/index.html
+root_index = ROOT / "index.html"
 docs_index = ROOT / "docs/index.html"
 sim_index = ROOT / "simulator/index.html"
 
 docs_index.parent.mkdir(parents=True, exist_ok=True)
 sim_index.parent.mkdir(parents=True, exist_ok=True)
 
+root_index.write_text(html_content, encoding="utf-8")
 docs_index.write_text(html_content, encoding="utf-8")
 sim_index.write_text(html_content, encoding="utf-8")
 
+print(f"✅ Generated {root_index} ({len(html_content)} bytes)")
 print(f"✅ Generated {docs_index} ({len(html_content)} bytes)")
 print(f"✅ Generated {sim_index} ({len(html_content)} bytes)")
