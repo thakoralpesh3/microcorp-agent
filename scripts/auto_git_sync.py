@@ -55,7 +55,15 @@ def sync_now(custom_msg: str = None) -> bool:
         return True
 
     print(f"[{time.strftime('%X')}] 📦 Local file changes detected by Antigravity Watchdog...")
-    run_git(["add", "-A"])
+    add_code, add_out = run_git(["add", "-A"])
+    if add_code != 0:
+        print(f"[{time.strftime('%X')}] ⚠️ git add failed: {add_out}")
+        return False
+
+    # Skip commit if nothing is staged
+    diff_code, _ = run_git(["diff", "--cached", "--quiet"])
+    if diff_code == 0:
+        return True
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     msg = custom_msg or f"🤖 Auto-Sync: Antigravity update in MicroCorp AI Autonomous Enterprise [{timestamp}]"
