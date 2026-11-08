@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Quickstart - Developer Toolkit: Person of Interest - Developer Reference & Architecture Kit</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --code-bg: #0b1120;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 30px 16px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #ffffff;
+            padding: 36px 40px;
+            border-bottom: 3px solid #3b82f6;
+        }
+        .badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        h1 { margin: 0 0 10px 0; font-size: 26px; color: #f8fafc; }
+        .meta { color: #94a3b8; font-size: 13px; }
+        
+        /* 3-Step Quick Launch Bar */
+        .quick-bar {
+            background: #f0fdf4;
+            border-bottom: 1px solid #bbf7d0;
+            padding: 20px 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .step-card {
+            background: #ffffff;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid #86efac;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .step-title {
+            color: #166534;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .step-desc { font-size: 12px; color: #4b5563; }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: #1e293b; background: rgba(0,0,0,0.02); }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; background: #ffffff; }
+        
+        /* Tab Contents */
+        .tab-content { display: none; padding: 36px 40px; }
+        .tab-content.active { display: block; }
+        
+        /* Code Block Viewer */
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 12px 18px;
+            border-radius: 8px 8px 0 0;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid #334155;
+            border-bottom: none;
+        }
+        .copy-btn {
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover { background: #15803d; }
+        pre.code-area {
+            background: #0b1120;
+            color: #f8fafc;
+            padding: 18px;
+            margin: 0;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 13px;
+            border: 1px solid #334155;
+            max-height: 520px;
+        }
+        
+        /* Tables */
+        table.file-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table.file-table th {
+            background: #f8fafc;
+            color: #475569;
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 13px;
+        }
+        table.file-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+        
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #16a34a;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 9999;
+        }
+        .footer {
+            background: #f8fafc;
+            padding: 20px 40px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="hero">
+            <span class="badge">MicroCorp AI • Customer Quickstart Center</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); margin-left: 6px;">🛠️ Crafted by Agency Specialist: Developer Tooling Engineer (Engineering)</span>
+            <h1>Developer Toolkit: Person of Interest - Developer Reference & Architecture Kit</h1>
+            <div class="meta">
+                <span>Category: <strong>Digital Product</strong></span> • 
+                <span>Commercial Ownership: <strong>100% Client Transferred</strong></span> • 
+                <span>Beneficiary: <strong>Alpesh Thakor</strong> (UPI: <code>talpesh100@ybl</code>)</span>
+            </div>
+        </div>
+
+        <!-- 3-Step Quick Launch Bar -->
+        <div class="quick-bar">
+            <div class="step-card">
+                <div class="step-title">⚡ 1. Interactive Reader (Browser)</div>
+                <div class="step-desc">You are already viewing it! Use the tabs below to copy code, read documentation, or view licenses.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-title">🪟 2. 1-Click Launch on Windows</div>
+                <div class="step-desc">Simply double-click <strong><code>RUN_WINDOWS.bat</code></strong> in this folder to automatically execute <code>main.py</code>.</div>
+            </div>
+            <div class="step-card">
+                <div class="step-title">🍎 3. 1-Click on macOS / Linux</div>
+                <div class="step-desc">Run <strong><code>bash RUN_MAC_LINUX.sh</code></strong> or <strong><code>python3 main.py</code></strong> in your terminal.</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('quickstart')">🚀 60-Second Quickstart</button>
+            <button class="tab-btn" onclick="switchTab('source')">💻 Standalone Source Code (main.py)</button>
+            <button class="tab-btn" onclick="switchTab('docs')">📖 Full Architecture Manual</button>
+            <button class="tab-btn" onclick="switchTab('files')">📂 Directory & Files Map</button>
+            <button class="tab-btn" onclick="switchTab('license')">📜 License & Commercial Invoice</button>
+        </div>
+
+        <!-- Tab 1: Quickstart -->
+        <div id="tab_quickstart" class="tab-content active">
+            <h2 style="color: #0f172a; margin-top: 0;">How to Use Your Deliverable in Under 60 Seconds</h2>
+            <p style="color: #475569;">Everything inside this bundle has been engineered with zero bloat and pre-configured for instant integration.</p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option A: Run Immediately with 1-Click Scripts</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+                    <li><strong>Windows Users:</strong> Double-click <code>RUN_WINDOWS.bat</code> in this directory.</li>
+                    <li><strong>Mac & Linux Users:</strong> Double-click <code>RUN_MAC_LINUX.sh</code> or run <code>bash RUN_MAC_LINUX.sh</code>.</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option B: Run from Command Line</h3>
+                <div style="background: #0f172a; color: #f8fafc; padding: 14px 18px; border-radius: 6px; font-family: monospace; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <code>pip install -r requirements.txt &amp;&amp; python main.py</code>
+                    <button class="copy-btn" onclick="copyText('pip install -r requirements.txt && python main.py')">Copy</button>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #1e293b;">Option C: Copy Source Code Directly into Your Project</h3>
+                <p style="color: #475569; font-size: 14px; margin: 0 0 12px 0;">Switch to the <strong>"Standalone Source Code"</strong> tab above, click <strong>"Copy Complete Code"</strong>, and paste it directly into your own repository or editor.</p>
+                <button onclick="switchTab('source')" style="background: #2563eb; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    View & Copy Code (main.py) →
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Standalone Source Code -->
+        <div id="tab_source" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div>
+                    <h2 style="margin: 0; color: #0f172a;">Standalone Source Code (<code>main.py</code>)</h2>
+                    <small style="color: #64748b;">Ready to execute, modular, zero unwanted dependencies.</small>
+                </div>
+                <button class="copy-btn" style="padding: 8px 18px; font-size: 13px;" onclick="copyCode()">
+                    📋 Copy Complete Source Code
+                </button>
+            </div>
+            
+            <div class="code-header">
+                <span>main.py • Python 3</span>
+                <span>Commercial Ownership: Client</span>
+            </div>
+            <pre class="code-area"><code id="codeBlock">"""
+MicroCorp AI - Interactive Customer Companion &amp; Quick Runner
+Asset: Developer Toolkit: Person of Interest - Developer Reference &amp; Architecture Kit
+Category: digital_product
+Commercial Rights: 100% Client Ownership
+Beneficiary: Alpesh Thakor (UPI: talpesh100@ybl)
+"""
+
+def main():
+    print("=" * 65)
+    print(" MicroCorp AI - Standalone Asset Runner")
+    print(" Asset: Developer Toolkit: Person of Interest - Developer Reference &amp; Architecture Kit")
+    print(" Commercial Rights: 100% Transferred to Client")
+    print(" Beneficiary: Alpesh Thakor (UPI: talpesh100@ybl)")
+    print("=" * 65)
+    print("\n[+] What is in your package:")
+    print("    - START_HERE.html : Interactive visual documentation &amp; reader")
+    print("    - README.md       : Complete technical architecture &amp; manual")
+    print("    - LICENSE.txt     : Commercial rights certificate")
+    print("    - INVOICE.txt     : Official verified commercial invoice")
+    print("\n[+] To get started:")
+    print("    Double-click START_HERE.html to open your interactive guide.")
+    print("=" * 65)
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+
+            <div style="margin-top: 24px;">
+                <h3 style="color: #0f172a; margin-bottom: 8px;">Requirements (<code>requirements.txt</code>)</h3>
+                <pre style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #334155;"># MicroCorp AI - Zero External Dependencies (Standard Python Library)
+</pre>
+            </div>
+        </div>
+
+        <!-- Tab 3: Full Architecture Manual -->
+        <div id="tab_docs" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Full Technical Documentation & Architectural Reference</h2>
+            <div style="line-height: 1.7; color: #334155;">
+                <h1>Person of Interest (POI): Developer Toolkit &amp; Architecture Kit</h1>
+<em>Enterprise-Grade Surveillance, Entity Resolution, and Real-Time Telemetry Processing</em>
+
+<h2>1. Product Title &amp; Value Proposition</h2>
+
+<h3>Product Title</h3>
+<strong>Person of Interest (POI): Enterprise Telemetry &amp; Entity Resolution Developer Kit</strong>
+
+<h3>Value Proposition</h3>
+<p>Modern distributed systems, security operations centers, and real-time analytics platforms drown in fragmented telemetry. IP addresses rotate, user sessions span multiple devices, API tokens get compromised, and logs arrive out of order across disparate geographical regions. </p>
+
+<strong>Person of Interest (POI)</strong> is a production-tested architectural reference and toolkit designed to solve the <strong>Entity Resolution and Real-Time Tracking Problem</strong>. It provides software engineers, security architects, and backend developers with battle-tested patterns to ingest, normalize, correlate, and track entities (users, devices, IPs, or assets) across massive data streams with sub-millisecond lookup times and deterministic consistency.
+
+<h3>What's Included</h3>
+<ul>
+<li><strong>Zero-Dependency Architecture Core</strong>: Blueprint for a high-throughput event ingestion pipeline.</li>
+<li><strong>Entity Resolution Engine</strong>: Probabilistic and deterministic matching algorithms implemented in production-ready Go and TypeScript.</li>
+<li><strong>Drop-in CLI Tooling (<code>poi-ctl</code>)</strong>: Fast, scriptable operational command-line tool built to enterprise CLI standards (sub-100ms startup, structured JSON output, explicit exit codes).</li>
+<li><strong>Production Code Patterns</strong>: Complete, copy-paste ready implementations for state management, deduplication, and alerting hooks.</li>
+</ul>
+
+<p>---</p>
+
+<h2>2. Quick Start &amp; Core Concepts</h2>
+
+<p>The POI framework operates on a four-stage pipeline: <strong>Ingest $\rightarrow$ Normalize $\rightarrow$ Resolve $\rightarrow$ Act</strong>.</p>
+
+<pre><code>[ Raw Telemetry ] 
+<p>       │</p>
+<p>       ▼ (Stream / API)</p>
+<p>[ 1. Ingestion Layer ] ──&gt; Fast validation &amp; structural checks</p>
+<p>       │</p>
+<p>       ▼</p>
+<p>[ 2. Normalization ] ──&gt; Canonical schema conversion (UTC, IP sanitization)</p>
+<p>       │</p>
+<p>       ▼</p>
+<p>[ 3. Entity Resolution ] ─&gt; Disjoint-Set / Graph-based identity stitching</p>
+<p>       │</p>
+<p>       ▼</p>
+<p>[ 4. Action Engine ] ───&gt; Webhooks, Alerting, State persistence</code></pre></p>
+
+<h3>CLI Quick Start (<code>poi-ctl</code>)</h3>
+<pre><code><h1>Initialize local POI configuration</h1>
+<p>poi-ctl init --region us-east-1</p>
+
+<h1>Validate an incoming event payload against the POI schema</h1>
+<p>poi-ctl validate --input ./sample-event.json</p>
+
+<h1>Resolve entity linkages for a given identifier</h1>
+<p>poi-ctl resolve --id "usr_9981247192" --depth 2 --format json</p>
+
+<h1>Run a dry-run simulation of an alerting rule</h1>
+<p>poi-ctl alert test --rule ./rules/suspicious-geo.yml --dry-run</code></pre></p>
+
+<h3>Core Concepts &amp; CLI Command Reference</h3>
+
+<p>| Concept | Definition | Primary CLI Command | Exit Codes &amp; Meaning |</p>
+<p>| :--- | :--- | :--- | :--- |</p>
+<p>| <strong>Entity</strong> | A unique real-world actor or asset distilled from multiple ephemeral identifiers (cookies, IPs, device fingerprints). | <code>poi-ctl entity inspect &lt;ID&gt;</code> | <strong>0</strong>: Found&lt;br&gt;<strong>1</strong>: Connection Error&lt;br&gt;<strong>2</strong>: Entity Not Found |</p>
+<p>| <strong>Telemetry Event</strong> | An immutable, timestamped record of an action emitted by an edge service, proxy, or application worker. | <code>poi-ctl validate &lt;FILE&gt;</code> | <strong>0</strong>: Valid payload&lt;br&gt;<strong>1</strong>: Schema syntax error&lt;br&gt;<strong>2</strong>: Missing required fields |</p>
+<p>| <strong>Identity Stitching</strong> | The algorithmic process of merging disparate identifiers into a single canonical Entity Graph. | <code>poi-ctl resolve --id &lt;ID&gt;</code> | <strong>0</strong>: Resolved successfully&lt;br&gt;<strong>3</strong>: Circular reference detected |</p>
+<p>| <strong>Watchlist Rule</strong> | Declarative criteria triggering high-priority operational hooks when an entity crosses risk thresholds. | <code>poi-ctl alert evaluate</code> | <strong>0</strong>: No triggers&lt;br&gt;<strong>1</strong>: Rule violation detected&lt;br&gt;<strong>4</strong>: Malformed rule syntax |</p>
+
+<p>---</p>
+
+<h2>3. Production Code Patterns &amp; Architecture Examples</h2>
+
+<h3>Pattern 1: High-Performance Entity Resolution Engine (Go)</h3>
+<p>This production-ready Go module implements a thread-safe Union-Find (Disjoint-Set) data structure with path compression. It allows real-time identity stitching when telemetry links two separate identifiers (e.g., an anonymous session token logging into a known user account).</p>
+
+<pre><code>// Package poi implements high-speed entity resolution using Disjoint-Set union.
+<p>package poi</p>
+
+<p>import (</p>
+<p>	"context"</p>
+<p>	"fmt"</p>
+<p>	"sync"</p>
+<p>	"time"</p>
+<p>)</p>
+
+<p>// EntityGraph manages identity mappings with thread safety.</p>
+<p>type EntityGraph struct {</p>
+<p>	mu     sync.RWMutex</p>
+<p>	parent map[string]string</p>
+<p>	rank   map[string]int</p>
+<p>}</p>
+
+<p>// NewEntityGraph initializes a pristine resolution store.</p>
+<p>func NewEntityGraph() *EntityGraph {</p>
+<p>	return &amp;EntityGraph{</p>
+<p>		parent: make(map[string]string),</p>
+<p>		rank:   make(map[string]int),</p>
+<p>	}</p>
+<p>}</p>
+
+<p>// AddIdentifier registers an identifier if it does not already exist.</p>
+<p>func (g *EntityGraph) AddIdentifier(id string) {</p>
+<p>	g.mu.Lock()</p>
+<p>	defer g.mu.Unlock()</p>
+
+<p>	if _, exists := g.parent[id]; !exists {</p>
+<p>		g.parent[id] = id</p>
+<p>		g.rank[id] = 0</p>
+<p>	}</p>
+<p>}</p>
+
+<p>// Find locates the canonical root entity for a given identifier with path compression.</p>
+<p>func (g *EntityGraph) Find(id string) (string, error) {</p>
+<p>	g.mu.Lock()</p>
+<p>	defer g.mu.Unlock()</p>
+
+<p>	root, exists := g.parent[id]</p>
+<p>	if !exists {</p>
+<p>		return "", fmt.Errorf("identifier not found: %s — run <code>poi-ctl entity register</code> first", id)</p>
+<p>	}</p>
+
+<p>	// Path compression traversal</p>
+<p>	if root != id {</p>
+<p>		resolvedRoot, err := g.findRecursive(root)</p>
+<p>		if err != nil {</p>
+<p>			return "", err</p>
+<p>		}</p>
+<p>		g.parent[id] = resolvedRoot</p>
+<p>		return resolvedRoot, nil</p>
+<p>	}</p>
+
+<p>	return id, nil</p>
+<p>}</p>
+
+<p>func (g *EntityGraph) findRecursive(id string) (string, error) {</p>
+<p>	p, exists := g.parent[id]</p>
+<p>	if !exists {</p>
+<p>		return "", fmt.Errorf("dangling reference in entity graph: %s", id)</p>
+<p>	}</p>
+<p>	if p == id {</p>
+<p>		return id, nil</p>
+<p>	}</p>
+<p>	root, err := g.findRecursive(p)</p>
+<p>	if err != nil {</p>
+<p>		return "", err</p>
+<p>	}</p>
+<p>	g.parent[id] = root</p>
+<p>	return root, nil</p>
+<p>}</p>
+
+<p>// Union stitches two identifiers together under a single canonical entity.</p>
+<p>func (g *EntityGraph) Union(id1, id2 string) error {</p>
+<p>	g.AddIdentifier(id1)</p>
+<p>	g.AddIdentifier(id2)</p>
+
+<p>	root1, err := g.Find(id1)</p>
+<p>	if err != nil {</p>
+<p>		return err</p>
+<p>	}</p>
+<p>	root2, err := g.Find(id2)</p>
+<p>	if err != nil {</p>
+<p>		return err</p>
+<p>	}</p>
+
+<p>	if root1 == root2 {</p>
+<p>		return nil // Already unified</p>
+<p>	}</p>
+
+<p>	g.mu.Lock()</p>
+<p>	defer g.mu.Unlock()</p>
+
+<p>	// Union by rank</p>
+<p>	if g.rank[root1] &lt; g.rank[root2] {</p>
+<p>		g.parent[root1] = root2</p>
+<p>	} else if g.rank[root1] &gt; g.rank[root2] {</p>
+<p>		g.parent[root2] = root1</p>
+<p>	} else {</p>
+<p>		g.parent[root2] = root1</p>
+<p>		g.rank[root1]++</p>
+<p>	}</p>
+
+<p>	return nil</p>
+<p>}</p>
+
+<p>// TelemetryEvent represents an incoming normalized observation.</p>
+<p>type TelemetryEvent struct {</p>
+<p>    EventID   string    <code>json:"event_id"</code></p>
+<p>    ActorID   string    <code>json:"actor_id"</code></p>
+<p>    TargetID  string    <code>json:"target_id"</code></p>
+<p>    Timestamp time.Time <code>json:"timestamp"</code></p>
+<p>    Action    string    <code>json:"action"</code></p>
+<p>}</p>
+
+<p>func ProcessEvent(ctx context.Context, graph *EntityGraph, event TelemetryEvent) error {</p>
+<p>    if event.ActorID == "" || event.TargetID == "" {</p>
+<p>        return fmt.Errorf("invalid telemetry payload [EventID: %s]: missing actor or target ID — verify upstream producer", event.EventID)</p>
+<p>    }</p>
+    
+<p>    err := graph.Union(event.ActorID, event.TargetID)</p>
+<p>    if err != nil {</p>
+<p>        return fmt.Errorf("failed to resolve entity linkage for event %s: %w", event.EventID, err)</p>
+<p>    }</p>
+    
+<p>    return nil</p>
+<p>}</code></pre></p>
+
+<h3>Pattern 2: Real-Time Stream Ingestion &amp; Deduplication Pipeline (TypeScript / Node.js)</h3>
+<p>High-frequency telemetry ingestion requires sliding-window deduplication to prevent flooding downstream databases with duplicate heartbeats or log emissions.</p>
+
+<pre><code>import { createHash } from 'crypto';
+
+<p>export interface TelemetryPacket {</p>
+<p>    sourceIp: string;</p>
+<p>    sessionId: string;</p>
+<p>    payload: Record&lt;string, unknown&gt;;</p>
+<p>    receivedAt: number;</p>
+<p>}</p>
+
+<p>export interface DedupConfig {</p>
+<p>    windowMs: number;</p>
+<p>    maxCacheSize: number;</p>
+<p>}</p>
+
+<p>/<em></em></p>
+<ul>
+<li>High-performance sliding window deduplicator for streaming telemetry.</li>
+</ul>
+<p> */</p>
+<p>export class StreamDeduplicator {</p>
+<p>    private cache = new Map&lt;string, number&gt;();</p>
+<p>    private windowMs: number;</p>
+<p>    private maxCacheSize: number;</p>
+
+<p>    constructor(config: DedupConfig) {</p>
+<p>        this.windowMs = config.windowMs;</p>
+<p>        this.maxCacheSize = config.maxCacheSize;</p>
+<p>    }</p>
+
+<p>    /<em></em></p>
+<ul>
+<li>Evaluates a packet. Returns true if the packet is unique, false if duplicate.</li>
+</ul>
+<p>     */</p>
+<p>    public evaluate(packet: TelemetryPacket): boolean {</p>
+<p>        const now = Date.now();</p>
+<p>        this.pruneExpired(now);</p>
+
+<p>        const fingerprint = this.hashPacket(packet);</p>
+
+<p>        if (this.cache.has(fingerprint)) {</p>
+<p>            return false; // Duplicate detected within window</p>
+<p>        }</p>
+
+<p>        if (this.cache.size &gt;= this.maxCacheSize) {</p>
+<p>            // Evict oldest entry (first key in Map)</p>
+<p>            const oldestKey = this.cache.keys().next().value;</p>
+<p>            if (oldestKey) {</p>
+<p>                this.cache.delete(oldestKey);</p>
+<p>            }</p>
+<p>        }</p>
+
+<p>        this.cache.set(fingerprint, now);</p>
+<p>        return true;</p>
+<p>    }</p>
+
+<p>    private hashPacket(packet: TelemetryPacket): string {</p>
+<p>        const raw = <code>${packet.sourceIp}:${packet.sessionId}:${JSON.stringify(packet.payload)}</code>;</p>
+<p>        return createHash('sha256').update(raw).digest('hex');</p>
+<p>    }</p>
+
+<p>    private pruneExpired(now: number): void {</p>
+<p>        // Periodic O(N) sweep when approaching capacity or on interval</p>
+<p>        if (this.cache.size &gt; this.maxCacheSize * 0.8) {</p>
+<p>            for (const [key, timestamp] of this.cache.entries()) {</p>
+<p>                if (now - timestamp &gt; this.windowMs) {</p>
+<p>                    this.cache.delete(key);</p>
+<p>                } else {</p>
+<p>                    break; // Map maintains insertion order; older items are first</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</code></pre></p>
+
+<p>---</p>
+
+<h2>4. Common Anti-Patterns &amp; Gotchas to Avoid</h2>
+
+<h3>❌ Anti-Pattern 1: Unbounded In-Memory Entity Graphs</h3>
+<ul>
+<li><strong>The Mistake</strong>: Keeping all historical entity relations in an unbounded local map or dictionary without partition keys or TTLs, leading to Out-Of-Memory (OOM) crashes in production clusters.</li>
+<li><strong>The Fix</strong>: Implement LRU caching layers over persistent graph storage (e.g., Redis or Neo4j) and ensure all ephemeral identifiers expire after 72 hours of inactivity.</li>
+</ul>
+
+<h3>❌ Anti-Pattern 2: Swallowing Resolution Errors with Raw Stack Traces</h3>
+<ul>
+<li><strong>The Mistake</strong>: Catching graph lookup errors and dumping raw unformatted stack traces or ambiguous messages (<code>Error: ENOENT</code>) to human operators or API consumers.</li>
+<li><strong>The Fix</strong>: Return structured errors that state what happened, why, and the exact remediation command.</li>
+</ul>
+  <em> </em>Bad*: <code>Error: graph failure at 0x7fff</code>
+  <em> </em>Good*: <code>Error: Entity record missing for ID 'usr_123' in partition 'us-east-1' — run 'poi-ctl entity rebuild --id usr_123' to re-index.</code>
+
+<h3>❌ Anti-Pattern 3: Blocking Hot Paths with Synchronous Webhooks</h3>
+<ul>
+<li><strong>The Mistake</strong>: Triggering synchronous HTTP webhook calls inside the telemetry ingestion hot loop when an entity triggers a watchlist alert.</li>
+<li><strong>The Fix</strong>: Push alert notifications onto an asynchronous message broker (Kafka, RabbitMQ, or Redis Streams) immediately, returning <code>202 Accepted</code> to the event producer.</li>
+</ul>
+
+<p>---</p>
+
+<h2>5. Performance &amp; Optimization Tips</h2>
+
+<p>1. <strong>Sub-100ms CLI Startup</strong>: Avoid loading heavy ORMs or remote configuration schemas on initialization. Lazy-load database drivers only when executing subcommands that require persistence.</p>
+<p>2. <strong>Deterministic Exit Codes</strong>: Ensure CI/CD pipelines and automated orchestration tools can reliably interpret failures without parsing messy stdout strings. Use code <code>0</code> for success, <code>1</code> for operational failure, and <code>2</code> for configuration/syntax errors.</p>
+<p>3. <strong>Pipe-Aware Output Formatting</strong>: </p>
+<ul>
+<li>When attached to a TTY, render rich tables with colorized status indicators.</li>
+<li>When piped (<code>poi-ctl resolve --id 123 | jq .</code>), automatically suppress ANSI escape codes, spinners, and banner headers to emit clean, machine-parseable JSON.</li>
+</ul>
+<p>4. <strong>Memory Footprint Reduction</strong>: Pre-allocate Go slices and maps where maximum expected load is known (<code>make(map[string]string, 100000)</code>) to minimize GC pause latencies during traffic spikes.</p>
+
+<p>---</p>
+
+<h2>6. Commercial License &amp; Attribution Summary</h2>
+
+<h3>License Grant</h3>
+<p>Copyright © 2024 MicroCorp AI &amp; The Agency Engineering Division. All rights reserved.</p>
+
+<p>Licensed under the <strong>MicroCorp Commercial Developer License (MCDL v1.2)</strong>. </p>
+<ul>
+<li>You are granted a perpetual, worldwide, non-exclusive license to use, modify, and integrate this toolkit into internal systems, proprietary software, and commercial SaaS products.</li>
+<li>Redistribution of this source code or architecture kit as a standalone competing product or template library is strictly prohibited without explicit written consent from MicroCorp AI.</li>
+</ul>
+
+<h3>Warranty &amp; Disclaimer</h3>
+<p>THIS SOFTWARE AND ARCHITECTURE KIT ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+            </div>
+        </div>
+
+        <!-- Tab 4: Directory Map -->
+        <div id="tab_files" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Package Directory & File Contents Map</h2>
+            <p style="color: #64748b; font-size: 14px;">Here is an overview of each file included in your unzipped deliverable:</p>
+            
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Description & Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>START_HERE.html</code></td>
+                        <td><span style="color: #2563eb; font-weight: 600;">Interactive UI</span></td>
+                        <td>The interactive customer onboarding dashboard with 1-click code copier and guides.</td>
+                    </tr>
+                    <tr>
+                        <td><code>main.py</code></td>
+                        <td><span style="color: #16a34a; font-weight: 600;">Python Script</span></td>
+                        <td>The standalone executable source code and verification runner.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_WINDOWS.bat</code></td>
+                        <td><span style="color: #d97706; font-weight: 600;">Batch Launcher</span></td>
+                        <td>1-click launcher for Windows. Double-click to run code and open dashboard.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RUN_MAC_LINUX.sh</code></td>
+                        <td><span style="color: #9333ea; font-weight: 600;">Shell Script</span></td>
+                        <td>1-click launcher for macOS and Linux environments.</td>
+                    </tr>
+                    <tr>
+                        <td><code>requirements.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Dependencies</span></td>
+                        <td>Dependencies file for easy installation via <code>pip install -r requirements.txt</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>QUICKSTART.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Plain Text</span></td>
+                        <td>Quickstart instructions readable in Notepad or any plain text editor.</td>
+                    </tr>
+                    <tr>
+                        <td><code>README.md</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Markdown</span></td>
+                        <td>Complete technical manual, architecture patterns, and setup reference.</td>
+                    </tr>
+                    <tr>
+                        <td><code>INVOICE.txt</code></td>
+                        <td><span style="color: #16a34a; font-weight: 600;">Invoice</span></td>
+                        <td>Official verified commercial invoice with payment settlement details.</td>
+                    </tr>
+                    <tr>
+                        <td><code>LICENSE.txt</code></td>
+                        <td><span style="color: #2563eb; font-weight: 600;">License</span></td>
+                        <td>Full commercial ownership transfer certificate.</td>
+                    </tr>
+                    <tr>
+                        <td><code>TERMS_AND_CONDITIONS.txt</code></td>
+                        <td><span style="color: #475569; font-weight: 600;">Legal Terms</span></td>
+                        <td>MicroCorp AI corporate terms and ethical governance charter.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 5: License & Invoice -->
+        <div id="tab_license" class="tab-content">
+            <h2 style="color: #0f172a; margin-top: 0;">Commercial Rights & Verification Invoice</h2>
+            
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+                <span style="background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Ownership Verified</span>
+                <h3 style="color: #166534; margin: 8px 0 4px 0;">Commercial Distribution & Modification Rights Granted</h3>
+                <p style="color: #15803d; font-size: 13px; margin: 0 0 16px 0;">You possess 100% royalty-free commercial rights to use, modify, embed, deploy, and distribute this software in personal or commercial projects.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px; color: #1e293b;">
+                    <div><strong>Agreed Price:</strong> ₹399 (~$4.99 USD)</div>
+                    <div><strong>Official Beneficiary:</strong> Alpesh Thakor</div>
+                    <div><strong>Payee UPI ID:</strong> <code>talpesh100@ybl</code></div>
+                    <div><strong>Asset ID:</strong> <code>20261108_173255_developer_toolkit__person_of_interest_-</code></div>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 style="margin: 0 0 8px 0; color: #0f172a;">Customer Support & Inquiries</h3>
+                <p style="color: #475569; font-size: 13px; margin: 0;">For customization inquiries, enterprise integrations, or support, contact the host developer at <strong>Alpesh Thakor</strong> via UPI reference at <code>talpesh100@ybl</code>.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <span>Asset: <strong>Developer Toolkit: Person of Interest - Developer Reference & Architecture Kit</strong></span>
+            <span>MicroCorp AI Autonomous Venture • Payout UPI: <strong>talpesh100@ybl</strong></span>
+        </div>
+    </div>
+
+    <div id="toast">Copied to clipboard!</div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+            var targetContent = document.getElementById('tab_' + tabId);
+            if (targetContent) targetContent.classList.add('active');
+            var btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(function(b) {
+                var oc = b.getAttribute('onclick') || '';
+                if (oc.indexOf(tabId) !== -1) b.classList.add('active');
+            });
+        }
+
+        function copyCode() {
+            var code = document.getElementById('codeBlock').innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                showToast('Source code copied to clipboard!');
+            });
+        }
+
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt).then(function() {
+                showToast('Command copied to clipboard!');
+            });
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(function() { t.style.display = 'none'; }, 2500);
+        }
+    </script>
+</body>
+</html>
