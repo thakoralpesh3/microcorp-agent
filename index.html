@@ -71,6 +71,12 @@
             color: #fff; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
             border: 1px solid rgba(251, 191, 36, 0.5); font-weight: 700;
         }
+                .badge-hire {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            border: 1px solid rgba(167, 139, 250, 0.4); font-weight: 700;
+        }
+        .badge-hire:hover { background: linear-gradient(135deg, #6366f1, #9333ea); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6); }
         .badge-coffee:hover { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6); }
         .badge-email {
             background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4);
@@ -368,6 +374,12 @@
                     <div class="term-line term-dim">──────────────────────────────────────────────────────────────────────────</div>
                     <div class="term-line term-yellow">⚡ [Autonomous Heartbeat] Mining trending tech architectures and remote developer contracts...</div>
                 </div>
+                <!-- Interactive Terminal CLI Command Prompt -->
+                <div class="terminal-cli" style="display: flex; gap: 8px; margin-top: 10px; align-items: center; background: #020617; border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 6px 12px;">
+                    <span style="color: #38bdf8; font-family: monospace; font-size: 13px; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-angle-right"></i> microcorp:~$</span>
+                    <input type="text" id="terminalCliInput" placeholder="Type command (try 'help', 'status', 'coffee', 'sprint', 'hire', 'products', 'clear')..." style="background: transparent; border: none; outline: none; color: #f8fafc; font-family: monospace; font-size: 13px; flex: 1; min-width: 140px;" onkeydown="handleCliKeyDown(event)">
+                    <button class="btn" style="padding: 5px 12px; font-size: 12px;" onclick="executeCliCommand()"><i class="fa-solid fa-play"></i> Run</button>
+                </div>
             </div>
 
             <!-- Right: The Agency Personas Explorer -->
@@ -388,6 +400,9 @@
                     <button class="tab-btn" onclick="filterDivision('specialized')">Specialized (59)</button>
                 </div>
 
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="personaSearchInput" placeholder="🔍 Search 268+ agents by role or tech stack..." style="width: 100%; background: #020617; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 7px 12px; color: #f8fafc; font-size: 12px; outline: none;" oninput="filterPersonasBySearch()">
+                </div>
                 <div class="item-list" id="personaList">
                     <!-- Populated dynamically -->
                 </div>
@@ -564,6 +579,64 @@
                 <small style="color: var(--text-muted); font-size: 11px; display: block; line-height: 1.5;">
                     Need urgent manual confirmation? Send your screenshot to <a href="mailto:thakoralpesh3@proton.me" style="color: #60a5fa;">thakoralpesh3@proton.me</a>.
                 </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🚀 HIRE AN AGENCY AGENT / CUSTOM ORDER MODAL -->
+    <div class="modal" id="hireModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div class="modal-content" style="max-width: 620px; width: 100%; max-height: 90vh; overflow-y: auto;">
+            <button class="modal-close" onclick="closeHireModal()">&times;</button>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                <div style="background: rgba(139, 92, 246, 0.2); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #c084fc;">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #fff;">Hire an Agency Subagent</h3>
+                    <div style="font-size: 13px; color: var(--text-muted);">Custom Autonomous Development & Solution Packaging by Alpesh Thakor</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 12px; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 4px;">Select Agency Division & Specialty</label>
+                    <select id="hireSpecialty" style="width: 100%; background: #020617; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; padding: 9px 12px; color: #f8fafc; font-size: 13px;" onchange="updateHireEstimate()">
+                        <option value="engineering" data-inr="4238" data-usd="49">🛠️ Full-Stack Web & API Architect ($49 / ~₹4,238)</option>
+                        <option value="security" data-inr="6833" data-usd="79">🛡️ Cybersecurity & Smart Contract Auditor ($79 / ~₹6,833)</option>
+                        <option value="ai" data-inr="7698" data-usd="89">🤖 Autonomous AI Agent & LLM Engineer ($89 / ~₹7,698)</option>
+                        <option value="automation" data-inr="3373" data-usd="39">⚡ Data Scraping & Workflow Automation ($39 / ~₹3,373)</option>
+                        <option value="devops" data-inr="5103" data-usd="59">🚀 Cloud Infrastructure, Docker & CI/CD ($59 / ~₹5,103)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 12px; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 4px;">Project / Task Title</label>
+                    <input type="text" id="hireTitle" placeholder="e.g. Build Telegram Bot with Webhooks & SQLite" style="width: 100%; background: #020617; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; padding: 9px 12px; color: #f8fafc; font-size: 13px;">
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 12px; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 4px;">Requirements & Specifications</label>
+                    <textarea id="hireScope" rows="3" placeholder="Describe the feature, stack, or deliverable you need..." style="width: 100%; background: #020617; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; padding: 9px 12px; color: #f8fafc; font-size: 13px; font-family: sans-serif; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); padding: 12px 16px; border-radius: 8px;">
+                    <div>
+                        <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px;">Estimated Settlement</span>
+                        <div style="font-size: 20px; font-weight: 800; color: #34d399;" id="hireEstimatedInr">₹4,238 INR</div>
+                        <span style="font-size: 12px; color: #94a3b8;" id="hireEstimatedUsd">~$49 USD</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px;">Direct UPI Payee</span>
+                        <div style="font-size: 14px; font-weight: 700; color: #38bdf8;">talpesh100@ybl</div>
+                        <span style="font-size: 12px; color: #94a3b8;">(Alpesh Thakor)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeHireModal()">Cancel</button>
+                <button class="btn btn-coffee" onclick="submitHireProposal()"><i class="fa-solid fa-qrcode"></i> Audit & Proceed to UPI Settlement</button>
             </div>
         </div>
     </div>
@@ -1441,6 +1514,10 @@
             const upiUri = `upi://pay?pa=talpesh100@ybl&pn=Alpesh%20Thakor&am=${item.inr}&cu=INR&tn=${encodeURIComponent(item.name.substring(0, 30))}`;
             document.getElementById("modalQrImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
             document.getElementById("modalUpiLink").href = upiUri;
+            if (document.getElementById("gpayLink")) document.getElementById("gpayLink").href = upiUri;
+            if (document.getElementById("phonepeLink")) document.getElementById("phonepeLink").href = upiUri;
+            if (document.getElementById("paytmLink")) document.getElementById("paytmLink").href = upiUri;
+            if (document.getElementById("bhimLink")) document.getElementById("bhimLink").href = upiUri;
 
             switchModalTab('upi');
             document.getElementById("paymentModal").style.display = "flex";

@@ -19,13 +19,18 @@ class GitSyncEngine:
         self.repo_dir = repo_dir
         self.remote_name = "origin"
         self.default_branch = "main"
+        self._cached_status: Optional[Dict[str, Any]] = None
+        self._cached_status_time: float = 0.0
 
     def _clean_stale_locks(self):
         lock = self.repo_dir / ".git/index.lock"
         if lock.exists():
             try:
                 import time
-                if time.time() - lock.stat().st_mtime > 5:
+                res = subprocess.run(["pgrep", "-f", "git.real"], stdout=subprocess.PIPE, text=True)
+                if not res.stdout.strip():
+                    lock.unlink(missing_ok=True)
+                elif time.time() - lock.stat().st_mtime > 180:
                     lock.unlink(missing_ok=True)
             except Exception:
                 pass
@@ -37,16 +42,19 @@ class GitSyncEngine:
         env["GIT_TERMINAL_PROMPT"] = "0"
         env["GIT_EDITOR"] = "true"
         env["GIT_SEQUENCE_EDITOR"] = "true"
-        return subprocess.run(
-            ["git"] + args,
-            cwd=str(self.repo_dir),
-            stdin=subprocess.DEVNULL,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            env=env,
-            check=False
-        )
+        try:
+            return subprocess.run(
+                ["git"] + args,
+                cwd=str(self.repo_dir),
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                env=env,
+                check=False
+            )
+        except subprocess.TimeoutExpired:
+            return subprocess.CompletedProcess(args, 124, stdout="", stderr="git command timed out")
 
     def is_git_repo(self) -> bool:
         """Returns True if the directory is a valid git repository."""
@@ -80,10 +88,16 @@ class GitSyncEngine:
                 }
         return {"hash": "none", "subject": "No commits", "author": "", "date": ""}
 
-    def get_sync_status(self) -> Dict[str, Any]:
+    def get_sync_status(self, force: bool = False) -> Dict[str, Any]:
         """
         Gathers comprehensive sync status between local workspace and GitHub.
+        Caches results with 30s TTL to prevent disk I/O thrashing on NTFS.
         """
+        import time
+        now = time.time()
+        if not force and self._cached_status and (now - self._cached_status_time < 30):
+            return self._cached_status
+
         if not self.is_git_repo():
             return {
                 "is_git_repo": False,
@@ -94,8 +108,8 @@ class GitSyncEngine:
         branch = self.get_current_branch()
         last_commit = self.get_last_commit()
 
-        # Check working tree status
-        status_res = self._run_git(["status", "--porcelain"])
+        # Check working tree status with -uno for fast response on NTFS
+        status_res = self._run_git(["status", "--porcelain", "-uno"])
         changed_files = [line.strip() for line in status_res.stdout.splitlines() if line.strip()]
         is_clean = len(changed_files) == 0
 
@@ -112,7 +126,7 @@ class GitSyncEngine:
         except Exception:
             pass
 
-        return {
+        res = {
             "is_git_repo": True,
             "branch": branch,
             "remote_url": remote_url,
@@ -124,6 +138,9 @@ class GitSyncEngine:
             "last_commit": last_commit,
             "last_checked": datetime.now().isoformat()
         }
+        self._cached_status = res
+        self._cached_status_time = now
+        return res
 
     def sync_to_github(self, commit_message: Optional[str] = None) -> Dict[str, Any]:
         """

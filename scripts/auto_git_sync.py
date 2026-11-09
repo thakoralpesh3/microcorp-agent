@@ -3,7 +3,7 @@
 MicroCorp AI — Autonomous Antigravity GitHub Sync Daemon
 Monitors the repository for any code or asset modifications made by Antigravity
 or autonomous departmental subagents and automatically stages, commits, and pushes
-them to GitHub origin main.
+them to GitHub origin main with adaptive polling and NTFS disk efficiency.
 """
 
 import os
@@ -26,39 +26,53 @@ def get_git_env() -> dict:
     return env
 
 def clean_stale_locks():
-    lock = REPO_ROOT / ".git/index.lock"
-    if lock.exists():
-        try:
-            if time.time() - lock.stat().st_mtime > 5:
-                lock.unlink(missing_ok=True)
-        except Exception:
-            pass
+    """Removes stale git lock files only if no active git process exists."""
+    locks = [
+        REPO_ROOT / ".git/index.lock",
+        REPO_ROOT / ".git/HEAD.lock",
+        REPO_ROOT / ".git/refs/heads/main.lock"
+    ]
+    for lock in locks:
+        if lock.exists():
+            try:
+                # Check if any git process is actually running
+                res = subprocess.run(["pgrep", "-f", "git.real"], stdout=subprocess.PIPE, text=True)
+                if not res.stdout.strip():
+                    lock.unlink(missing_ok=True)
+                elif time.time() - lock.stat().st_mtime > 180:
+                    lock.unlink(missing_ok=True)
+            except Exception:
+                pass
 
-def run_git(args: list[str]) -> tuple[int, str]:
+def run_git(args: list[str], timeout: int = 300) -> tuple[int, str]:
     clean_stale_locks()
     git_bin = shutil.which("git") or str(Path.home() / ".local/bin/git")
-    res = subprocess.run(
-        [git_bin] + args,
-        cwd=str(REPO_ROOT),
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        env=get_git_env()
-    )
-    return res.returncode, (res.stdout + res.stderr).strip()
+    try:
+        res = subprocess.run(
+            [git_bin] + args,
+            cwd=str(REPO_ROOT),
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=timeout,
+            env=get_git_env()
+        )
+        return res.returncode, (res.stdout + res.stderr).strip()
+    except subprocess.TimeoutExpired:
+        return 124, "git command timed out"
 
 def sync_now(custom_msg: str = None) -> bool:
-    """Stages all changes, commits, and pushes to GitHub."""
-    code, status = run_git(["status", "--porcelain"])
+    """Stages changes, commits, and pushes to GitHub with path targeting."""
+    code, status = run_git(["status", "--porcelain", "-uno"])
     if not status:
         return True
 
     print(f"[{time.strftime('%X')}] 📦 Local file changes detected by Antigravity Watchdog...")
-    add_code, add_out = run_git(["add", "-A"])
-    if add_code != 0:
-        print(f"[{time.strftime('%X')}] ⚠️ git add failed: {add_out}")
-        return False
+    # Add tracked changes quickly without deep untracked disk scan
+    add_code, add_out = run_git(["add", "-u"], timeout=120)
+    # Stage newly created deliverables or docs specifically
+    run_git(["add", "docs/", "deliverables/", "index.html", "scripts/"], timeout=120)
 
     # Skip commit if nothing is staged
     diff_code, _ = run_git(["diff", "--cached", "--quiet"])
@@ -95,32 +109,39 @@ def sync_now(custom_msg: str = None) -> bool:
         print(f"[{time.strftime('%X')}] ❌ Push failed: {out}")
         return False
 
-def run_polling_sync(interval_sec: int = 15):
-    """Continuous polling loop watching for Antigravity edits."""
-    print(f"🔍 Starting MicroCorp Antigravity Auto-Sync Watcher (polling every {interval_sec}s)...")
-    dirty_counter = 0
+def run_polling_sync():
+    """Adaptive polling loop watching for Antigravity edits with low NTFS I/O footprint."""
+    print("🔍 Starting MicroCorp Antigravity Auto-Sync Watcher (adaptive polling)...")
+    clean_cycles = 0
 
     while True:
         try:
-            code, status = run_git(["status", "--porcelain"])
+            # Quick check with -uno to avoid full NTFS untracked file walking
+            code, status = run_git(["status", "--porcelain", "-uno"])
             is_dirty = bool(status.strip())
 
-            if is_dirty:
-                dirty_counter += 1
-                # Wait 2 consecutive checks (debounce ~30s) to allow Antigravity to finish writing
-                if dirty_counter >= 2:
-                    sync_now()
-                    dirty_counter = 0
-            else:
-                dirty_counter = 0
+            # If tracked files didn't show changes, do a check including untracked once every 3 cycles
+            if not is_dirty and (clean_cycles % 3 == 0):
+                code, status_all = run_git(["status", "--porcelain"])
+                is_dirty = bool(status_all.strip())
 
-            time.sleep(interval_sec)
+            if is_dirty:
+                clean_cycles = 0
+                time.sleep(10)  # Debounce to let multi-file Antigravity writes complete
+                sync_now()
+                sleep_sec = 20
+            else:
+                clean_cycles += 1
+                # Adaptive backoff when repository is clean: 25s -> 45s -> max 60s
+                sleep_sec = 60 if clean_cycles > 5 else (40 if clean_cycles > 2 else 25)
+
+            time.sleep(sleep_sec)
         except KeyboardInterrupt:
             print("\nStopped Auto-Sync Watcher.")
             break
         except Exception as e:
             print(f"Auto-Sync exception: {e}")
-            time.sleep(interval_sec)
+            time.sleep(30)
 
 if __name__ == "__main__":
     if "--now" in sys.argv:
@@ -128,4 +149,4 @@ if __name__ == "__main__":
         success = sync_now(msg)
         sys.exit(0 if success else 1)
     else:
-        run_polling_sync(30)
+        run_polling_sync()

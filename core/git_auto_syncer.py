@@ -1,10 +1,11 @@
 """
 MicroCorp AI - Continuous Antigravity & Enterprise Git Auto-Syncer
-Runs as a background daemon thread to continuously detect local file changes
-(created by Antigravity, departmental subagents, or code edits) and automatically
-stages, commits, and pushes them to GitHub.
+Runs as a background daemon thread to detect local file changes and sync to GitHub.
+If the dedicated microcorp-sync systemd service (auto_git_sync.py) is active,
+it delegates routine polling to avoid duplicate git index locking.
 """
 
+import os
 import time
 import threading
 import logging
@@ -22,6 +23,23 @@ class GitAutoSyncer:
         self._lock = threading.Lock()
         self.last_sync_time: Optional[str] = None
         self.last_sync_result: Optional[Dict[str, Any]] = None
+
+    def _is_external_syncer_running(self) -> bool:
+        """Checks if auto_git_sync.py is already active as a daemon."""
+        try:
+            import psutil
+            cur_pid = os.getpid()
+            for p in psutil.process_iter(['pid', 'name', 'cmdline']):
+                try:
+                    if p.info['pid'] != cur_pid and p.info['cmdline']:
+                        cmd_str = " ".join(p.info['cmdline'])
+                        if "auto_git_sync.py" in cmd_str:
+                            return True
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+        except Exception:
+            pass
+        return False
 
     def start(self):
         """Starts the background auto-sync thread."""
@@ -65,7 +83,11 @@ class GitAutoSyncer:
         time.sleep(10)  # Initial grace period upon startup
         while self.is_running:
             try:
-                self.trigger_sync(reason="antigravity auto-sync cycle")
+                # If the external dedicated systemd sync daemon is active, avoid conflicting git operations
+                if self._is_external_syncer_running():
+                    logger.debug("External auto_git_sync daemon active; routine sync delegated.")
+                else:
+                    self.trigger_sync(reason="antigravity auto-sync cycle")
             except Exception as e:
                 logger.debug(f"Auto-sync loop exception: {e}")
             time.sleep(self.interval)

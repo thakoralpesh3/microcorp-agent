@@ -107,12 +107,19 @@ async def get_compliance_endpoint():
 
 @app.post("/api/customer/order")
 async def submit_customer_order(req: CustomerOrderRequest):
+    # Sanitize user inputs against XSS and control characters
+    import html
+    sanitized_title = html.escape(re.sub(r'[\x00-\x1f\x7f]', '', req.project_title).strip())[:200]
+    sanitized_requirements = html.escape(re.sub(r'[\x00-\x1f\x7f]', '', req.project_requirements).strip())[:8000]
+    sanitized_name = html.escape(re.sub(r'[\x00-\x1f\x7f]', '', req.customer_name or "Client").strip())[:100]
+    sanitized_email = html.escape(re.sub(r'[\x00-\x1f\x7f]', '', req.customer_email or "").strip())[:120]
+
     from core.legal_guardian import legal_guardian
     audit = legal_guardian.audit_customer_order(
-        project_title=req.project_title,
-        requirements=req.project_requirements,
-        client_name=req.customer_name,
-        client_email=req.customer_email
+        project_title=sanitized_title,
+        requirements=sanitized_requirements,
+        client_name=sanitized_name,
+        client_email=sanitized_email
     )
 
     if not audit.get("is_legal", True):
@@ -598,16 +605,30 @@ async def verify_payment_endpoint(req: UTRVerificationRequest):
         raise HTTPException(status_code=400, detail=res.get("error"))
     return {
         **res,
-        "download_url": f"/download_purchased/{req.asset_id}"
+        "download_url": f"/download_purchased/{req.asset_id}?order_id={req.order_id}"
     }
 
 @app.get("/download_purchased/{asset_id}")
-async def download_purchased_asset(asset_id: str):
-    # Find zip file matching asset_id
-    matches = list(DELIVERABLES_DIR.glob(f"**/*{asset_id}*.zip"))
+async def download_purchased_asset(asset_id: str, order_id: Optional[str] = None):
+    # Strict path sanitization against directory traversal
+    clean_id = re.sub(r'[^a-zA-Z0-9_\-]', '', asset_id)
+    if not clean_id or clean_id != asset_id:
+        raise HTTPException(status_code=400, detail="Invalid asset identifier format.")
+
+    # Find zip file matching sanitized asset_id
+    matches = list(DELIVERABLES_DIR.glob(f"**/*{clean_id}*.zip"))
     if not matches:
         raise HTTPException(status_code=404, detail="Purchased asset archive not found.")
     target_zip = matches[0]
+
+    # Enforce safe filesystem boundary containment
+    try:
+        if not target_zip.resolve().is_relative_to(DELIVERABLES_DIR.resolve()):
+            raise HTTPException(status_code=403, detail="Access denied: path boundary violation.")
+    except AttributeError:
+        if not str(target_zip.resolve()).startswith(str(DELIVERABLES_DIR.resolve())):
+            raise HTTPException(status_code=403, detail="Access denied: path boundary violation.")
+
     return FileResponse(path=str(target_zip), media_type="application/zip", filename=target_zip.name)
 
 @app.get("/api/gateway/public_url")
