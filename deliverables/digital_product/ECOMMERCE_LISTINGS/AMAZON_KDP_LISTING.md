@@ -26,10 +26,10 @@
 ---
 
 ## 3. Royalty & Pricing Strategy
-- **Digital Kindle Price (USD):** $4.99 USD (70% Royalty Tier = ~$3.49 per sale)
-- **Digital Kindle Price (INR):** ₹399.00 INR
-- **Paperback MRP (INR):** ₹549.00 INR
-- **Paperback MRP (USD):** $9.99 USD
+- **Digital Kindle Price (USD):** $250.00 USD (70% Royalty Tier = ~$175.00 per sale)
+- **Digital Kindle Price (INR):** ₹21500.00 INR
+- **Paperback MRP (INR):** ₹21650.00 INR
+- **Paperback MRP (USD):** $255.00 USD
 - **KDP Select Enrollment:** Recommended (Earn royalties per page read on Kindle Unlimited)
 
 ---

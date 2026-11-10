@@ -18,12 +18,12 @@
 ---
 
 ## 2. Pricing & Margin Strategy
-- **MRP:** ₹699.00 INR
-- **Selling Price:** ₹399.00 INR
-- **Flipkart / Meesho Referral Fee:** ~12-15% (₹60 INR)
+- **MRP:** ₹32250.00 INR
+- **Selling Price:** ₹21500.00 INR
+- **Flipkart / Meesho Referral Fee:** ~12-15% (₹3225 INR)
 - **Courier Shipping (National):** ~₹45 - ₹60 INR (Meesho offers free zero-commission shipping)
 - **Print Cost (Local Print Shop A5 Spiral 24-page):** ~₹35 - ₹45 INR
-- **Estimated Net Profit per Order:** ~₹279 INR
+- **Estimated Net Profit per Order:** ~₹15050 INR
 
 ---
 
